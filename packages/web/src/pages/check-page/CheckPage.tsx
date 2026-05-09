@@ -14,14 +14,6 @@ import { push as pushRoute } from 'utils/navigation'
 
 import './CheckPage.module.css'
 
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void
-    }
-  }
-}
-
 const { SIGN_IN_PAGE, SETTINGS_PAGE } = route
 
 const CheckPage = () => {
@@ -56,63 +48,24 @@ const CheckPage = () => {
     fetchSessionToken()
   }, [])
 
-  const isInWebView = useRef(
-    typeof window !== 'undefined' && window.ReactNativeWebView !== undefined
-  )
-
-  const sendMessageToWebView = useCallback((type: 'success' | 'error') => {
-    if (isInWebView.current && window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(JSON.stringify({ type }))
-    }
-  }, [])
-
   const onComplete = useCallback(() => {
     wasSuccessful.current = true
-    if (isInWebView.current) {
-      // In WebView, send message instead of navigating
-      setTimeout(() => {
-        sendMessageToWebView('success')
-      }, 500)
-    } else {
-      // In web, navigate normally
-      setTimeout(() => {
-        navigate(`${SETTINGS_PAGE}?verification=success`)
-      }, 500)
-    }
-  }, [navigate, sendMessageToWebView])
+    setTimeout(() => {
+      navigate(`${SETTINGS_PAGE}?verification=success`)
+    }, 500)
+  }, [navigate])
 
   const onCancel = useCallback(() => {
-    if (isInWebView.current) {
-      // In WebView, send message instead of navigating
-      if (wasSuccessful.current) {
-        sendMessageToWebView('success')
-      } else {
-        // User cancelled without completing - just close
-        if (window.ReactNativeWebView) {
-          window.ReactNativeWebView.postMessage(
-            JSON.stringify({ type: 'close' })
-          )
-        }
-      }
+    if (wasSuccessful.current) {
+      navigate(`${SETTINGS_PAGE}?verification=success`)
     } else {
-      // In web, navigate normally
-      if (wasSuccessful.current) {
-        navigate(`${SETTINGS_PAGE}?verification=success`)
-      } else {
-        navigate(SETTINGS_PAGE)
-      }
+      navigate(SETTINGS_PAGE)
     }
-  }, [navigate, sendMessageToWebView])
+  }, [navigate])
 
   const onError = useCallback(() => {
-    if (isInWebView.current) {
-      // In WebView, send message instead of navigating
-      sendMessageToWebView('error')
-    } else {
-      // In web, navigate normally
-      navigate(`${SETTINGS_PAGE}?verification=error`)
-    }
-  }, [navigate, sendMessageToWebView])
+    navigate(`${SETTINGS_PAGE}?verification=error`)
+  }, [navigate])
 
   useEffect(() => {
     if (sessionToken) {

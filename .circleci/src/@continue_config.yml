@@ -46,9 +46,6 @@ parameters:
   run-web-workflow:
     type: boolean
     default: false
-  run-mobile-workflow:
-    type: boolean
-    default: false
   run-embed-workflow:
     type: boolean
     default: false
@@ -56,8 +53,5 @@ parameters:
     type: boolean
     default: false
   run-create-audius-app-workflow:
-    type: boolean
-    default: false
-  run-mobile-prod-build-workflow:
     type: boolean
     default: false

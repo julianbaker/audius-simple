@@ -6,8 +6,7 @@ let sdkInstance: AudiusSdk | null = null
 /**
  * Get or create the singleton SDK instance.
  *
- * Uses default production discovery/identity endpoints. Same pattern as the
- * mobile trending example (packages/mobile/examples/trending).
+ * Uses default production discovery/identity endpoints.
  */
 export function getSDK(): AudiusSdk {
   if (!sdkInstance) {

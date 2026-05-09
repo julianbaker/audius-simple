@@ -1,1 +1,0 @@
-export { ContestsScreen } from './ContestsScreen'

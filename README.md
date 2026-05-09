@@ -9,7 +9,7 @@
 
 <br/>
 
-[![web](https://img.shields.io/github/actions/workflow/status/AudiusProject/apps/web.yml?label=web&style=for-the-badge)](https://github.com/AudiusProject/apps/actions/workflows/web.yml) [![mobile](https://img.shields.io/github/actions/workflow/status/AudiusProject/apps/mobile.yml?label=mobile&style=for-the-badge)](https://github.com/AudiusProject/apps/actions/workflows/mobile.yml) [![sdk](https://img.shields.io/github/actions/workflow/status/AudiusProject/apps/sdk.yml?label=sdk&style=for-the-badge)](https://github.com/AudiusProject/apps/actions/workflows/sdk.yml)</br>
+[![web](https://img.shields.io/github/actions/workflow/status/AudiusProject/apps/web.yml?label=web&style=for-the-badge)](https://github.com/AudiusProject/apps/actions/workflows/web.yml) [![sdk](https://img.shields.io/github/actions/workflow/status/AudiusProject/apps/sdk.yml?label=sdk&style=for-the-badge)](https://github.com/AudiusProject/apps/actions/workflows/sdk.yml)</br>
 [![npm @audius/sdk](https://img.shields.io/npm/v/@audius/sdk?label=%40audius%2Fsdk&style=for-the-badge)](https://www.npmjs.com/package/@audius/sdk) [![npm @audius/harmony](https://img.shields.io/npm/v/@audius/harmony?label=%40audius%2Fharmony&style=for-the-badge)](https://www.npmjs.com/package/@audius/harmony) [![npm @audius/spl](https://img.shields.io/npm/v/@audius/spl?label=%40audius%2Fspl&style=for-the-badge)](https://www.npmjs.com/package/@audius/spl) [![npm @audius/eth](https://img.shields.io/npm/v/@audius/eth?label=%40audius%2Feth&style=for-the-badge)](https://www.npmjs.com/package/@audius/eth)
 
 Audius is the community-run music platform and developer gateway to the internet's largest open music catalog, the [Open Audio Protocol](https://openaudio.org).
@@ -19,11 +19,10 @@ Audius is the community-run music platform and developer gateway to the internet
 | Name                                                      | Description                                            |
 | --------------------------------------------------------- | ------------------------------------------------------ |
 | [`web`](./packages/web)                                   | Web and desktop app                                    |
-| [`mobile`](./packages/mobile)                             | iOS and Android app                                    |
 | [`embed`](./packages/embed)                               | Embed player for third-party sites (X, Discord, etc.)  |
 | [`sdk`](./packages/sdk)                                   | `@audius/sdk` — TypeScript SDK for the Audius protocol |
 | [`harmony`](./packages/harmony)                           | Audius design system                                   |
-| [`common`](./packages/common)                             | Shared state, models, and utilities for web and mobile |
+| [`common`](./packages/common)                             | Shared state, models, and utilities                    |
 | [`spl`](./packages/spl)                                   | Solana program instructions for Audius                 |
 | [`eth`](./packages/eth)                                   | Ethereum governance and staking contract interactions  |
 | [`fixed-decimal`](./packages/fixed-decimal)               | Fixed-point decimal math utilities                     |
@@ -41,7 +40,7 @@ npm install
 This will do the following:
 
 - Install the correct versions of node, ruby, and python
-- Install dependencies (npm packages, gems, pods, etc.)
+- Install dependencies
 - Set up command line tools for interacting with the protocol ([dev-tools/README.md](./dev-tools/README.md))
 - Initialize git hooks
 

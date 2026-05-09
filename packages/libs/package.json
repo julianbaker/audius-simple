@@ -22,7 +22,6 @@
     "./dist/index.cjs.js": "./dist/index.browser.cjs.js",
     "./dist/index.esm.js": "./dist/index.browser.esm.js"
   },
-  "react-native": "./dist/index.native.js",
   "scripts": {
     "test": "npm run test:unit && npm run test:sdk",
     "test:libs": "./scripts/test.sh",
@@ -31,9 +30,7 @@
     "test:integration": "ts-mocha tests/index.js",
     "setup": "./scripts/migrate_contracts.sh",
     "build": "rm -rf ./dist && rollup -c --configPlugin typescript",
-    "build:legacy:native": "rm -rf ./dist && rollup -c rollup.legacy.native.config.ts --configPlugin typescript",
     "start": "rollup -c -w --configPlugin typescript",
-    "start:legacy:native": "rollup -c rollup.legacy.native.config.ts -w --configPlugin typescript",
     "lint": "eslint ./src ./types",
     "lint:fix": "npm run lint -- --fix",
     "typecheck": "tsc --noEmit",

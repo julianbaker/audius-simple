@@ -25,7 +25,6 @@ On the same page, register the **redirect URI(s)** your app will use. Audius val
 URI in every authorization request against this list.
 
 - **Web popup / full-page redirect**: register your callback page URL (e.g. `https://yourapp.com/callback`)
-- **Mobile (React Native)**: register a custom URL scheme (e.g. `myapp://oauth/callback`)
 - **Local development**: register `http://localhost:PORT` (or the specific path you use)
 
 ## 3. Initialize the SDK
@@ -38,15 +37,6 @@ const audiusSdk = sdk({
   apiKey: 'YOUR_API_KEY',
   redirectUri: 'https://yourapp.com/callback',
 })
-```
-
-On **React Native / Expo** (requires React Native 0.71+ / Expo SDK 48+), import from `@audius/sdk`
-as normal — the native entry point is resolved automatically and configures `AsyncStorage`-backed
-token persistence and `expo-web-browser` for the OAuth browser session out of the box. Make sure
-both peer dependencies are installed:
-
-```sh
-npx expo install expo-web-browser @react-native-async-storage/async-storage
 ```
 
 ## 4. Log the User In
@@ -89,13 +79,6 @@ await audiusSdk.oauth.handleRedirect()
 
 :::tip
 
-On **mobile**, `handleRedirect()` is called automatically inside `login()` — your app does not
-need to call it at all.
-
-:::
-
-:::tip
-
 For the **popup flow**, the popup window must load your callback page before `handleRedirect()` can
 run. If your app has a large JavaScript bundle, users will see a spinner in the popup while it
 loads. To avoid this, use a dedicated lightweight callback page at your `redirectUri` that only
@@ -118,9 +101,7 @@ if (await audiusSdk.oauth.isAuthenticated()) {
 
 See the
 [web upload example](https://github.com/AudiusProject/audius-protocol/tree/main/packages/web/examples/upload)
-and the
-[React Native upload example](https://github.com/AudiusProject/audius-protocol/tree/main/packages/mobile/examples/upload)
-for complete, runnable apps that sign in with OAuth and upload a track — no backend required.
+for a complete, runnable app that signs in with OAuth and uploads a track — no backend required.
 
 ## Example Use Cases
 

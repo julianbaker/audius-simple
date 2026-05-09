@@ -19,15 +19,6 @@ import { LeftNav } from './desktop/LeftNav'
 import { NavSidebarContext } from './desktop/NavSidebarContext'
 import ConnectedNavBar from './mobile/ConnectedNavBar'
 
-// Extend Window interface for React Native WebView
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void
-    }
-  }
-}
-
 interface OwnProps {
   className?: string
 }
@@ -143,9 +134,7 @@ const Navigator = ({ className }: OwnProps) => {
     }
   }, [isDragging, setIsCollapsed])
 
-  const isInWebView =
-    typeof window !== 'undefined' && window.ReactNativeWebView !== undefined
-  if (isInWebView || hideMobileNav) return null
+  if (hideMobileNav) return null
 
   return (
     <NavSidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>

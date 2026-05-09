@@ -499,8 +499,8 @@ export class FixedDecimal<BigIntBrand extends bigint = bigint> {
       maximumFractionDigits: 0
     })
 
-    // Annoyingly, React Native doesn't respect minimumFractionDigits for
-    // bigint formatting. Instead, get the decimalSeparator from a Number.
+    // Some runtimes do not respect minimumFractionDigits for bigint formatting.
+    // Instead, get the decimalSeparator from a Number.
     const decimalSeparator = Number(0).toLocaleString(locale, {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1

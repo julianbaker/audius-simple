@@ -1,8 +1,5 @@
 // This is copied from isMobile from web/src/utils since moving it to common would require
-// changing 90+ files. This will be ignored in RN-reloaded, since we check
-// isNativeMobile from storeContext first.
-
-/** This check CANNOT be used in the mobile app (React Native). It should only be run once we already know that we are NOT on the native mobile app. */
+// changing 90+ files.
 // Respect the User-Agent so "Request Desktop Site" works: when a mobile
 // browser flips its UA to desktop, we serve the desktop app. Avoid
 // platform/touchPoints heuristics that would override that explicit choice.

@@ -4,8 +4,6 @@ import { getSDK } from '../sdk'
 /**
  * Fetches trending tracks from Audius using the SDK.
  * Uses React Query for caching and request state.
- *
- * Mirrors packages/mobile/examples/trending/src/hooks/useTrendingTracks.ts
  */
 export function useTrendingTracks() {
   const audiusSdk = getSDK()

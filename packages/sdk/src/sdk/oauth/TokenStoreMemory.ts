@@ -7,7 +7,6 @@ import type { OAuthTokenStore } from './tokenStore'
  * do not need tokens to survive session restarts. For persistence, use one of:
  *
  * - `TokenStoreLocalStorage` — browser apps; survives page reloads
- * - `TokenStoreAsyncStorage` — React Native apps; survives app restarts
  */
 export class TokenStoreMemory implements OAuthTokenStore {
   private _accessToken: string | null = null

@@ -10,8 +10,7 @@ import { isMobileWeb } from 'common/utils/isMobileWeb'
 const { getIsReachable } = reachabilitySelectors
 const { setUnreachable, setReachable } = reachabilityActions
 
-// Property values borrowed from
-// https://github.com/react-native-community/react-native-netinfo
+// Property values match common reachability timeout defaults.
 export const REACHABILITY_LONG_TIMEOUT = 10 * 1000 // 10s
 const REACHABILITY_SHORT_TIMEOUT = 5 * 1000 // 5s
 const REACHABILITY_REQUEST_TIMEOUT = 15 * 1000 // 15s

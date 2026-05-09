@@ -39,14 +39,6 @@ try {
 }
 ```
 
-Example (mobile):
-
-```ts
-// redirectUri set once in sdk({ redirectUri: 'myapp://oauth/callback' })
-await audiusSdk.oauth.login({ scope: 'write', display: 'fullScreen' })
-const user = await audiusSdk.oauth.getUser()
-```
-
 #### Params
 
 | Parameter    | Type                      | Default      | Description                                                                                                                    |
@@ -108,18 +100,16 @@ Completes an OAuth flow by processing the redirect URL. Call this on your callba
 
 - **Popup**: Detects `window.opener`, forwards the authorization code back to the parent window via
   `postMessage`, and closes the popup. The parent's `login()` promise resolves.
-- **Full-page redirect / mobile**: Verifies the CSRF state, performs the PKCE token exchange, and
+- **Full-page redirect**: Verifies the CSRF state, performs the PKCE token exchange, and
   stores the tokens. Call `getUser()` afterwards to retrieve the profile.
 
-Pass the redirect URL explicitly (e.g. a mobile deep link URL) or omit to use the current page URL
-on web. Is a no-op when no redirect params are present. The result can only be consumed once.
+Pass the redirect URL explicitly or omit to use the current page URL. Is a no-op when no redirect
+params are present. The result can only be consumed once.
 
 The `redirectUri` used in the token exchange is resolved in this order:
 1. The value stored in session state from the originating `login()` call
 2. The `redirectUri` set in the top-level SDK config
 3. The current page's origin + path (web only, fallback)
-
-On **mobile**, this is called automatically inside `login()` — you do not need to call it.
 
 Example:
 
@@ -143,9 +133,8 @@ Returns `Promise<void>`.
 
 ## isAuthenticated()
 
-Returns `true` if an access token is currently stored. Tokens are persisted across sessions
-(localStorage on web, AsyncStorage on React Native), so this will be `true` on page/app reload if
-the user previously logged in.
+Returns `true` if an access token is currently stored. Tokens are persisted in localStorage on web,
+so this will be `true` on page reload if the user previously logged in.
 
 Example:
 

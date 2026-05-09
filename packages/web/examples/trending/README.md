@@ -8,8 +8,6 @@ Minimal Vite + React app that renders **trending tracks** from Audius. Use this 
 - **Play** via `sdk.tracks.getTrackStreamUrl()` + HTML5 `Audio`
 - **React Query** for caching and loading state
 
-Mirrors the [mobile trending example](../../mobile/examples/trending/): same SDK usage and hook shape, with a simple list UI.
-
 ## How to run
 
 1. From the **apps repo root**, install and build the SDK if needed:
@@ -52,4 +50,3 @@ SDK setup, Vite, React, trending tracks, getTrendingTracks, Audius SDK, web exam
 
 - **SDK factory:** `packages/sdk/src/sdk/sdk.ts` — `sdk(config)` with `appName` (and optional `services`, `apiKey`, etc.).
 - **Tracks API:** `packages/sdk` — `getTrendingTracks(params)`.
-- **Mobile counterpart:** `packages/mobile/examples/trending/` — same pattern for Expo.

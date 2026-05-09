@@ -10,7 +10,7 @@
 
 ### Minor Changes
 
-- c8f9a4d: Restore a CommonJS build alongside the existing ESM output. The SDK now ships dual ESM + CJS via the `package.json#exports` map (with `import`/`require`/`browser`/`react-native`/`types` conditions), so Node consumers using `require('@audius/sdk')` no longer hit ESM/CJS interop edges on transitive CJS deps (e.g. `lodash`, `axios`, `commander`, `file-type`, `tus-js-client`).
+- c8f9a4d: Restore a CommonJS build alongside the existing ESM output. The SDK now ships dual ESM + CJS via the `package.json#exports` map (with `import`/`require`/`browser`/`types` conditions), so Node consumers using `require('@audius/sdk')` no longer hit ESM/CJS interop edges on transitive CJS deps (e.g. `lodash`, `axios`, `commander`, `file-type`, `tus-js-client`).
 
   Resolved entries:
 
@@ -18,7 +18,6 @@
   - Node CJS: `dist/index.cjs`
   - Browser ESM: `dist/index.browser.esm.js`
   - Browser CJS: `dist/index.browser.cjs`
-  - React Native: `dist/index.native.js`
   - Types: `dist/index.d.ts`
 
 ## 15.2.0
@@ -81,15 +80,13 @@
   from `@audius/eth` with optional per-environment overrides via
   `EthereumServiceConfig`.
 
-- 383db12: OAuth: rewrite with PKCE, async login, and React Native support
+- 383db12: OAuth: rewrite with PKCE and async login
 
   The OAuth service has been fully reworked. It now uses the OAuth 2.0
   Authorization Code Flow with PKCE. The implicit flow (Ethereum-signed JWT)
   has been removed. Tokens are persisted across sessions by default.
 
   `sdk.oauth` is now always defined — no null check or `!` assertion needed.
-
-  React Native / Expo is now supported out of the box. See the [React Native / Expo](#react-native--expo) section below.
 
   ## Breaking changes
 
@@ -117,7 +114,7 @@
 
   | Added                          | Description                                                                                        |
   | ------------------------------ | -------------------------------------------------------------------------------------------------- |
-  | `handleRedirect(url?: string)` | Completes the OAuth flow from the redirect page. On mobile, called automatically inside `login()`. |
+  | `handleRedirect(url?: string)` | Completes the OAuth flow from the redirect page. |
   | `isAuthenticated()`            | `async` method returning `Promise<boolean>` — true if an access token is stored.                   |
   | `getUser()`                    | Fetches the authenticated user's profile using the stored access token.                            |
 
@@ -192,38 +189,11 @@
   // Full-page redirect: token exchange complete — call getUser() next
   ```
 
-  On **mobile** (React Native / Expo), the redirect is handled automatically
-  inside `login()` — no call to `handleRedirect()` is needed.
-
   ## Registering a redirect URI
 
   Register your redirect URI(s) at [audius.co/settings](https://audius.co/settings) → Developer Apps.
 
-  **Mobile** — use a custom URL scheme (e.g. `myapp://oauth/callback`) and register
-  the scheme as an intent filter in your app's native config.
-
   **Local development** — register `http://localhost:PORT/callback` for your dev environment.
-
-  ## React Native / Expo
-
-  Import from `@audius/sdk` on React Native — the native entry point automatically:
-
-  - Uses `AsyncStorage` for token persistence across app restarts
-  - Uses `expo-web-browser` (`openAuthSessionAsync`) for the OAuth browser session, bypassing universal link interception
-
-  No extra configuration is needed. `login()` resolves after the browser closes and
-  the token exchange completes:
-
-  ```ts
-  const sdk = audiusSdk({
-    appName: "My App",
-    apiKey: "YOUR_API_KEY",
-    redirectUri: "myapp://oauth/callback",
-  });
-
-  await sdk.oauth.login({ scope: "write" });
-  const user = await sdk.oauth.getUser();
-  ```
 
 - e0e1ecb: Create SDK without services by default in all cases
 

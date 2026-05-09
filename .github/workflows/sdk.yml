@@ -61,9 +61,6 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: npm ci --prefer-offline
 

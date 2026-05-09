@@ -92,28 +92,6 @@ export const outputConfigs = {
   },
 
   /**
-   * Libs Legacy React Native Package
-   * Used by the Audius React Native Client
-   * - Includes a modified version of AudiusLibs with Solana dependencies removed
-   */
-  legacyReactNativeConfig: {
-    input: 'src/native-libs.ts',
-    output: [{ dir: 'dist', format: 'es', sourcemap: true }],
-    plugins: [
-      ignore(['web3', 'graceful-fs', 'node-localstorage']),
-      resolve({ extensions, preferBuiltins: true }),
-      commonjs({ extensions }),
-      alias({
-        entries: [{ find: 'stream', replacement: 'stream-browserify' }]
-      }),
-      babel({ babelHelpers: 'bundled', extensions }),
-      json(),
-      pluginTypescript
-    ],
-    external
-  },
-
-  /**
    * Core Package
    * Exports a small bundle that can be loaded quickly, useful for eager requests
    */

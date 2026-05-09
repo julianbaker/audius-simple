@@ -1,1 +1,0 @@
-export const PANEL_EXPAND_DURATION = 880

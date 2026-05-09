@@ -12,14 +12,6 @@ import TrendingButton from 'components/bottom-bar/buttons/TrendingButton'
 
 import styles from './BottomBar.module.css'
 
-declare global {
-  interface Window {
-    ReactNativeWebView?: {
-      postMessage: (message: string) => void
-    }
-  }
-}
-
 const {
   FEED_PAGE,
   TRENDING_PAGE,
@@ -65,7 +57,7 @@ const BottomBar = ({
     [setStackReset, pathname]
   )
 
-  return window.ReactNativeWebView?.postMessage ? null : (
+  return (
     <div className={styles.bottomBar}>
       <HomeButton
         isActive={currentPage === HOMEPAGE_PAGE}

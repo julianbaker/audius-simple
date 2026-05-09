@@ -7,8 +7,6 @@ Minimal Vite + React app that lets users **sign in via OAuth** and **update thei
 - **Token verification** via `sdk.users.verifyIDToken()`
 - **Server-side writes** — client POSTs `{ userId, description }` to your server; server uses developer app bearer + `sdk.users.updateUser()`
 
-Mirrors the [mobile update-profile example](../../mobile/examples/update-profile/): same SDK usage, OAuth flow, and server contract, with a web UI.
-
 ## Requirements
 
 - **Your own server** with `AUDIUS_API_KEY` and `AUDIUS_BEARER_TOKEN` in `.env`
@@ -79,4 +77,3 @@ SDK setup, Vite, React, OAuth, update profile, updateUser, verifyIDToken, server
 
 - **SDK factory:** `packages/sdk/src/sdk/sdk.ts` — `sdk(config)` with `appName`, `apiKey`, `bearerToken`.
 - **Users API:** `packages/sdk` — `verifyIDToken`, `getUser`, `updateUser`.
-- **Mobile counterpart:** `packages/mobile/examples/update-profile/` — same pattern for Expo (WebView OAuth).

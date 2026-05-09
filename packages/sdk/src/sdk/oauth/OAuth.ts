@@ -129,8 +129,7 @@ export class OAuth {
       this._pkceVerifier = codeVerifier
       this._pkceRedirectUri = resolvedRedirectUri
       // Also persist to sessionStorage so the values survive a full-page redirect
-      // (which destroys the JS context). Popup and mobile flows use the instance
-      // properties above and never need the sessionStorage fallback.
+      // that destroys the JS context.
       if (typeof window !== 'undefined' && window.sessionStorage) {
         window.sessionStorage.setItem(CSRF_TOKEN_KEY, csrfToken)
         window.sessionStorage.setItem(PKCE_VERIFIER_KEY, codeVerifier)
@@ -260,13 +259,13 @@ export class OAuth {
   /**
    * Completes an OAuth flow by processing the redirect URL.
    *
-   * Pass the redirect URL explicitly (mobile deep link) or omit to use the
-   * current page URL (web). Is a no-op when no redirect params are present.
+   * Pass the redirect URL explicitly or omit to use the current page URL.
+   * Is a no-op when no redirect params are present.
    * The result can only be consumed once — subsequent calls are no-ops.
    *
    * - **Web popup**: detects `window.opener`, forwards the code to the parent
    *   window, and closes the popup. The parent's `login()` promise resolves.
-   * - **Web full-page redirect / mobile**: performs the PKCE token exchange
+   * - **Web full-page redirect**: performs the PKCE token exchange
    *   and stores the tokens. Call `getUser()` afterwards.
    */
   async handleRedirect(url?: string): Promise<void> {
@@ -522,7 +521,7 @@ export class OAuth {
       return
     }
 
-    // Full-page redirect / mobile — handle the exchange locally
+    // Full-page redirect: handle the exchange locally
     const codeVerifier = this.pkceVerifier
     if (!codeVerifier) {
       this._settleLogin(

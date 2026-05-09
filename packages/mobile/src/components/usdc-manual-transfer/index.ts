@@ -1,1 +1,0 @@
-export { USDCManualTransfer } from './USDCManualTransfer'

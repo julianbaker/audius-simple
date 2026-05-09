@@ -358,7 +358,7 @@ export const fileToSdk = (
   file: Blob | File | NativeFile,
   name: string
 ): CrossPlatformFile => {
-  // If we're in react-native, return as-is
+  // If this is already a URI-backed file, return as-is.
   if ('uri' in file) {
     return file
   }

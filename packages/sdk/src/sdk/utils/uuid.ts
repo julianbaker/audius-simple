@@ -2,8 +2,7 @@ export const uuid = () => {
   // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript/873856#873856
   const s = []
   const hexDigits = '0123456789abcdef'
-  // all the ts-ignores are needed so the mobile package types things correctly
-  // remove when upgrading to latest typescript
+  // Remove the ts-ignores when upgrading to latest typescript.
   for (let i = 0; i < 36; i++) {
     // @ts-ignore
     s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)

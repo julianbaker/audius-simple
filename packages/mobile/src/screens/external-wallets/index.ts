@@ -1,1 +1,0 @@
-export { ExternalWalletsModalScreen } from './ExternalWalletsModalScreen'

@@ -1,1 +1,0 @@
-export { UpdateRequiredScreen } from './UpdateRequiredScreen'

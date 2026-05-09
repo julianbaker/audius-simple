@@ -29,7 +29,7 @@ The Free plan is always free with no restrictions. For higher limits and support
 2. You will receive an **API Key** and a **Bearer Token**.
 
 - **API Key** — used in all contexts (frontend and backend). Safe to include in client-side code.
-- **Bearer Token** — backend only. Grants your app the ability to act on behalf of users who have authorized it. **Never expose this in browser or mobile code.**
+- **Bearer Token** — backend only. Grants your app the ability to act on behalf of users who have authorized it. **Never expose this in browser code.**
 
 ## Install the SDK
 
@@ -56,7 +56,7 @@ Otherwise, include the SDK script tag in your web page. The Audius SDK will then
 
 ## Initialize the SDK
 
-How you initialize the SDK depends on whether you are running in a **backend** (Node.js) or **frontend** (browser/mobile) context.
+How you initialize the SDK depends on whether you are running in a **backend** (Node.js) or **frontend** (browser) context.
 
 ### Node.js (backend) example
 
@@ -73,7 +73,7 @@ const audiusSdk = sdk({
 
 ### HTML + JS (frontend) example
 
-In a browser or mobile context, initialize with your **API key only** — no bearer token. User authentication is handled via the [OAuth flow](#log-in-with-audius-oauth) described below.
+In a browser context, initialize with your **API key only** — no bearer token. User authentication is handled via the [OAuth flow](#log-in-with-audius-oauth) described below.
 
 ```js title="In web page"
 const audiusSdk = window.audiusSdk({
@@ -83,7 +83,7 @@ const audiusSdk = window.audiusSdk({
 
 :::warning
 
-**Never include your bearer token in frontend code.** The bearer token allows your app to act on behalf of users who have authorized it. Exposing it in client-side code (browser or mobile) is a critical security risk — anyone who inspects your code could use it to impersonate your app.
+**Never include your bearer token in frontend code.** The bearer token allows your app to act on behalf of users who have authorized it. Exposing it in client-side code is a critical security risk — anyone who inspects your code could use it to impersonate your app.
 
 For frontend apps, use the [OAuth flow](#log-in-with-audius-oauth) instead.
 
@@ -188,7 +188,7 @@ After the user logs in, the SDK stores their access token automatically and incl
 
 ## Direct API Access
 
-You can also access the Audius API directly without the SDK. The examples below use a bearer token and are intended for **backend/server-side use only** — do not use your bearer token in browser or mobile code.
+You can also access the Audius API directly without the SDK. The examples below use a bearer token and are intended for **backend/server-side use only** — do not use your bearer token in browser code.
 
 **REST API:**
 

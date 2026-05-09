@@ -1,1 +1,0 @@
-export { CoinRedeemScreen } from './CoinRedeemScreen'

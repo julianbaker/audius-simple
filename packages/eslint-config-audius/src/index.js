@@ -17,7 +17,6 @@ module.exports = {
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    // TODO: enable after react-native migration [C-3548]
     // project: true,
     ecmaFeatures: {
       jsx: true
@@ -34,7 +33,6 @@ module.exports = {
     'import'
   ],
   rules: {
-    // TODO: enable after react-native migration [C-3548]
     // '@typescript-eslint/consistent-type-exports': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
@@ -150,7 +148,6 @@ module.exports = {
       extends: 'plugin:mdx/recommended',
       plugins: ['mdx'],
       parser: 'eslint-mdx'
-      // TODO: enable after react-native migration [C-3548]
       // rules: {
       //   '@typescript-eslint/consistent-type-exports': 'off'
       // }

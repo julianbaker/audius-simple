@@ -1,1 +1,0 @@
-export { SummaryTable } from './SummaryTable'

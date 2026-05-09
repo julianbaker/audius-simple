@@ -67,12 +67,8 @@ jobs:
       - name: Install dependencies
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           if [[ -d node_modules ]]; then
             echo "Using cached node_modules, running postinstall..."
             npm run postinstall
@@ -124,12 +120,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -184,12 +176,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -241,12 +229,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -313,12 +297,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -328,12 +308,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Cache for Turbo
@@ -404,12 +380,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm cache clean --force || true
           npm ci --prefer-offline || npm install --prefer-offline
 
@@ -417,12 +389,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Download builds
@@ -562,12 +530,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -577,12 +541,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Download builds
@@ -637,12 +597,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -652,12 +608,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Download builds
@@ -753,12 +705,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           # Clear npm cache to avoid EEXIST conflicts
           npm cache clean --force || true
           # Try npm ci first, fallback to npm install if lock file is out of sync
@@ -768,12 +716,8 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Download builds
@@ -869,24 +813,16 @@ jobs:
         if: steps.cache-node-modules.outputs.cache-hit != 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm ci --prefer-offline
 
       - name: Run postinstall (if cache hit)
         if: steps.cache-node-modules.outputs.cache-hit == 'true'
         env:
           CI: true
-          SKIP_POD_INSTALL: true
-          SKIP_ANDROID_INSTALL: true
-          ANDROID_HOME: /tmp/android-sdk-dummy
           NODE_OPTIONS: --max-old-space-size=8192
         run: |
-          mkdir -p /tmp/android-sdk-dummy
           npm run postinstall
 
       - name: Download builds

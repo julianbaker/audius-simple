@@ -1,7 +1,6 @@
 /**
  * Build the Audius OAuth URL for the redirect flow (scope=write for track uploads).
  * See: packages/sdk/src/sdk/oauth/OAuth.ts and types.ts.
- * Mirrors packages/mobile/examples/upload/src/oauth/buildOAuthUrl.ts
  */
 const OAUTH_URL = 'https://audius.co/oauth/auth'
 

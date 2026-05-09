@@ -8,7 +8,6 @@
 CLIENT_DIRS="packages/web
     packages/fixed-decimal \
     packages/common \
-    packages/mobile \
     packages/harmony \
     packages/libs"
 

@@ -80,7 +80,6 @@ jobs:
             - ./node_modules
             - ./packages/protocol-dashboard/node_modules
             - ./packages/web/node_modules
-            - ./packages/mobile/node_modules
             - ./packages/embed/node_modules
             - ./packages/harmony/node_modules
             - ./packages/common/node_modules
@@ -220,7 +219,6 @@ workflows:
             .circleci/.* run-protocol-dashboard-workflow true
             .circleci/.* run-sdk-workflow true
             .circleci/.* run-web-workflow false
-            .circleci/.* run-mobile-workflow false
             .circleci/.* run-embed-workflow true
             package-lock.json run-sdk-workflow true
             .* run-integration-workflow true
@@ -228,24 +226,20 @@ workflows:
             packages/discovery-provider/.* run-discovery-workflow true
             packages/web/.* run-web-workflow false
             packages/web/e2e/.* run-integration-workflow true
-            packages/mobile/.* run-mobile-workflow false
             packages/embed/.* run-embed-workflow true
             packages/common/.* run-common-workflow true
             packages/common/.* run-web-workflow false
-            packages/common/.* run-mobile-workflow false
             packages/common/.* run-protocol-dashboard-workflow true
             packages/protocol-dashboard/.* run-protocol-dashboard-workflow true
             packages/harmony/.* run-web-workflow false
             packages/harmony/.* run-protocol-dashboard-workflow true
             packages/harmony/.* run-embed-workflow true
             packages/eslint-config-audius/.* run-web-workflow false
-            packages/eslint-config-audius/.* run-mobile-workflow false
             packages/sdk/.* run-sdk-workflow true
             packages/sdk/.* run-create-audius-app-workflow true
             packages/create-audius-app/.* run-create-audius-app-workflow true
             packages/fixed-decimal/.* run-sdk-workflow true
             packages/fixed-decimal/.* run-web-workflow false
-            packages/fixed-decimal/.* run-mobile-workflow false
             packages/fixed-decimal/.* run-common-workflow true
             packages/spl/.* run-sdk-workflow true
             packages/spl/.* run-identity-workflow true
@@ -271,33 +265,27 @@ workflows:
             .circleci/.* run-protocol-dashboard-workflow true
             .circleci/.* run-sdk-workflow true
             .circleci/.* run-web-workflow false
-            .circleci/.* run-mobile-workflow false
             .circleci/.* run-embed-workflow true
             package-lock.json run-sdk-workflow true
             .* run-integration-workflow true
             .* run-release-workflow false
             packages/discovery-provider/.* run-discovery-workflow true
             packages/web/.* run-web-workflow false
-            packages/mobile/.* run-mobile-workflow false
             packages/embed/.* run-embed-workflow true
             packages/common/.* run-common-workflow true
             packages/common/.* run-web-workflow false
-            packages/common/.* run-mobile-workflow false
             packages/protocol-dashboard/.* run-protocol-dashboard-workflow true
             packages/harmony/.* run-web-workflow false
             packages/eslint-config-audius/.* run-web-workflow false
-            packages/eslint-config-audius/.* run-mobile-workflow false
             packages/sdk/.* run-sdk-workflow true
             packages/sdk/.* run-create-audius-app-workflow true
             packages/create-audius-app/.* run-create-audius-app-workflow true
             packages/fixed-decimal/.* run-sdk-workflow true
             packages/fixed-decimal/.* run-web-workflow false
-            packages/fixed-decimal/.* run-mobile-workflow false
             packages/fixed-decimal/.* run-common-workflow true
             packages/spl/.* run-sdk-workflow true
             packages/spl/.* run-identity-workflow true
             .* run-web-workflow false
-            .* run-mobile-workflow false
           requires:
             - generate-config
             - init
@@ -356,19 +344,3 @@ workflows:
     jobs:
       - approve-foundation-deployment-holds:
           context: [slack-secrets, circle-daily-deploy-secrets]
-
-  mobile-prod-build:
-    when:
-      and:
-        - equal: ['mobile-prod-build', << pipeline.parameters.workflow >>]
-        - equal: ['disabled', 'enabled']  # Always false - CircleCI disabled
-    jobs:
-      - generate-config
-      - init:
-          context:
-            - Vercel
-      - continuation/continue:
-          config_path: .circleci/continue_config.yml
-          parameters:
-            run-mobile-prod-build-workflow: true
-

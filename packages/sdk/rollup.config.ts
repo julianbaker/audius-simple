@@ -74,34 +74,6 @@ export const outputConfigs = {
   },
 
   /**
-   * SDK React Native Package
-   * Used by the Audius React Native client
-   */
-  sdkConfigReactNative: {
-    input: { index: 'src/index.native.ts' },
-    output: [
-      {
-        dir: 'dist',
-        format: 'es',
-        sourcemap: true,
-        entryFileNames: '[name].native.js'
-      }
-    ],
-    plugins: [
-      ignore(['graceful-fs', 'node-localstorage']),
-      resolve({ extensions, preferBuiltins: true }),
-      commonjs({ extensions }),
-      alias({
-        entries: [{ find: 'stream', replacement: 'stream-browserify' }]
-      }),
-      babel({ babelHelpers: 'bundled', extensions, plugins: [] }),
-      json(),
-      pluginTypescript
-    ],
-    external
-  },
-
-  /**
    * SDK Browser Package (ES Module + CommonJS)
    * Used by the Audius Web Client and by extension the Desktop Client
    * - Includes polyfills for node libraries

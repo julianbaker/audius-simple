@@ -57,7 +57,6 @@ export type ServicesContainer = {
   /**
    * Called with the OAuth URL when `login()` is invoked. Defaults to
    * `window.open` (popup) or `window.location.href` (fullScreen) on web.
-   * Required on mobile — use `Linking.openURL` or a WebView.
    */
   openUrl?: (url: string) => void | Promise<void>
 
