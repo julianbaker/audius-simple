@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react'
 
-import { selectIsGuestAccount, useCurrentAccountUser } from '@audius/common/api'
+import { useCurrentAccountUser } from '@audius/common/api'
 import { route } from '@audius/common/utils'
 import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
@@ -28,8 +28,7 @@ const ConnectedBottomBar = () => {
   const isMatrixMode = useIsMatrix()
   const { data: accountData } = useCurrentAccountUser({
     select: (user) => ({
-      handle: user?.handle,
-      isGuestAccount: selectIsGuestAccount(user)
+      handle: user?.handle
     })
   })
   const { handle } = accountData ?? {}
