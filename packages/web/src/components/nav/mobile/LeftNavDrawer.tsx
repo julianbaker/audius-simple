@@ -9,12 +9,10 @@ import {
   Flex,
   IconAudiusLogoHorizontal,
   IconComponent,
-  IconFanClub,
-  IconGift,
+  IconLibrary,
   IconSettings,
   IconTrophy,
   IconUser,
-  IconWallet,
   Text
 } from '@audius/harmony'
 import cn from 'classnames'
@@ -29,22 +27,18 @@ import { push } from 'utils/navigation'
 import styles from './LeftNavDrawer.module.css'
 
 const {
-  CLUBS_EXPLORE_PAGE,
   CONTESTS_PAGE,
   FOLLOWERS_USERS_ROUTE,
   FOLLOWING_USERS_ROUTE,
-  REWARDS_PAGE,
+  LIBRARY_PAGE,
   SETTINGS_PAGE,
-  WALLET_PAGE,
   profilePage
 } = route
 
 const messages = {
   profile: 'My Profile',
-  audio: '$AUDIO',
-  artistCoins: 'Artist Coins',
+  library: 'Library',
   contests: 'Contests',
-  rewards: 'Rewards',
   settings: 'Settings',
   followers: 'Followers',
   following: 'Following'
@@ -225,18 +219,14 @@ export const LeftNavDrawer = ({ isOpen, onClose }: LeftNavDrawerProps) => {
                 onNavigate={handleNavigate}
               />
             ) : null}
-            <NavItem
-              icon={IconWallet}
-              label={messages.audio}
-              href={WALLET_PAGE}
-              onNavigate={handleNavigate}
-            />
-            <NavItem
-              icon={IconFanClub}
-              label={messages.artistCoins}
-              href={CLUBS_EXPLORE_PAGE}
-              onNavigate={handleNavigate}
-            />
+            {currentUserId ? (
+              <NavItem
+                icon={IconLibrary}
+                label={messages.library}
+                href={LIBRARY_PAGE}
+                onNavigate={handleNavigate}
+              />
+            ) : null}
             {isContestsEnabled ? (
               <NavItem
                 icon={IconTrophy}
@@ -245,12 +235,6 @@ export const LeftNavDrawer = ({ isOpen, onClose }: LeftNavDrawerProps) => {
                 onNavigate={handleNavigate}
               />
             ) : null}
-            <NavItem
-              icon={IconGift}
-              label={messages.rewards}
-              href={REWARDS_PAGE}
-              onNavigate={handleNavigate}
-            />
             <NavItem
               icon={IconSettings}
               label={messages.settings}

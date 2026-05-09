@@ -2,12 +2,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 
 import { useTrack } from '@audius/common/api'
 import { remixSettingsMessages as messages } from '@audius/common/messages'
-import {
-  isContentUSDCPurchaseGated,
-  ID,
-  FieldVisibility,
-  Remix
-} from '@audius/common/models'
+import { ID, FieldVisibility, Remix } from '@audius/common/models'
 import { Nullable } from '@audius/common/utils'
 import { IconRemix, Text } from '@audius/harmony'
 import { get, set } from 'lodash'
@@ -90,18 +85,16 @@ export const RemixSettingsField = (props: RemixSettingsFieldProps) => {
     streamConditions
   ])
 
-  const isUSDCPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
-
-  // When uploading, if the track is public or usdc purchase gated, default to showing remixes.
+  // When uploading, public tracks default to showing remixes. Gated tracks default to hiding remixes.
   // Otherwise, default to hiding remixes.
   useEffect(() => {
     if (!isUpload) return
-    if (!isStreamGated || isUSDCPurchaseGated) {
+    if (!isStreamGated) {
       setShowRemixes(true)
     } else if (isStreamGated) {
       setShowRemixes(false)
     }
-  }, [isUpload, isStreamGated, isUSDCPurchaseGated, setShowRemixes])
+  }, [isUpload, isStreamGated, setShowRemixes])
 
   const handleSubmit = useCallback(
     (values: RemixSettingsFormValues) => {

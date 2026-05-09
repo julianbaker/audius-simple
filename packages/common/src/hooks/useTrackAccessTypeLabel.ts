@@ -1,11 +1,7 @@
 import { useCurrentUserId, useTrack } from '~/api'
 import { AccessType } from '~/models/AccessType'
 import { ID } from '~/models/Identifiers'
-import {
-  isContentFollowGated,
-  isContentTokenGated,
-  isContentUSDCPurchaseGated
-} from '~/models/Track'
+import { isContentFollowGated } from '~/models/Track'
 import { Nullable } from '~/utils'
 
 import { useGatedTrackAccess } from './useGatedContent'
@@ -35,10 +31,7 @@ export const useTrackAccessTypeLabel = (trackId: ID): TrackAccessType => {
 
   const isUnlockedStream = !isOwner && hasStreamAccess
   const isUnlockedDownload = !isOwner && hasDownloadAccess
-  const isPurchaseable = isContentUSDCPurchaseGated(track?.stream_conditions)
-  const isTokenGated = isContentTokenGated(track?.stream_conditions)
   const isFollowGated = isContentFollowGated(track?.stream_conditions)
-  const isDownloadGated = isContentUSDCPurchaseGated(track?.download_conditions)
   const isScheduledRelease =
     track?.release_date && new Date(track.release_date) > new Date()
 
@@ -49,18 +42,9 @@ export const useTrackAccessTypeLabel = (trackId: ID): TrackAccessType => {
     type = AccessType.SCHEDULED_RELEASE
   } else if (track?.is_unlisted) {
     type = AccessType.HIDDEN
-  } else if (isPurchaseable) {
-    type = AccessType.PREMIUM
-    isUnlocked = isUnlockedStream
-  } else if (isTokenGated) {
-    type = AccessType.TOKEN_GATED
-    isUnlocked = isUnlockedStream
   } else if (isFollowGated) {
     type = AccessType.FOLLOW_GATED
     isUnlocked = isUnlockedStream
-  } else if (isDownloadGated) {
-    type = AccessType.PREMIUM_EXTRAS
-    isUnlocked = isUnlockedDownload
   } else if (track?.is_downloadable) {
     type = AccessType.EXTRAS
     isUnlocked = isUnlockedDownload

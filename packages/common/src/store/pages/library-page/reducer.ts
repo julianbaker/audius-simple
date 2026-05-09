@@ -24,9 +24,6 @@ const initialState = {
       reposts: {
         added: {},
         removed: {}
-      },
-      purchased: {
-        added: {}
       }
     },
     album: {
@@ -37,9 +34,6 @@ const initialState = {
       reposts: {
         added: [],
         removed: []
-      },
-      purchased: {
-        added: []
       }
     },
     playlist: {
@@ -61,9 +55,7 @@ const actionsMap: ActionsMap<LibraryPageState> = {
     const categoryKey =
       action.category === LibraryCategory.Repost
         ? 'reposts'
-        : action.category === LibraryCategory.Purchase
-          ? 'purchased'
-          : 'favorites'
+        : 'favorites'
     const newState = { ...state }
     newState.local[kindKey][categoryKey].added = [
       action.collectionId,
@@ -80,9 +72,7 @@ const actionsMap: ActionsMap<LibraryPageState> = {
     const categoryKey =
       action.category === LibraryCategory.Repost
         ? 'reposts'
-        : action.category === LibraryCategory.Purchase
-          ? 'purchased'
-          : 'favorites'
+        : 'favorites'
     const newState = { ...state }
     newState.local[kindKey][categoryKey].removed = [
       action.collectionId,

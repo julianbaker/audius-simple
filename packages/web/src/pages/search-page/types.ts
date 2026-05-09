@@ -26,7 +26,6 @@ export type Filter =
   | 'mood'
   | 'key'
   | 'bpm'
-  | 'isPremium'
   | 'hasDownloads'
   | 'isVerified'
 

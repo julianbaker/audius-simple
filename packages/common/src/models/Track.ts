@@ -127,6 +127,33 @@ export const isContentUSDCPurchaseGated = (
 ): gatedConditions is USDCPurchaseConditions =>
   !!gatedConditions && 'usdc_purchase' in (gatedConditions ?? {})
 
+export const isContentUnsupportedCryptoGated = (
+  gatedConditions?: Nullable<AccessConditions>
+): gatedConditions is
+  | USDCPurchaseConditions
+  | TokenGatedConditions
+  | NftGatedConditions =>
+  isContentUSDCPurchaseGated(gatedConditions) ||
+  isContentTokenGated(gatedConditions) ||
+  isContentNftGated(gatedConditions)
+
+export const stripUnsupportedCryptoGatedConditions = (
+  gatedConditions?: Nullable<AccessConditions>
+): Nullable<AccessConditions> =>
+  isContentUnsupportedCryptoGated(gatedConditions)
+    ? null
+    : (gatedConditions ?? null)
+
+export const shouldHideTrackForUnsupportedCrypto = (
+  track?: Nullable<Pick<TrackMetadata, 'stream_conditions'>>
+) => isContentUnsupportedCryptoGated(track?.stream_conditions)
+
+export const filterUnsupportedCryptoGatedTracks = <
+  T extends Pick<TrackMetadata, 'stream_conditions'>
+>(
+  tracks: T[]
+) => tracks.filter((track) => !shouldHideTrackForUnsupportedCrypto(track))
+
 export type AccessSignature = {
   data: string
   signature: string
@@ -136,6 +163,8 @@ export type NFTAccessSignature = {
   mp3: AccessSignature
   original: AccessSignature
 }
+
+export type GatedContentStatus = 'LOCKED' | 'UNLOCKED' | 'UNLOCKING'
 
 export type ResourceContributor = {
   name: string

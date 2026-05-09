@@ -46,7 +46,6 @@ export const SET_LINKED_SOCIAL_ON_FIRST_PAGE =
   'SIGN_ON/SET_LINKED_SOCIAL_ON_FIRST_PAGE'
 
 export const SET_STATUS = 'SIGN_ON/SET_STATUS'
-export const USING_EXTERNAL_WALLET = 'SIGN_ON/USING_EXTERNAL_WALLET'
 
 export const OPEN_SIGN_ON = 'SIGN_ON/OPEN_SIGN_ON'
 
@@ -278,10 +277,6 @@ export function followArtists(skipDefaultFollows: boolean = false) {
  */
 export function setStatus(status: 'loading' | 'editing') {
   return { type: SET_STATUS, status }
-}
-
-export function usingExternalWallet() {
-  return { type: USING_EXTERNAL_WALLET }
 }
 
 /**

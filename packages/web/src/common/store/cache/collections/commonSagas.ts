@@ -16,8 +16,7 @@ import {
   Kind,
   PlaylistContents,
   ID,
-  Collection,
-  isContentUSDCPurchaseGated
+  Collection
 } from '@audius/common/models'
 import {
   accountActions,
@@ -41,7 +40,6 @@ import { all, call, put, takeEvery, takeLatest } from 'typed-redux-saga'
 import { make } from 'common/store/analytics/actions'
 import watchTrackErrors from 'common/store/cache/collections/errorSagas'
 import * as signOnActions from 'common/store/pages/signon/actions'
-import { getUSDCMetadata } from 'common/store/upload/sagaHelpers'
 import { ensureLoggedIn } from 'common/utils/ensureLoggedIn'
 import { waitForWrite } from 'utils/sagaHelpers'
 
@@ -117,17 +115,6 @@ function* editPlaylistAsync(
         call(queryTrack, track)
       )
     )).filter(removeNullable)
-
-    // If the collection is a newly premium album, this will populate the premium metadata (price/splits/etc)
-    if (
-      playlist.is_album &&
-      isContentUSDCPurchaseGated(playlist.stream_conditions)
-    ) {
-      playlist.stream_conditions = yield* call(
-        getUSDCMetadata,
-        playlist.stream_conditions
-      )
-    }
 
     // Optimistic update #1 to quickly update metadata and track lineup
     if (isNative) {

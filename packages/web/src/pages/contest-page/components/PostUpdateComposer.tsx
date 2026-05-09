@@ -15,10 +15,9 @@ import {
 } from '@audius/harmony'
 import { EntityType } from '@audius/sdk'
 
+import { AttachVideoModal } from 'components/attach-video-modal/AttachVideoModal'
 import { ComposerInput } from 'components/composer-input/ComposerInput'
 import { useProfilePicture } from 'hooks/useProfilePicture'
-
-import { AttachVideoModal } from '../../fan-club-detail-page/components/AttachVideoModal'
 
 const messages = {
   placeholder: 'Update your fans',

@@ -1,1 +1,1 @@
-export type LockedStatusVariant = 'premium' | 'gated' | 'tokenGated'
+export type LockedStatusVariant = 'gated'

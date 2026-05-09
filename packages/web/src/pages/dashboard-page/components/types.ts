@@ -13,7 +13,6 @@ export type DataSourceTrack = Track & {
 
 export enum TrackFilters {
   PUBLIC = 'Public',
-  PREMIUM = 'Premium',
   FOLLOW_GATED = 'FollowGated',
   HIDDEN = 'Hidden'
 }
@@ -28,6 +27,5 @@ export type DataSourceAlbum = Collection & {
 
 export enum AlbumFilters {
   PUBLIC = 'Public',
-  PREMIUM = 'Premium',
   HIDDEN = 'Hidden'
 }

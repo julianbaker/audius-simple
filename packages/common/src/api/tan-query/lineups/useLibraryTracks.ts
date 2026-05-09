@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-query'
 
 import { useQueryContext } from '~/api/tan-query/utils'
-import { ID } from '~/models/Identifiers'
+import { filterUnsupportedCryptoGatedTracks, ID } from '~/models'
 import { LibraryCategoryType } from '~/store/pages'
 import { removeNullable } from '~/utils'
 
@@ -98,6 +98,9 @@ export const useLibraryTracks = (
           return { track, timestamp: activity.timestamp }
         })
         .filter(removeNullable)
+        .filter(
+          ({ track }) => filterUnsupportedCryptoGatedTracks([track]).length > 0
+        )
 
       primeTrackData({
         tracks: entries.map((e) => e.track),

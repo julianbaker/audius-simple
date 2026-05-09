@@ -11,9 +11,7 @@ import {
   instanceOfTrackMilestoneNotificationActionData
 } from '@audius/sdk'
 
-import { BadgeTier, type ID } from '~/models'
-import type { ChallengeRewardID } from '~/models/AudioRewards'
-import type { StringUSDC, StringWei } from '~/models/Wallet'
+import { type ID } from '~/models'
 import {
   Achievement,
   Entity,
@@ -122,26 +120,6 @@ export const notificationFromSDK = (
         ...formatBaseNotification(notification)
       }
     }
-    case 'track_added_to_purchased_album': {
-      let trackId = 0
-      let playlistId = 0
-      let playlistOwnerId = 0
-      notification.actions.filter(removeNullable).forEach((action) => {
-        const { data } = action
-        if (data.trackId && data.playlistId && data.playlistOwnerId) {
-          trackId = HashId.parse(data.trackId) as ID
-          playlistId = HashId.parse(data.playlistId) as ID
-          playlistOwnerId = HashId.parse(data.playlistOwnerId) as ID
-        }
-      })
-      return {
-        type: NotificationType.TrackAddedToPurchasedAlbum,
-        trackId,
-        playlistId,
-        playlistOwnerId,
-        ...formatBaseNotification(notification)
-      }
-    }
     case 'track_added_to_playlist': {
       let trackId = 0
       let playlistId = 0
@@ -169,39 +147,6 @@ export const notificationFromSDK = (
         entityType: Entity.Track,
         entityId: HashId.parse(data.tastemakerItemId),
         userId: HashId.parse(data.tastemakerItemOwnerId), // owner of the tastemaker track
-        ...formatBaseNotification(notification)
-      }
-    }
-    case 'challenge_reward': {
-      const data = notification.actions[0].data
-      const challengeId = data.challengeId as ChallengeRewardID
-      return {
-        type: NotificationType.ChallengeReward,
-        challengeId,
-        entityType: Entity.User,
-        amount: data.amount as StringWei,
-        listenStreak: data.listenStreak,
-        ...formatBaseNotification(notification)
-      }
-    }
-    case 'claimable_reward': {
-      const data = notification.actions[0].data
-      const challengeId = data.challengeId as ChallengeRewardID
-      return {
-        type: NotificationType.ClaimableReward,
-        challengeId,
-        entityType: Entity.User,
-        ...formatBaseNotification(notification)
-      }
-    }
-    case 'tier_change': {
-      const data = notification.actions[0].data
-      const tier = data.newTier as BadgeTier
-      const userId = HashId.parse(notification.actions[0].specifier)
-      return {
-        type: NotificationType.TierChange,
-        tier,
-        userId,
         ...formatBaseNotification(notification)
       }
     }
@@ -399,52 +344,6 @@ export const notificationFromSDK = (
         ...formatBaseNotification(notification)
       }
     }
-    case 'usdc_purchase_seller': {
-      let entityId = 0
-      let entityType = Entity.Track
-      let amount = '' as StringUSDC
-      let extraAmount = '' as StringUSDC
-      const userIds = notification.actions
-        .map((action) => {
-          const data = action.data
-          entityId = HashId.parse(data.contentId)
-          entityType =
-            data.contentType === 'track' ? Entity.Track : Entity.Album
-          amount = data.amount as StringUSDC
-          extraAmount = data.extraAmount as StringUSDC
-          return HashId.parse(data.buyerUserId)
-        })
-        .filter(removeNullable)
-      return {
-        type: NotificationType.USDCPurchaseSeller,
-        userIds,
-        entityId,
-        entityType,
-        amount,
-        extraAmount,
-        ...formatBaseNotification(notification)
-      }
-    }
-    case 'usdc_purchase_buyer': {
-      let entityId = 0
-      let entityType = Entity.Track
-      const userIds = notification.actions
-        .map((action) => {
-          const data = action.data
-          entityId = HashId.parse(data.contentId)
-          entityType =
-            data.contentType === 'track' ? Entity.Track : Entity.Album
-          return HashId.parse(data.sellerUserId)
-        })
-        .filter(removeNullable)
-      return {
-        type: NotificationType.USDCPurchaseBuyer,
-        userIds,
-        entityId,
-        entityType,
-        ...formatBaseNotification(notification)
-      }
-    }
     case 'request_manager': {
       const data = notification.actions[0].data
 
@@ -572,14 +471,6 @@ export const notificationFromSDK = (
         ...formatBaseNotification(notification)
       }
     }
-    case 'listen_streak_reminder': {
-      const data = notification.actions[0].data
-      return {
-        type: NotificationType.ListenStreakReminder,
-        streak: data.streak,
-        ...formatBaseNotification(notification)
-      }
-    }
     case 'fan_remix_contest_ended': {
       const data = notification.actions[0].data
       return {
@@ -649,15 +540,6 @@ export const notificationFromSDK = (
         milestone: data.milestone,
         entityId: HashId.parse(data.entityId),
         entityType: Entity.Track,
-        ...formatBaseNotification(notification)
-      }
-    }
-    case 'fan_club_text_post': {
-      const data = notification.actions[0].data
-      return {
-        type: NotificationType.FanClubTextPost,
-        entityUserId: HashId.parse(data.entityUserId),
-        commentId: HashId.parse(data.commentId),
         ...formatBaseNotification(notification)
       }
     }

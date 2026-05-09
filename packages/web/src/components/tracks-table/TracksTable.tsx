@@ -9,19 +9,15 @@ import {
 
 import { useGatedContentAccessMap } from '@audius/common/hooks'
 import {
-  ModalSource,
   SquareSizes,
   Track,
   UID,
   UserTrack,
-  isContentFollowGated,
-  isContentUSDCPurchaseGated
+  isContentFollowGated
 } from '@audius/common/models'
 import {
-  PurchaseableContentType,
   gatedContentActions,
-  gatedContentSelectors,
-  usePremiumContentPurchaseModal
+  gatedContentSelectors
 } from '@audius/common/store'
 import { formatCount, formatSeconds, dayjs } from '@audius/common/utils'
 import {
@@ -32,7 +28,6 @@ import {
   IconImage,
   Flex,
   IconUserFollowing,
-  IconCart,
   Artwork,
   Text,
   Tooltip
@@ -238,8 +233,6 @@ export const TracksTable = ({
   onClickRepostRef.current = onClickRepost
   const onClickRemoveRef = useRef(onClickRemove)
   onClickRemoveRef.current = onClickRemove
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
   const [, setGatedModalVisibility] = useModalState('LockedContent')
   const trackNameColumnWidth = isAlbumPage
     ? ALBUM_TRACK_NAME_COLUMN_WIDTH
@@ -253,11 +246,10 @@ export const TracksTable = ({
       hasStreamAccess: true
     }
     const isLocked = !isFetchingNFTAccess && !hasStreamAccess
-    const isPremium = isContentUSDCPurchaseGated(track.stream_conditions)
     const deleted =
       track.is_delete || track._marked_deleted || !!track.user?.is_deactivated
 
-    return (isLocked && !isPremium) || deleted
+    return isLocked || deleted
   }, [])
 
   const activateTrack = useCallback(
@@ -273,7 +265,6 @@ export const TracksTable = ({
     const index = cellInfo.row.index
     const active = index === activeIndexRef.current
     const track = cellInfo.row.original
-    const isTrackPremium = isContentUSDCPurchaseGated(track.stream_conditions)
     const { isFetchingNFTAccess, hasStreamAccess } = trackAccessMapRef.current[
       track.track_id
     ] ?? { isFetchingNFTAccess: false, hasStreamAccess: true }
@@ -285,7 +276,6 @@ export const TracksTable = ({
         paused={!playingRef.current}
         playing={active}
         hideDefault={false}
-        isTrackPremium={isTrackPremium}
         isLocked={isLocked}
       />
     )
@@ -306,9 +296,7 @@ export const TracksTable = ({
         hasStreamAccess: true
       }
       const isLocked = !isFetchingNFTAccess && !hasStreamAccess
-      const isPremium = isContentUSDCPurchaseGated(track.stream_conditions)
-      const isArtworkDisabled =
-        !onClickRowRef.current || (isLocked && !isPremium) || deleted
+      const isArtworkDisabled = !onClickRowRef.current || isLocked || deleted
 
       const artistRow = showArtistInTrackNameColumn ? (
         user?.is_deactivated ? (
@@ -649,11 +637,9 @@ export const TracksTable = ({
       if (shouldShowGatedType) {
         Icon = track.is_unlisted
           ? IconVisibilityHidden
-          : isContentUSDCPurchaseGated(streamConditions)
-            ? IconCart
-            : isContentFollowGated(streamConditions)
-              ? IconUserFollowing
-              : null
+          : isContentFollowGated(streamConditions)
+            ? IconUserFollowing
+            : null
       } else {
         Icon = !hasStreamAccess
           ? IconLock
@@ -712,19 +698,6 @@ export const TracksTable = ({
     [shouldShowGatedType, disabledTrackEdit, isAlbumPage, removeText, userId]
   )
 
-  const onClickPremiumPill = useCallback(
-    (trackId: number) => {
-      openPremiumContentPurchaseModal(
-        {
-          contentId: trackId,
-          contentType: PurchaseableContentType.TRACK
-        },
-        { source: ModalSource.TrackLibrary }
-      )
-    },
-    [openPremiumContentPurchaseModal]
-  )
-
   const onClickGatedPill = useCallback(
     (trackId: number) => {
       dispatch(setLockedContentId({ id: trackId }))
@@ -742,8 +715,6 @@ export const TracksTable = ({
         hasStreamAccess: true
       }
       const isLocked = !isFetchingNFTAccess && !hasStreamAccess
-      const isLockedPremium =
-        isLocked && isContentUSDCPurchaseGated(track.stream_conditions)
       const gatedTrackStatus = gatedTrackStatusMapRef.current[track.track_id]
       const isOwner = track.owner_id === userId
 
@@ -758,9 +729,7 @@ export const TracksTable = ({
           streamConditions={track.stream_conditions!}
           unlocking={gatedTrackStatus === 'UNLOCKING'}
           onClick={() => {
-            isLockedPremium
-              ? onClickPremiumPill(track.track_id)
-              : onClickGatedPill(track.track_id)
+            onClickGatedPill(track.track_id)
           }}
           buttonSize='small'
           showIcon={false}
@@ -769,7 +738,7 @@ export const TracksTable = ({
         />
       )
     },
-    [onClickGatedPill, onClickPremiumPill, userId]
+    [onClickGatedPill, userId]
   )
 
   const renderTrackActions = useCallback(
@@ -1057,10 +1026,9 @@ export const TracksTable = ({
     const isLocked = !isFetchingNFTAccess && !hasStreamAccess
     const deleted =
       track.is_delete || track._marked_deleted || !!track.user?.is_deactivated
-    const isPremium = isContentUSDCPurchaseGated(track.stream_conditions)
     return cn(styles.tableRow, {
       [styles.disabled]: deleted,
-      [styles.lockedRow]: isLocked && !deleted && !isPremium
+      [styles.lockedRow]: isLocked && !deleted
     })
   }, [])
 

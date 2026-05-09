@@ -1,6 +1,6 @@
-/* Responsive grid mirroring the Fan Clubs leaderboard card layout —
+/* Responsive grid for contest cards —
    3-col at desktop, 2-col on tablet, 1-col on mobile. min-width +
-   gap values are aligned with `FanClubsTable.module.css`.
+   gap values are shared by the contests table layout.
    Uses viewport media queries rather than container queries because
    the latter don't apply uniformly through the flex-grandchildren
    (`.cardsContainer > *`) in this bundle. The app's left nav is a

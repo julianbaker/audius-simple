@@ -20,7 +20,8 @@ import {
   ShareSource,
   RepostSource,
   FollowSource,
-  PlaybackSource
+  PlaybackSource,
+  isContentUnsupportedCryptoGated
 } from '@audius/common/models'
 import { FeatureFlags } from '@audius/common/services'
 import {
@@ -87,10 +88,13 @@ const TrackPage = () => {
 
   // Simple error handling
   useEffect(() => {
-    if (status === 'error') {
+    if (
+      status === 'error' ||
+      isContentUnsupportedCryptoGated(track?.stream_conditions)
+    ) {
       navigate(NOT_FOUND_PAGE)
     }
-  }, [status, navigate])
+  }, [status, track?.stream_conditions, navigate])
 
   // Simple cleanup
   useEffect(() => {

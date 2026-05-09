@@ -1,20 +1,13 @@
 import { memo, useCallback } from 'react'
 
 import { useCurrentUserId, useTrack, useUser } from '@audius/common/api'
-import {
-  ID,
-  RepostSource,
-  ModalSource,
-  isContentUSDCPurchaseGated
-} from '@audius/common/models'
+import { ID, RepostSource } from '@audius/common/models'
 import {
   gatedContentActions,
   gatedContentSelectors,
   mobileOverflowMenuUIActions,
   tracksSocialActions,
-  usePremiumContentPurchaseModal,
   OverflowAction,
-  PurchaseableContentType,
   OverflowSource
 } from '@audius/common/store'
 import { connect, useDispatch } from 'react-redux'
@@ -51,9 +44,7 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
     isLocked,
     isReposted,
     isSaved,
-    streamConditions,
-    trackId,
-    isDeleted
+    trackId
   } = props
   const { data: currentUserId } = useCurrentUserId()
   const { data: partialTrack } = useTrack(trackId, {
@@ -67,8 +58,6 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
   const { ownerId, albumBacklink } = partialTrack ?? {}
   const { data: user } = useUser(ownerId)
   const dispatch = useDispatch()
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
   const [, setLockedContentVisibility] = useModalState('LockedContent')
   const openLockedContentModal = useCallback(() => {
     dispatch(setLockedContentId({ id: trackId }))
@@ -78,9 +67,6 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
   const isOwner = user?.user_id === currentUserId
   const onClickOverflow = () => {
     const overflowActions = [
-      isPurchase && !hasStreamAccess && !isDeleted
-        ? OverflowAction.PURCHASE_TRACK
-        : null,
       isLocked || isUnlisted
         ? null
         : isReposted
@@ -102,31 +88,15 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
     clickOverflow(trackId, overflowActions)
   }
 
-  const isPurchase = isContentUSDCPurchaseGated(streamConditions)
   const onClickGatedUnlockPill = useRequiresAccountOnClick(() => {
-    if (isPurchase && trackId) {
-      openPremiumContentPurchaseModal(
-        {
-          contentId: trackId,
-          contentType: PurchaseableContentType.TRACK
-        },
-        { source: ModalSource.TrackListItem }
-      )
-    } else if (trackId && !hasStreamAccess) {
+    if (trackId && !hasStreamAccess) {
       openLockedContentModal()
     }
-  }, [
-    isPurchase,
-    trackId,
-    openPremiumContentPurchaseModal,
-    hasStreamAccess,
-    openLockedContentModal
-  ])
+  }, [trackId, hasStreamAccess, openLockedContentModal])
 
   return (
     <TrackListItem
       {...props}
-      isPremium={isPurchase}
       onClickOverflow={onClickOverflow}
       onClickGatedUnlockPill={onClickGatedUnlockPill}
       trackItemAction={TrackItemAction.Overflow}

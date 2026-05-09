@@ -4,7 +4,7 @@ import { useQueryContext } from '@audius/common/api'
 
 /**
  * Handles mediorum upload of a contest cover photo. Mirrors the pattern
- * used by useLaunchCoin / useUpdateFanClub for banner images — uploads the
+ * used by remix-contest cover updates — uploads the
  * file with `img_backdrop` template (wide aspect-ratio) and resolves to a
  * content-node URL the form can persist in `eventData.coverPhotoUrl`.
  */

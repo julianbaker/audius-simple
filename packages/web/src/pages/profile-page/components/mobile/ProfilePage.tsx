@@ -32,7 +32,6 @@ import NavContext, {
 } from 'components/nav/mobile/NavContext'
 import TextElement, { Type } from 'components/nav/mobile/TextElement'
 import { Tab, TabList } from 'components/tabs'
-import TierExplainerDrawer from 'components/user-badges/TierExplainerDrawer'
 import { useProfilePage } from 'pages/profile-page/useProfilePage'
 import { getUserPageContext } from 'ssr/metaTags'
 
@@ -459,58 +458,54 @@ const ProfilePage = ({ containerRef }: ProfilePageProps) => {
   } = getUserPageContext({ handle, userName: name, bio })
 
   return (
-    <>
-      <MobilePageContainer
-        title={title}
-        description={description}
-        canonicalUrl={canonicalUrl}
-        structuredData={structuredData}
-        entityType='user'
-        hashId={profile?.user_id ? Id.parse(profile.user_id) : undefined}
-        containerClassName={styles.container}
-      >
-        <ProfileHeader
-          isDeactivated={profile.is_deactivated ?? false}
-          profile={profile}
-          name={name}
-          handle={handle}
-          isArtist={isArtist}
-          bio={bio}
-          verified={verified}
-          userId={profile.user_id}
-          loading={status === Status.LOADING}
-          coverPhotoSizes={coverPhotoSizes}
-          profilePictureSizes={profilePictureSizes}
-          hasProfilePicture={hasProfilePicture}
-          playlistCount={profile.playlist_count}
-          trackCount={profile.track_count}
-          followerCount={profile.follower_count}
-          followingCount={profile.followee_count}
-          setFollowingUserId={setFollowingUserId}
-          setFollowersUserId={setFollowersUserId}
-          xHandle={xHandle}
-          instagramHandle={instagramHandle}
-          tikTokHandle={tikTokHandle}
-          website={website}
-          followers={followers}
-          following={following}
-          onFollow={onFollow}
-          onUnfollow={onConfirmUnfollow}
-          goToRoute={goToRoute}
-          mode={mode}
-          switchToEditMode={onEdit}
-          updatedProfilePicture={updatedProfilePicture?.url ?? null}
-          updatedCoverPhoto={updatedCoverPhoto?.url ?? null}
-          onUpdateProfilePicture={updateProfilePicture}
-          onUpdateCoverPhoto={updateCoverPhoto}
-          areArtistRecommendationsVisible={areArtistRecommendationsVisible}
-          onCloseArtistRecommendations={onCloseArtistRecommendations}
-        />
-        {content}
-      </MobilePageContainer>
-
-      <TierExplainerDrawer />
-    </>
+    <MobilePageContainer
+      title={title}
+      description={description}
+      canonicalUrl={canonicalUrl}
+      structuredData={structuredData}
+      entityType='user'
+      hashId={profile?.user_id ? Id.parse(profile.user_id) : undefined}
+      containerClassName={styles.container}
+    >
+      <ProfileHeader
+        isDeactivated={profile.is_deactivated ?? false}
+        profile={profile}
+        name={name}
+        handle={handle}
+        isArtist={isArtist}
+        bio={bio}
+        verified={verified}
+        userId={profile.user_id}
+        loading={status === Status.LOADING}
+        coverPhotoSizes={coverPhotoSizes}
+        profilePictureSizes={profilePictureSizes}
+        hasProfilePicture={hasProfilePicture}
+        playlistCount={profile.playlist_count}
+        trackCount={profile.track_count}
+        followerCount={profile.follower_count}
+        followingCount={profile.followee_count}
+        setFollowingUserId={setFollowingUserId}
+        setFollowersUserId={setFollowersUserId}
+        xHandle={xHandle}
+        instagramHandle={instagramHandle}
+        tikTokHandle={tikTokHandle}
+        website={website}
+        followers={followers}
+        following={following}
+        onFollow={onFollow}
+        onUnfollow={onConfirmUnfollow}
+        goToRoute={goToRoute}
+        mode={mode}
+        switchToEditMode={onEdit}
+        updatedProfilePicture={updatedProfilePicture?.url ?? null}
+        updatedCoverPhoto={updatedCoverPhoto?.url ?? null}
+        onUpdateProfilePicture={updateProfilePicture}
+        onUpdateCoverPhoto={updateCoverPhoto}
+        areArtistRecommendationsVisible={areArtistRecommendationsVisible}
+        onCloseArtistRecommendations={onCloseArtistRecommendations}
+      />
+      {content}
+    </MobilePageContainer>
   )
 }
 

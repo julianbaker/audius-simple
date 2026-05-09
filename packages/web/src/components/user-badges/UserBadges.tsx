@@ -1,17 +1,9 @@
-import {
-  cloneElement,
-  MouseEvent,
-  ReactElement,
-  useCallback,
-  useMemo
-} from 'react'
+import { MouseEvent, ReactElement, useCallback, useMemo } from 'react'
 
-import { useUser } from '@audius/common/api'
 import { BadgeTier, ID } from '@audius/common/models'
 import { useTierAndVerifiedForUser } from '@audius/common/store'
 import { Nullable } from '@audius/common/utils'
 import {
-  Artwork,
   Box,
   Flex,
   HoverCard,
@@ -27,10 +19,6 @@ import {
 } from '@audius/harmony'
 import { Origin } from '@audius/harmony/src/components/popup/types'
 import cn from 'classnames'
-
-import { AudioHoverCard } from 'components/hover-card/AudioHoverCard'
-import { FanClubHoverCard } from 'components/hover-card/FanClubHoverCard'
-import { env } from 'services/env'
 
 import styles from './UserBadges.module.css'
 
@@ -62,13 +50,6 @@ type UserBadgesProps = {
   isVerifiedOverride?: boolean
   overrideTier?: BadgeTier
 
-  // Optional mint address for displaying specific fan club
-  // If provided, shows the fan club badge for that token
-  mint?: string
-
-  // Optional flag to hide the fan club badge
-  hideFanClubBadge?: boolean
-
   // Disable hover/click handling when badges are rendered inside a larger
   // interactive surface.
   disableInteraction?: boolean
@@ -82,33 +63,12 @@ const UserBadges = ({
   size = 'xs',
   className,
   inline = false,
-  anchorOrigin,
-  transformOrigin,
   isVerifiedOverride,
-  overrideTier,
-  mint,
-  hideFanClubBadge = false,
   disableInteraction = false
 }: UserBadgesProps) => {
-  const { tier: currentTier, isVerified } = useTierAndVerifiedForUser(userId)
-  const { data: user } = useUser(userId, {
-    select: (user) => ({
-      fanClubBadge: user?.fan_club_badge
-    })
-  })
-
-  const { fanClubBadge: userFanClubBadge } = user ?? {}
-
-  const displayMint = useMemo(() => {
-    // Priority: explicit mint prop > user's fan_club_badge > null
-    if (mint) return mint
-    if (userFanClubBadge?.mint) return userFanClubBadge.mint
-    return null
-  }, [mint, userFanClubBadge?.mint])
-
-  const tier = overrideTier || currentTier
+  const { isVerified } = useTierAndVerifiedForUser(userId)
   const isUserVerified = isVerifiedOverride ?? isVerified
-  const hasContent = isUserVerified || tier !== 'none' || !!displayMint
+  const hasContent = isUserVerified
 
   // Create a handler to stop event propagation
   const handleStopPropagation = useCallback((e: MouseEvent) => {
@@ -146,77 +106,6 @@ const UserBadges = ({
     )
   }, [isUserVerified, size])
 
-  // Get the tier badge and wrap it with AudioHoverCard if user has a tier
-  const tierBadge = useMemo(() => {
-    if (tier === 'none') return null
-
-    return (
-      <AudioHoverCard
-        tier={tier}
-        userId={userId}
-        anchorOrigin={anchorOrigin}
-        transformOrigin={transformOrigin}
-        triggeredBy='both'
-      >
-        <Flex
-          css={{
-            cursor: 'pointer',
-            transition: `opacity ${motion.quick}`,
-            '&:hover': {
-              opacity: 0.6
-            }
-          }}
-        >
-          {/* @ts-ignore */}
-          {cloneElement(audioTierMap[tier]!, { size })}
-        </Flex>
-      </AudioHoverCard>
-    )
-  }, [tier, userId, anchorOrigin, transformOrigin, size])
-
-  const shouldShowFanClubBadge =
-    !hideFanClubBadge &&
-    !!displayMint &&
-    displayMint !== env.WAUDIO_MINT_ADDRESS
-
-  const fanClubBadge = useMemo(() => {
-    if (!shouldShowFanClubBadge) return null
-
-    return (
-      <FanClubHoverCard
-        userId={userId}
-        anchorOrigin={anchorOrigin}
-        transformOrigin={transformOrigin}
-        triggeredBy='both'
-      >
-        <Flex
-          css={{
-            cursor: 'pointer',
-            transition: `opacity ${motion.quick}`,
-            '&:hover': {
-              opacity: 0.6
-            }
-          }}
-        >
-          <Artwork
-            src={userFanClubBadge?.logo_uri ?? ''}
-            hex
-            w={iconSizes[size]}
-            h={iconSizes[size]}
-            borderWidth={0}
-          />
-        </Flex>
-      </FanClubHoverCard>
-    )
-  }, [
-    shouldShowFanClubBadge,
-    userId,
-    anchorOrigin,
-    transformOrigin,
-    userFanClubBadge?.logo_uri,
-    size
-  ])
-
   if (!hasContent) return null
 
   return (
@@ -239,8 +128,6 @@ const UserBadges = ({
         )}
       >
         {verifiedBadge}
-        {tierBadge}
-        {fanClubBadge}
       </span>
     </Box>
   )

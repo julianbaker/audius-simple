@@ -1,13 +1,10 @@
 import { EntityState, PayloadAction } from '@reduxjs/toolkit'
 
-import { ChallengeRewardID } from '~/models/AudioRewards'
-import { BadgeTier } from '~/models/BadgeTier'
 import { Collection } from '~/models/Collection'
 import { ID } from '~/models/Identifiers'
 import { Status } from '~/models/Status'
 import { Track } from '~/models/Track'
 import { User } from '~/models/User'
-import { StringUSDC, StringWei } from '~/models/Wallet'
 import { Nullable } from '~/utils'
 
 export enum NotificationType {
@@ -30,24 +27,16 @@ export enum NotificationType {
   Tastemaker = 'Tastemaker',
   TrendingTrack = 'TrendingTrack',
   TrendingUnderground = 'TrendingUnderground',
-  ChallengeReward = 'ChallengeReward',
-  ClaimableReward = 'ClaimableReward',
-  TierChange = 'TierChange',
   AddTrackToPlaylist = 'AddTrackToPlaylist',
-  TrackAddedToPurchasedAlbum = 'TrackAddedToPurchasedAlbum',
-  USDCPurchaseSeller = 'USDCPurchaseSeller',
-  USDCPurchaseBuyer = 'USDCPurchaseBuyer',
   RequestManager = 'RequestManager',
   ApproveManagerRequest = 'ApproveManagerRequest',
   Comment = 'Comment',
   CommentThread = 'CommentThread',
   CommentMention = 'CommentMention',
   CommentReaction = 'CommentReaction',
-  ListenStreakReminder = 'ListenStreakReminder',
   ArtistRemixContestEnded = 'ArtistRemixContestEnded',
   ArtistRemixContestEndingSoon = 'ArtistRemixContestEndingSoon',
-  ArtistRemixContestSubmissions = 'ArtistRemixContestSubmissions',
-  FanClubTextPost = 'FanClubTextPost'
+  ArtistRemixContestSubmissions = 'ArtistRemixContestSubmissions'
 }
 
 export enum PushNotificationType {
@@ -75,12 +64,9 @@ export enum PushNotificationType {
   RemixCreate = 'RemixCreate',
   RemixCosign = 'RemixCosign',
   TrendingTrack = 'TrendingTrack',
-  ChallengeReward = 'ChallengeReward',
   Tastemaker = 'Tastemaker',
-  TierChange = 'TierChange',
   PlaylistUpdate = 'PlaylistUpdate',
   AddTrackToPlaylist = 'AddTrackToPlaylist',
-  TrackAddedToPurchasedAlbum = 'TrackAddedToPurchasedAlbum',
   Message = 'Message',
   MessageReaction = 'MessageReaction',
   RequestManager = 'RequestManager',
@@ -88,9 +74,7 @@ export enum PushNotificationType {
   Comment = 'Comment',
   CommentThread = 'CommentThread',
   CommentMention = 'CommentMention',
-  CommentReaction = 'CommentReaction',
-  ListenStreakReminder = 'ListenStreakReminder',
-  FanClubTextPost = 'FanClubTextPost'
+  CommentReaction = 'CommentReaction'
 }
 
 export enum Entity {
@@ -466,35 +450,8 @@ export type TastemakerNotification = BaseNotification & {
   userId: ID // track owner id
 }
 
-export type ChallengeRewardNotification = BaseNotification & {
-  type: NotificationType.ChallengeReward
-  challengeId: ChallengeRewardID
-  entityType: string
-  amount: StringWei
-  listenStreak?: number
-}
-
-export type ClaimableRewardNotification = BaseNotification & {
-  type: NotificationType.ClaimableReward
-  challengeId: ChallengeRewardID
-  entityType: string
-}
-
-export type TierChangeNotification = BaseNotification & {
-  type: NotificationType.TierChange
-  userId: ID
-  tier: BadgeTier
-}
-
 export type AddTrackToPlaylistNotification = BaseNotification & {
   type: NotificationType.AddTrackToPlaylist
-  trackId: ID
-  playlistId: ID
-  playlistOwnerId: ID
-}
-
-export type TrackAddedToPurchasedAlbumNotification = BaseNotification & {
-  type: NotificationType.TrackAddedToPurchasedAlbum
   trackId: ID
   playlistId: ID
   playlistOwnerId: ID
@@ -509,33 +466,6 @@ export type AddTrackToPlaylistPushNotification = {
     trackOwnerId: ID
     playlistOwnerId: ID
   }
-}
-
-export type TrackAddedToPurchasedAlbumPushNotification = {
-  type: PushNotificationType.TrackAddedToPurchasedAlbum
-  entityId: ID
-  metadata: {
-    // TODO: Need to verify camelCase vs snake_case
-    playlistId: ID
-    trackOwnerId: ID
-    playlistOwnerId: ID
-  }
-}
-
-export type USDCPurchaseSellerNotification = BaseNotification & {
-  type: NotificationType.USDCPurchaseSeller
-  entityId: ID
-  userIds: ID[]
-  entityType: Entity.Track | Entity.Album
-  amount: StringUSDC
-  extraAmount: StringUSDC
-}
-
-export type USDCPurchaseBuyerNotification = BaseNotification & {
-  type: NotificationType.USDCPurchaseBuyer
-  entityId: ID
-  userIds: ID[]
-  entityType: Entity.Track | Entity.Album
 }
 
 export type RequestManagerNotification = BaseNotification & {
@@ -581,11 +511,6 @@ export type CommentReactionNotification = BaseNotification & {
   userIds: ID[]
   entityType: Entity.Playlist | Entity.Album | Entity.Track | Entity.Event
   commentId?: ID
-}
-
-export type ListenStreakReminderNotification = BaseNotification & {
-  type: NotificationType.ListenStreakReminder
-  streak: number
 }
 
 export type FanRemixContestStartedNotification = BaseNotification & {
@@ -655,12 +580,6 @@ export type ArtistRemixContestSubmissionsNotification = BaseNotification & {
   entityType: Entity.Track
 }
 
-export type FanClubTextPostNotification = BaseNotification & {
-  type: NotificationType.FanClubTextPost
-  entityUserId: ID
-  commentId: ID
-}
-
 export type Notification =
   | AnnouncementNotification
   | UserSubscriptionNotification
@@ -677,20 +596,13 @@ export type Notification =
   | TastemakerNotification
   | TrendingTrackNotification
   | TrendingUndergroundNotification
-  | ChallengeRewardNotification
-  | ClaimableRewardNotification
-  | TierChangeNotification
   | AddTrackToPlaylistNotification
-  | TrackAddedToPurchasedAlbumNotification
-  | USDCPurchaseSellerNotification
-  | USDCPurchaseBuyerNotification
   | RequestManagerNotification
   | ApproveManagerRequestNotification
   | CommentNotification
   | CommentThreadNotification
   | CommentMentionNotification
   | CommentReactionNotification
-  | ListenStreakReminderNotification
   | ArtistRemixContestEndedNotification
   | FanRemixContestEndedNotification
   | FanRemixContestWinnersSelectedNotification
@@ -698,7 +610,6 @@ export type Notification =
   | FanRemixContestSubmissionNotification
   | ArtistRemixContestEndingSoonNotification
   | ArtistRemixContestSubmissionsNotification
-  | FanClubTextPostNotification
 
 export type IdentityNotification = Omit<Notification, 'timestamp'> & {
   timestamp: string

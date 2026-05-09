@@ -4,16 +4,18 @@ import { CommonState } from '~/store/commonStore'
 
 import { ID } from '../../../models/Identifiers'
 
-import { LibraryCategory, LibraryPageTabs } from './types'
+import { isLibraryCategory, LibraryCategory, LibraryPageTabs } from './types'
 
 export const getLibrary = (state: CommonState) => state.pages.libraryPage
 
 export const getCollectionsCategory = (state: CommonState) => {
-  return state.pages.libraryPage.collectionsCategory
+  const category = state.pages.libraryPage.collectionsCategory
+  return isLibraryCategory(category) ? category : LibraryCategory.All
 }
 
 export const getTracksCategory = (state: CommonState) => {
-  return state.pages.libraryPage.tracksCategory
+  const category = state.pages.libraryPage.tracksCategory
+  return isLibraryCategory(category) ? category : LibraryCategory.All
 }
 
 export const getCategory = (
@@ -35,17 +37,11 @@ export const getLocalTrackReposts = (state: CommonState) =>
   state.pages.libraryPage.local.track.reposts.added
 export const getLocalTrackRepost = (state: CommonState, props: { id: ID }) =>
   state.pages.libraryPage.local.track.reposts.added[props.id]
-export const getLocalTrackPurchases = (state: CommonState) =>
-  state.pages.libraryPage.local.track.purchased.added
-export const getLocalTrackPurchase = (state: CommonState, props: { id: ID }) =>
-  state.pages.libraryPage.local.track.purchased.added[props.id]
 
 export const getLocalAlbumFavorites = (state: CommonState) =>
   state.pages.libraryPage.local.album.favorites.added
 export const getLocalAlbumReposts = (state: CommonState) =>
   state.pages.libraryPage.local.album.reposts.added
-export const getLocalAlbumPurchases = (state: CommonState) =>
-  state.pages.libraryPage.local.album.purchased.added
 export const getLocalRemovedAlbumFavorites = (state: CommonState) =>
   state.pages.libraryPage.local.album.favorites.removed
 export const getLocalRemovedAlbumReposts = (state: CommonState) =>
@@ -66,21 +62,17 @@ export const getSelectedCategoryLocalTrackAdds = (state: CommonState) => {
     currentTab: LibraryPageTabs.TRACKS
   })
   const localFavorites = getLocalTrackFavorites(state)
-  const localPurchases = getLocalTrackPurchases(state)
   const localReposts = getLocalTrackReposts(state)
   let localLibraryAdditions
   if (selectedCategory === LibraryCategory.Favorite) {
     localLibraryAdditions = localFavorites
-  } else if (selectedCategory === LibraryCategory.Purchase) {
-    localLibraryAdditions = localPurchases
   } else if (selectedCategory === LibraryCategory.Repost) {
     localLibraryAdditions = localReposts
   } else {
     // Category = ALL
     localLibraryAdditions = {
       ...localReposts,
-      ...localFavorites,
-      ...localPurchases
+      ...localFavorites
     }
   }
 
@@ -97,14 +89,12 @@ const getSelectedCategoryLocalCollectionUpdates = (
       ? LibraryPageTabs.ALBUMS
       : LibraryPageTabs.PLAYLISTS
   const selectedCategory = getCategory(state, { currentTab })
-  let localFavorites: ID[], localPurchases: ID[], localReposts: ID[]
+  let localFavorites: ID[], localReposts: ID[]
   if (updateType === 'add') {
     localFavorites =
       collectionType === 'album'
         ? getLocalAlbumFavorites(state)
         : getLocalPlaylistFavorites(state)
-    localPurchases =
-      collectionType === 'album' ? getLocalAlbumPurchases(state) : [] // Can't buy playlists
     localReposts =
       collectionType === 'album'
         ? getLocalAlbumReposts(state)
@@ -114,7 +104,6 @@ const getSelectedCategoryLocalCollectionUpdates = (
       collectionType === 'album'
         ? getLocalRemovedAlbumFavorites(state)
         : getLocalRemovedPlaylistFavorites(state)
-    localPurchases = [] // Can't remove purchases
     localReposts =
       collectionType === 'album'
         ? getLocalRemovedAlbumReposts(state)
@@ -124,13 +113,11 @@ const getSelectedCategoryLocalCollectionUpdates = (
   switch (selectedCategory) {
     case LibraryCategory.Favorite:
       return localFavorites
-    case LibraryCategory.Purchase:
-      return localPurchases
     case LibraryCategory.Repost:
       return localReposts
     default:
       // Category = ALL
-      return uniq([...localReposts, ...localFavorites, ...localPurchases])
+      return uniq([...localReposts, ...localFavorites])
   }
 }
 

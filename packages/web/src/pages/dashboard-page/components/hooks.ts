@@ -6,14 +6,8 @@ import {
   useCurrentAccountUser,
   useUserTracksByHandle
 } from '@audius/common/api'
+import { Collection, Track, isContentFollowGated } from '@audius/common/models'
 import {
-  Collection,
-  Track,
-  isContentFollowGated,
-  isContentUSDCPurchaseGated
-} from '@audius/common/models'
-import {
-  IconCart,
   IconUserFollowing,
   IconVisibilityHidden,
   IconVisibilityPublic
@@ -31,9 +25,7 @@ const DASHBOARD_TRACKS_PAGE_SIZE = 50
 
 const messages = {
   public: 'Public',
-  premium: 'Premium',
   followersOnly: 'Followers Only',
-  gated: 'Gated',
   hidden: 'Hidden'
 }
 
@@ -82,56 +74,39 @@ export const useFormattedTrackData = () => {
 
 /**
  * Returns a set of arrays that contain the logged-in user's tracks filtered by
- * whether the tracks are public, follow-gated, hidden, or premium.
+ * whether the tracks are public, follow-gated, or hidden.
  * Also returns a boolean indicating whether the user has only one type of track.
  */
 const useSegregatedTrackData = () => {
   const tracks = useFormattedTrackData()
-  const {
-    hasOnlyOneSection,
-    publicTracks,
-    followGatedTracks,
-    hiddenTracks,
-    premiumTracks
-  } = useMemo(() => {
-    const publicTracks = tracks.filter(
-      (data) => data.is_unlisted === false && !data.is_stream_gated
-    )
-    const followGatedTracks = tracks.filter(
-      (data) =>
-        data.is_stream_gated && isContentFollowGated(data.stream_conditions)
-    )
-    const hiddenTracks = tracks.filter((data) => !!data.is_unlisted)
-    const premiumTracks = tracks.filter(
-      (data) =>
-        data.is_stream_gated &&
-        isContentUSDCPurchaseGated(data.stream_conditions)
-    )
+  const { hasOnlyOneSection, publicTracks, followGatedTracks, hiddenTracks } =
+    useMemo(() => {
+      const publicTracks = tracks.filter(
+        (data) => data.is_unlisted === false && !data.is_stream_gated
+      )
+      const followGatedTracks = tracks.filter(
+        (data) =>
+          data.is_stream_gated && isContentFollowGated(data.stream_conditions)
+      )
+      const hiddenTracks = tracks.filter((data) => !!data.is_unlisted)
 
-    const arrays = [
-      publicTracks,
-      followGatedTracks,
-      hiddenTracks,
-      premiumTracks
-    ]
-    const nonEmptyArrays = arrays.filter((arr) => arr.length > 0)
-    const hasOnlyOneSection = nonEmptyArrays.length <= 1
+      const arrays = [publicTracks, followGatedTracks, hiddenTracks]
+      const nonEmptyArrays = arrays.filter((arr) => arr.length > 0)
+      const hasOnlyOneSection = nonEmptyArrays.length <= 1
 
-    return {
-      hasOnlyOneSection,
-      publicTracks,
-      followGatedTracks,
-      hiddenTracks,
-      premiumTracks
-    }
-  }, [tracks])
+      return {
+        hasOnlyOneSection,
+        publicTracks,
+        followGatedTracks,
+        hiddenTracks
+      }
+    }, [tracks])
 
   return {
     hasOnlyOneSection,
     publicTracks,
     followGatedTracks,
-    hiddenTracks,
-    premiumTracks
+    hiddenTracks
   }
 }
 
@@ -146,7 +121,7 @@ export const useFilteredTrackData = ({
   filterText: string
 }) => {
   const tracks = useFormattedTrackData()
-  const { publicTracks, followGatedTracks, hiddenTracks, premiumTracks } =
+  const { publicTracks, followGatedTracks, hiddenTracks } =
     useSegregatedTrackData()
 
   const filteredData = useMemo(() => {
@@ -154,9 +129,6 @@ export const useFilteredTrackData = ({
     switch (selectedFilter) {
       case TrackFilters.PUBLIC:
         filteredData = publicTracks
-        break
-      case TrackFilters.PREMIUM:
-        filteredData = premiumTracks
         break
       case TrackFilters.FOLLOW_GATED:
         filteredData = followGatedTracks
@@ -179,7 +151,6 @@ export const useFilteredTrackData = ({
   }, [
     filterText,
     hiddenTracks,
-    premiumTracks,
     publicTracks,
     selectedFilter,
     followGatedTracks,
@@ -194,7 +165,7 @@ export const useFilteredTrackData = ({
  * the "hidden" option will only be available if the user has hidden tracks.
  */
 export const useArtistDashboardTrackFilters = () => {
-  const { followGatedTracks, hiddenTracks, premiumTracks, hasOnlyOneSection } =
+  const { followGatedTracks, hiddenTracks, hasOnlyOneSection } =
     useSegregatedTrackData()
 
   const filterButtonOptions = useMemo(() => {
@@ -206,14 +177,6 @@ export const useArtistDashboardTrackFilters = () => {
         value: TrackFilters.PUBLIC
       }
     ]
-    if (premiumTracks.length) {
-      filterButtonTrackOptions.push({
-        id: TrackFilters.PREMIUM,
-        label: messages.premium,
-        icon: IconCart,
-        value: TrackFilters.PREMIUM
-      })
-    }
     if (followGatedTracks.length) {
       filterButtonTrackOptions.push({
         id: TrackFilters.FOLLOW_GATED,
@@ -231,7 +194,7 @@ export const useArtistDashboardTrackFilters = () => {
       })
     }
     return filterButtonTrackOptions
-  }, [hiddenTracks, premiumTracks, followGatedTracks])
+  }, [hiddenTracks, followGatedTracks])
 
   return { filterButtonOptions, hasOnlyOneSection }
 }
@@ -265,31 +228,24 @@ export const useFormattedAlbumData = () => {
 const useSegregatedAlbumData = () => {
   const albums = useFormattedAlbumData()
 
-  const { hasOnlyOneSection, publicAlbums, hiddenAlbums, premiumAlbums } =
-    useMemo(() => {
-      const publicAlbums = albums.filter(
-        (data) => data.is_private === false && !data.is_stream_gated
-      )
-      const hiddenAlbums = albums.filter((data) => !!data.is_private)
-      const premiumAlbums = albums.filter(
-        (data) =>
-          data.is_stream_gated &&
-          isContentUSDCPurchaseGated(data.stream_conditions)
-      )
+  const { hasOnlyOneSection, publicAlbums, hiddenAlbums } = useMemo(() => {
+    const publicAlbums = albums.filter(
+      (data) => data.is_private === false && !data.is_stream_gated
+    )
+    const hiddenAlbums = albums.filter((data) => !!data.is_private)
 
-      const arrays = [publicAlbums, hiddenAlbums, premiumAlbums]
-      const nonEmptyArrays = arrays.filter((arr) => arr.length > 0)
-      const hasOnlyOneSection = nonEmptyArrays.length <= 1
+    const arrays = [publicAlbums, hiddenAlbums]
+    const nonEmptyArrays = arrays.filter((arr) => arr.length > 0)
+    const hasOnlyOneSection = nonEmptyArrays.length <= 1
 
-      return {
-        hasOnlyOneSection,
-        publicAlbums,
-        hiddenAlbums,
-        premiumAlbums
-      }
-    }, [albums])
+    return {
+      hasOnlyOneSection,
+      publicAlbums,
+      hiddenAlbums
+    }
+  }, [albums])
 
-  return { hasOnlyOneSection, publicAlbums, hiddenAlbums, premiumAlbums }
+  return { hasOnlyOneSection, publicAlbums, hiddenAlbums }
 }
 
 /**
@@ -303,16 +259,13 @@ export const useFilteredAlbumData = ({
   filterText: string
 }) => {
   const albums = useFormattedAlbumData()
-  const { publicAlbums, hiddenAlbums, premiumAlbums } = useSegregatedAlbumData()
+  const { publicAlbums, hiddenAlbums } = useSegregatedAlbumData()
 
   const filteredData = useMemo(() => {
     let filteredData: DataSourceAlbum[] = albums
     switch (selectedFilter) {
       case AlbumFilters.PUBLIC:
         filteredData = publicAlbums
-        break
-      case AlbumFilters.PREMIUM:
-        filteredData = premiumAlbums
         break
       case AlbumFilters.HIDDEN:
         filteredData = hiddenAlbums
@@ -329,14 +282,7 @@ export const useFilteredAlbumData = ({
     }
 
     return filteredData
-  }, [
-    albums,
-    filterText,
-    hiddenAlbums,
-    premiumAlbums,
-    publicAlbums,
-    selectedFilter
-  ])
+  }, [albums, filterText, hiddenAlbums, publicAlbums, selectedFilter])
 
   return filteredData
 }
@@ -346,8 +292,7 @@ export const useFilteredAlbumData = ({
  * the "hidden" option will only be available if the user has hidden albums.
  */
 export const useArtistDashboardAlbumFilters = () => {
-  const { hiddenAlbums, premiumAlbums, hasOnlyOneSection } =
-    useSegregatedAlbumData()
+  const { hiddenAlbums, hasOnlyOneSection } = useSegregatedAlbumData()
 
   const filterButtonOptions = useMemo(() => {
     const filterButtonAlbumOptions = [
@@ -358,14 +303,6 @@ export const useArtistDashboardAlbumFilters = () => {
         value: AlbumFilters.PUBLIC
       }
     ]
-    if (premiumAlbums.length) {
-      filterButtonAlbumOptions.push({
-        id: AlbumFilters.PREMIUM,
-        label: messages.premium,
-        icon: IconCart,
-        value: AlbumFilters.PREMIUM
-      })
-    }
     if (hiddenAlbums.length) {
       filterButtonAlbumOptions.push({
         id: AlbumFilters.HIDDEN,
@@ -376,7 +313,7 @@ export const useArtistDashboardAlbumFilters = () => {
     }
 
     return filterButtonAlbumOptions
-  }, [hiddenAlbums, premiumAlbums])
+  }, [hiddenAlbums])
 
   return { filterButtonOptions, hasOnlyOneSection }
 }

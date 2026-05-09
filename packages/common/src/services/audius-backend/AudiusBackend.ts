@@ -20,7 +20,6 @@ import {
   Transaction,
   VersionedTransaction
 } from '@solana/web3.js'
-import { getAddress } from 'viem'
 
 import { userMetadataToSdk } from '~/adapters/user'
 import { Env } from '~/services/env'
@@ -44,6 +43,7 @@ import { getErrorMessage, uuid, Maybe, Nullable } from '../../utils'
 import { MintName } from './solana'
 
 type DisplayEncoding = 'utf8' | 'hex'
+type EthereumAddress = `0x${string}`
 type PhantomEvent = 'disconnect' | 'connect' | 'accountChanged'
 type PhantomRequestMethod =
   | 'connect'
@@ -91,18 +91,15 @@ const unauthenticatedUuid = uuid()
 
 export type TransactionReceipt = { blockHash: string; blockNumber: number }
 
+const normalizeEthAddress = (address: string) => address as EthereumAddress
+
 type AudiusBackendSolanaConfig = Partial<{
   claimableTokenPda: string
   claimableTokenProgramAddress: string
-  rewardsManagerProgramId: string
-  rewardsManagerProgramPda: string
-  rewardsManagerTokenPda: string
-  paymentRouterProgramId: string
   solanaClusterEndpoint: string
   solanaFeePayerAddress: string
   solanaTokenAddress: string
   waudioMintAddress: string
-  usdcMintAddress: string
   wormholeAddress: string
 }>
 
@@ -146,8 +143,7 @@ export const audiusBackend = ({
   function getMintAddress(mint: MintName): PublicKey {
     // Simple mapping for the fixed set of mint names
     const mintAddresses: Record<MintName, string> = {
-      wAUDIO: env.WAUDIO_MINT_ADDRESS,
-      USDC: env.USDC_MINT_ADDRESS
+      wAUDIO: env.WAUDIO_MINT_ADDRESS
     }
 
     const address = mintAddresses[mint]
@@ -758,7 +754,7 @@ export const audiusBackend = ({
     if (!ethAddress) return null
 
     try {
-      const checksumWallet = getAddress(ethAddress)
+      const checksumWallet = normalizeEthAddress(ethAddress)
       const balance = await sdk.services.ethereum.audiusToken.read.balanceOf([
         checksumWallet
       ])
@@ -842,7 +838,7 @@ export const audiusBackend = ({
     if (!address) return null
 
     try {
-      const checksumWallet = getAddress(address)
+      const checksumWallet = normalizeEthAddress(address)
       const ethereum = sdk.services.ethereum
       const [balance, stakedBalance, delegatedBalance] = await Promise.all([
         ethereum.audiusToken.read.balanceOf([checksumWallet]),

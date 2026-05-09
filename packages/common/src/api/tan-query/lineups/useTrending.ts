@@ -8,7 +8,10 @@ import {
 import { userTrackMetadataFromSDK } from '~/adapters/track'
 import { transformAndCleanList } from '~/adapters/utils'
 import { useQueryContext } from '~/api/tan-query/utils'
-import { ID } from '~/models/Identifiers'
+import {
+  filterUnsupportedCryptoGatedTracks,
+  ID
+} from '~/models'
 import { TimeRange } from '~/models/TimeRange'
 import { StringKeys } from '~/services/remote-config'
 import { Genre } from '~/utils/genres'
@@ -94,9 +97,11 @@ export const useTrending = (
             offset: pageParam
           })
 
-      const tracks = transformAndCleanList(
+      const tracks = filterUnsupportedCryptoGatedTracks(
+        transformAndCleanList(
         sdkResponse,
         userTrackMetadataFromSDK
+        )
       )
 
       primeTrackData({ tracks, queryClient })

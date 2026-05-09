@@ -97,11 +97,7 @@ const PlayBar = ({
 
   const { hasStreamAccess } = useGatedContentAccess(track)
   const isPreviewing = useSelector(getPreviewing)
-  const shouldShowPreviewLock =
-    isPreviewing ||
-    (track?.stream_conditions &&
-      'usdc_purchase' in track.stream_conditions &&
-      !hasStreamAccess)
+  const shouldShowPreviewLock = isPreviewing || !hasStreamAccess
 
   const toggleFavorite = useToggleFavoriteTrack({
     trackId: track?.track_id,
@@ -212,7 +208,7 @@ const PlayBar = ({
               <div className={styles.lockPreview}>
                 <LockedStatusBadge
                   locked
-                  variant='premium'
+                  variant='gated'
                   text={messages.preview}
                   coloredWhenLocked
                   iconSize='2xs'

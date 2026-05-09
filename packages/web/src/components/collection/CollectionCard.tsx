@@ -1,11 +1,7 @@
 import { MouseEvent, Ref, forwardRef, useCallback } from 'react'
 
-import { useCollection, useCurrentUserId } from '@audius/common/api'
-import {
-  ID,
-  SquareSizes,
-  isContentUSDCPurchaseGated
-} from '@audius/common/models'
+import { useCollection } from '@audius/common/api'
+import { ID, SquareSizes } from '@audius/common/models'
 import { formatCount, formatReleaseDate } from '@audius/common/utils'
 import { Flex, Skeleton, Text, useTheme } from '@audius/harmony'
 import IconHeart from '@audius/harmony/src/assets/icons/Heart.svg'
@@ -15,7 +11,6 @@ import { useLinkClickHandler } from 'react-router'
 
 import { Card, CardProps, CardFooter, CardContent } from 'components/card'
 import { TextLink, UserLink } from 'components/link'
-import { LockedStatusBadge } from 'components/locked-status-badge'
 
 import { CollectionDogEar } from './CollectionDogEar'
 import { CollectionImage } from './CollectionImage'
@@ -86,7 +81,6 @@ export const CollectionCard = forwardRef(
       ...other
     } = props
 
-    const { data: currentUserId } = useCurrentUserId()
     const { data: collection, isPending } = useCollection(id, {
       select: (collection) =>
         pick(
@@ -97,8 +91,6 @@ export const CollectionCard = forwardRef(
           'repost_count',
           'save_count',
           'is_private',
-          'access',
-          'stream_conditions',
           'is_scheduled_release',
           'release_date'
         )
@@ -111,8 +103,6 @@ export const CollectionCard = forwardRef(
       repost_count,
       save_count,
       is_private: isPrivate,
-      access,
-      stream_conditions,
       is_scheduled_release: isScheduledRelease,
       release_date: releaseDate
     } = collection ?? {}
@@ -131,9 +121,6 @@ export const CollectionCard = forwardRef(
     if (isPending || loading) {
       return <CollectionCardSkeleton size={size} {...other} />
     }
-
-    const isOwner = currentUserId === playlist_owner_id
-    const isPurchase = isContentUSDCPurchaseGated(stream_conditions)
 
     return (
       <Card ref={ref} onClick={handleClick} size={size} {...other}>
@@ -196,9 +183,6 @@ export const CollectionCard = forwardRef(
               </Flex>
             </>
           )}
-          {isPurchase && !isOwner ? (
-            <LockedStatusBadge variant='premium' locked={!access?.stream} />
-          ) : null}
         </CardFooter>
       </Card>
     )

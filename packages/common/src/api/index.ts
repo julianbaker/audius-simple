@@ -34,12 +34,9 @@ export * from './tan-query/events'
 export * from './tan-query/collection/useExploreContent'
 export * from './tan-query/collection/useTrendingAlbums'
 export * from './tan-query/collection/useNewAlbumReleases'
-export * from './tan-query/collection/useBestSellingAlbums'
 
 // Lineups
 export * from './tan-query/lineups/useFeed'
-export * from './tan-query/lineups/useForYouFeed'
-export * from './tan-query/lineups/useExclusiveTracks'
 export * from './tan-query/lineups/useLibraryTracks'
 export * from './tan-query/lineups/useProfileReposts'
 export * from './tan-query/lineups/useProfileTracks'
@@ -54,19 +51,6 @@ export * from './tan-query/notifications/useNotifications'
 export * from './tan-query/notifications/useNotificationEntities'
 export * from './tan-query/notifications/useNotificationEntity'
 export * from './tan-query/notifications/useNotificationUnreadCount'
-
-// Purchases
-export * from './tan-query/purchases/useAudioTransactions'
-export * from './tan-query/purchases/useUSDCTransactions'
-export * from './tan-query/purchases/useUSDCTransactionsCount'
-export * from './tan-query/purchases/useAudioTransactionsCount'
-export * from './tan-query/purchases/usePurchases'
-export * from './tan-query/purchases/usePurchasesCount'
-export * from './tan-query/purchases/useSales'
-export * from './tan-query/purchases/useSalesCount'
-export * from './tan-query/purchases/usePurchasers'
-export * from './tan-query/purchases/usePurchasersCount'
-export * from './tan-query/purchases/useSalesAggregate'
 
 // Reactions
 export * from './tan-query/reactions/types'
@@ -165,25 +149,6 @@ export * from './tan-query/users/account/useWalletAddresses'
 export * from './tan-query/users/account/useAccountStatus'
 export * from './tan-query/users/account/useSyncLocalStorageUser'
 
-// Wallet logic
-export * from './tan-query/wallets/useAudioBalance'
-export * from './tan-query/wallets/useAssociatedWallets'
-export * from './tan-query/wallets/useWalletOwner'
-export * from './tan-query/wallets/useUSDCBalance'
-export * from './tan-query/wallets/useDestinationUsdcAccountCheck'
-export * from './tan-query/wallets/useRootWalletUsdcAccountCheck'
-export * from './tan-query/wallets/useExternalWalletBalance'
-export * from './tan-query/wallets/useCoinBalance'
-export * from './tan-query/wallets/useCoinBalanceBreakdown'
-export * from './tan-query/wallets/useUserBalanceHistory'
-export * from './tan-query/wallets/useUserTotalBalance'
-export * from './tan-query/wallets/useSendCoins'
-export * from './tan-query/wallets/useTransferEthToSol'
-export * from './tan-query/jupiter/useSwapCoins'
-export * from './tan-query/jupiter/useCoinExchangeRate'
-export * from './tan-query/jupiter/utils'
-export * from './tan-query/jupiter/types'
-
 // Saga fetch utils, remove when migration is complete
 export * from './tan-query/saga-utils'
 export * from './tan-query/utils'
@@ -191,9 +156,6 @@ export * from './tan-query/utils'
 // New authorized-apps exports
 export * from './tan-query/authorized-apps/useAuthorizedApps'
 export * from './tan-query/authorized-apps/useRemoveAuthorizedApp'
-
-// Coins
-export * from './tan-query/coins'
 
 // Uploads
 export * from './tan-query/upload/useUpload'

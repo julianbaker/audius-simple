@@ -33,7 +33,7 @@ const messages = {
  * document scroll, so it remains reachable while the user scrolls the
  * contest grid.
  *
- * Positioning mirrors FanClubsExplorePage's launch banner: fixed inside
+ * Positioning is fixed inside
  * a portal on the main content container, offset by the nav width on the
  * left and the play bar height on the bottom. Dismissable for the rest
  * of the session (state is not persisted across reloads).

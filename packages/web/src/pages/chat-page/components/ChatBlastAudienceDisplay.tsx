@@ -4,7 +4,6 @@ import {
   useChatBlastAudienceContent
 } from '@audius/common/hooks'
 import { User } from '@audius/common/models'
-import { PurchaseableContentType } from '@audius/common/store'
 import {
   Text,
   IconTowerBroadcast,
@@ -51,14 +50,8 @@ export const ChatBlastAudienceDisplay = (
     case ChatBlastAudience.FOLLOWERS:
       userListType = UserListType.FOLLOWER
       break
-    case ChatBlastAudience.CUSTOMERS:
-      userListType = UserListType.PURCHASER
-      break
     case ChatBlastAudience.REMIXERS:
       userListType = UserListType.REMIXER
-      break
-    case ChatBlastAudience.COIN_HOLDERS:
-      userListType = UserListType.COIN_LEADERBOARD
       break
     default:
       userListType = UserListType.FOLLOWER
@@ -92,16 +85,16 @@ export const ChatBlastAudienceDisplay = (
             limit={USER_LIST_LIMIT}
             userListType={userListType}
             userListEntityType={
-              audienceContentType === PurchaseableContentType.TRACK
+              audienceContentType === 'track'
                 ? UserListEntityType.TRACK
-                : audienceContentType === PurchaseableContentType.ALBUM
+                : audienceContentType === 'album'
                   ? UserListEntityType.COLLECTION
                   : UserListEntityType.USER
             }
             userListEntityId={
-              audienceContentType === PurchaseableContentType.TRACK
+              audienceContentType === 'track'
                 ? audienceContentId
-                : audienceContentType === PurchaseableContentType.ALBUM
+                : audienceContentType === 'album'
                   ? audienceContentId
                   : (currentUserId ?? undefined)
             }

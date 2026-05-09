@@ -19,7 +19,7 @@ const messages = {
   title: 'Remove Track',
   description1: 'Are you sure you want to remove this track from your album?',
   description2:
-    'By default, fans who have purchased your album will still have access to your track.',
+    'This removes the track from the album listing, but the standalone track remains available wherever it is already published.',
   cancel: 'Cancel',
   release: 'Remove Track From Album'
 }

@@ -13,9 +13,9 @@ const invalidPaths = new Set(['undefined'])
 // Reserved paths that have their own SSR handlers and should NOT match /@handle patterns
 // This prevents /upload from being matched as a profile with handle="upload"
 const reservedPaths = new Set([
+  'home',
   'upload',
   'explore',
-  'audio',
   'signup',
   'download',
   'trending',
@@ -23,20 +23,15 @@ const reservedPaths = new Set([
   'library',
   'history',
   'dashboard',
-  'rewards',
   'settings',
   'notifications',
   'messages',
   'search',
-  'coins',
-  'clubs',
-  'cash',
-  'wallet',
   'error'
 ])
 
 // Static routes that should skip SSR (only the root now, all others have SSR handlers)
-const staticRoutes = new Set(['/'])
+const staticRoutes = new Set(['/', '/home'])
 
 // Paths that should not use SSR even if they match a route
 const nonSsrPaths = [

@@ -1,10 +1,3 @@
-import { useCollection } from '~/api'
-import { ID, isContentUSDCPurchaseGated } from '~/models'
+import { ID } from '~/models'
 
-export const useIsCollectionUnlockable = (collectionId: ID) => {
-  const { data: streamConditions } = useCollection(collectionId, {
-    select: (collection) => collection?.stream_conditions
-  })
-
-  return isContentUSDCPurchaseGated(streamConditions)
-}
+export const useIsCollectionUnlockable = (_collectionId: ID) => false

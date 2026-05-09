@@ -3,8 +3,7 @@ import { useCallback } from 'react'
 import {
   AccessConditions,
   DownloadTrackAvailabilityType,
-  isContentFollowGated,
-  isContentUSDCPurchaseGated
+  isContentFollowGated
 } from '@audius/common/models'
 import { Nullable } from '@audius/common/utils'
 import {
@@ -12,7 +11,6 @@ import {
   Flex,
   IconUserFollowing,
   IconVisibilityPublic,
-  IconCart,
   Text,
   TextLink,
   IconError,
@@ -28,18 +26,12 @@ import { useTrackField } from 'components/edit-track/hooks'
 
 import { STREAM_CONDITIONS } from '../types'
 
-import { DownloadPriceField } from './DownloadPriceField'
-
 const getMessages = (props: DownloadAvailabilityProps) => ({
   downloadAvailability: 'Download Availability',
   customize: 'Decide who can download your files.',
   public: 'Public',
   followers: 'Followers',
-  premium: 'Premium',
   callout: {
-    premium: `You're ${
-      props.isUpload ? 'uploading' : 'editing'
-    } a Premium track. By default, purchasers will be able to download your available files. If you'd like to sell your files, set your track to Public or Hidden in the`,
     followersOnly: `You're ${
       props.isUpload ? 'uploading' : 'editing'
     } a Followers Only track. By default, users who unlock your track will be able to download your available files. If you'd like to sell your files, set your track to Public or Hidden in the`,
@@ -60,24 +52,15 @@ export const DownloadAvailability = (props: DownloadAvailabilityProps) => {
   const { submitForm, setStatus } = useFormikContext()
   const [{ value: streamConditions }] =
     useTrackField<Nullable<AccessConditions>>(STREAM_CONDITIONS)
-  const isUsdcGated = isContentUSDCPurchaseGated(streamConditions)
   const isFollowGated = isContentFollowGated(streamConditions)
-  const shouldRenderCallout = isUsdcGated || isFollowGated
+  const shouldRenderCallout = isFollowGated
 
   const getCalloutMessage = useCallback(() => {
-    if (isUsdcGated) {
-      return messages.callout.premium
-    }
     if (isFollowGated) {
       return messages.callout.followersOnly
     }
     return ''
-  }, [
-    isFollowGated,
-    isUsdcGated,
-    messages.callout.premium,
-    messages.callout.followersOnly
-  ])
+  }, [isFollowGated, messages.callout.followersOnly])
 
   const handleCalloutClick = useCallback(() => {
     setStatus(MenuFormCallbackStatus.OPEN_ACCESS_AND_SALE)
@@ -94,12 +77,6 @@ export const DownloadAvailability = (props: DownloadAvailabilityProps) => {
       key: DownloadTrackAvailabilityType.FOLLOWERS,
       text: messages.followers,
       icon: <IconUserFollowing size='s' color='default' />
-    },
-    {
-      key: DownloadTrackAvailabilityType.USDC_PURCHASE,
-      text: messages.premium,
-      icon: <IconCart size='s' color='default' />,
-      variant: 'default'
     }
   ]
 
@@ -144,9 +121,6 @@ export const DownloadAvailability = (props: DownloadAvailabilityProps) => {
             // Matches 0.18s entry animation
             forceRefreshAfterMs={180}
           />
-          {value === DownloadTrackAvailabilityType.USDC_PURCHASE ? (
-            <DownloadPriceField disabled={false} />
-          ) : null}
         </>
       )}
       <Divider />

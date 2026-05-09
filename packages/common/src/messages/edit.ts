@@ -17,10 +17,8 @@ export const visibilityMessages = {
 
 export const priceAndAudienceMessages = {
   title: 'Price & Audience',
-  freePremiumDescription: 'Control who can access your track.',
+  accessDescription: 'Control who can access your track.',
   free: 'Free for Everyone',
-  premium: 'Premium',
-  coinGated: 'Coin Gated',
   hidden: 'Hidden',
   followersOnly: 'Followers Only',
   markedAsRemix:
@@ -30,32 +28,16 @@ export const priceAndAudienceMessages = {
     'Publishing is disabled for empty albums and albums containing hidden tracks.',
   fromFreeHint: (
     contentType: 'album' | 'track',
-    gatedType: 'gated' | 'premium'
+    gatedType: 'gated'
   ) => `You can't make a free ${contentType} ${gatedType}.`,
   freeRadio: {
     title: 'Free for Everyone',
     description: (contentType: 'album' | 'track') =>
       `Everyone can stream your ${contentType} for free.`
   },
-  premiumRadio: {
-    title: 'Premium',
-    description: (contentType: 'album' | 'track') =>
-      `Only those who purchase can stream your ${contentType}.`,
-    waitlist:
-      'Start selling your music on Audius today! Limited access beta now available.',
-    join: 'Join the Waitlist',
-    comingSoon: 'Coming Soon'
-  },
   followersOnlyRadio: {
     title: 'Followers Only',
     description: 'Anyone who follows your account can stream.'
-  },
-  tokenGatedRadio: {
-    title: 'Coin Gated',
-    yourCoin: 'your coin',
-    noCoins: 'No coins found. Launch a coin to enable this option.',
-    description: (coinTicker: string) =>
-      `Anyone holding $${coinTicker} can stream.`
   }
 }
 

@@ -16,18 +16,12 @@ export type GateKeeper = {
 export const STREAM_AVAILABILITY_TYPE = 'stream_availability_type'
 export const IS_STREAM_GATED = 'is_stream_gated'
 export const STREAM_CONDITIONS = 'stream_conditions'
-export const PRICE = 'stream_conditions.usdc_purchase.price'
-export const ALBUM_TRACK_PRICE =
-  'stream_conditions.usdc_purchase.albumTrackPrice'
-export const PRICE_HUMANIZED = 'price_humanized'
 export const PREVIEW = 'preview_start_seconds'
 export const DOWNLOAD_AVAILABILITY_TYPE = 'download_availability_type'
 export const IS_DOWNLOADABLE = 'is_downloadable'
 export const IS_ORIGINAL_AVAILABLE = 'is_original_available'
 export const IS_DOWNLOAD_GATED = 'is_download_gated'
 export const DOWNLOAD_CONDITIONS = 'download_conditions'
-export const DOWNLOAD_PRICE = 'download_conditions.usdc_purchase.price'
-export const DOWNLOAD_PRICE_HUMANIZED = 'download_price_humanized'
 export const STEMS = 'stems'
 export const IS_UNLISTED = 'is_unlisted'
 export const IS_PRIVATE = 'is_private'
@@ -43,7 +37,6 @@ export type AccessAndSaleFormValues = {
   [STREAM_AVAILABILITY_TYPE]: StreamTrackAvailabilityType
   [STREAM_CONDITIONS]: Nullable<AccessConditions>
   [FIELD_VISIBILITY]: FieldVisibility
-  [PRICE_HUMANIZED]: string
   [PREVIEW]?: number
 }
 
@@ -55,5 +48,4 @@ export type StemsAndDownloadsFormValues = {
   [DOWNLOAD_CONDITIONS]: Nullable<AccessConditions>
   [STREAM_CONDITIONS]: Nullable<AccessConditions>
   [DOWNLOAD_AVAILABILITY_TYPE]: DownloadTrackAvailabilityType
-  [IS_OWNED_BY_USER]: boolean
 }

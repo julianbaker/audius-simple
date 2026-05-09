@@ -25,7 +25,6 @@ import {
   LibraryPageTabs as ProfileTabs,
   libraryPageActions as saveActions,
   libraryPageSelectors,
-  LibraryCategory,
   LibraryPageTabs,
   playbackSelectors,
   tracksSocialActions as socialActions,
@@ -62,7 +61,6 @@ const { getPlaying, getBuffering } = playbackSelectors
 const {
   getLocalTrackFavorites,
   getLocalTrackReposts,
-  getLocalTrackPurchases,
   getTracksCategory,
   getCategory
 } = libraryPageSelectors
@@ -101,7 +99,6 @@ type LibraryPageState = {
   initialOrder: UID[] | null
   reordering?: UID[] | null
   allowReordering?: boolean
-  shouldReturnToTrackPurchases: boolean
 }
 
 export const useLibraryPage = () => {
@@ -115,7 +112,6 @@ export const useLibraryPage = () => {
 
   const localFavorites = useSelector(getLocalTrackFavorites)
   const localReposts = useSelector(getLocalTrackReposts)
-  const localPurchases = useSelector(getLocalTrackPurchases)
 
   const getCurrentQueueItem = makeGetCurrent()
   const currentQueueItem = useSelector(getCurrentQueueItem)
@@ -148,8 +144,7 @@ export const useLibraryPage = () => {
     sortDirection: '',
     initialOrder: null,
     allTracksFetched: false,
-    currentTab: urlTab,
-    shouldReturnToTrackPurchases: false
+    currentTab: urlTab
   })
 
   // Debounced query input — drives the tan-query queryKey, so each keystroke
@@ -168,13 +163,7 @@ export const useLibraryPage = () => {
   // Sync from URL to state and Redux when location changes
   useEffect(() => {
     const tab = getTabFromPathname(location.pathname)
-    let category = categoryFromFilterParam(urlFilter)
-    if (
-      tab === LibraryPageTabs.PLAYLISTS &&
-      category === LibraryCategory.Purchase
-    ) {
-      category = LibraryCategory.All
-    }
+    const category = categoryFromFilterParam(urlFilter)
     const search = urlSearch
 
     lastCategoryUrlRef.current = filterParamFromCategory(category)
@@ -244,15 +233,14 @@ export const useLibraryPage = () => {
     const localIds = Array.from(
       new Set([
         ...Object.keys(localFavorites).map(Number),
-        ...Object.keys(localReposts).map(Number),
-        ...Object.keys(localPurchases).map(Number)
+        ...Object.keys(localReposts).map(Number)
       ])
     ) as ID[]
     const allIds = new Set<ID>()
     localIds.forEach((id) => allIds.add(id))
     fetchedTrackIds.forEach((id) => allIds.add(id))
     return Array.from(allIds)
-  }, [fetchedTrackIds, localFavorites, localReposts, localPurchases])
+  }, [fetchedTrackIds, localFavorites, localReposts])
 
   const {
     byId: libraryTracksById,

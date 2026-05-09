@@ -20,8 +20,7 @@ import { useCurrentTrack } from '@audius/common/hooks'
 import {
   Status,
   ID,
-  isContentUSDCPurchaseGated,
-  ModalSource,
+  isContentUnsupportedCryptoGated,
   Name,
   ShareSource,
   RepostSource,
@@ -38,7 +37,6 @@ import {
   tracksSocialActions as socialTracksActions,
   usersSocialActions as socialUsersActions,
   mobileOverflowMenuUIActions,
-  modalsActions,
   shareModalUIActions,
   OverflowAction,
   OverflowSource,
@@ -49,9 +47,6 @@ import {
   CollectionTrack,
   CollectionsPageType,
   CollectionPageTrackRecord,
-  PurchaseableContentType,
-  usePremiumContentPurchaseModalActions,
-  albumTrackRemoveConfirmationModalActions,
   PlayerBehavior,
   cacheCollectionsActions
 } from '@audius/common/store'
@@ -83,7 +78,6 @@ import { getPathname, collectionPage, profilePage } from 'utils/route'
 import { parseCollectionRoute } from 'utils/route/collectionRouteParser'
 
 const { NOT_FOUND_PAGE, REPOSTING_USERS_ROUTE, FAVORITING_USERS_ROUTE } = route
-const { trackModalOpened } = modalsActions
 const {
   makeGetCurrent,
   getCurrentPlayerBehavior: getPlayerBehavior,
@@ -326,7 +320,9 @@ export const useCollectionPage = (
   // Error handling
   useEffect(() => {
     if (!params || !collection) return
-    if (status === Status.ERROR) {
+    if (isContentUnsupportedCryptoGated(collection.stream_conditions)) {
+      navigate(NOT_FOUND_PAGE)
+    } else if (status === Status.ERROR) {
       if (
         params.collectionId === playlistId &&
         collection?.playlist_owner_id !== accountUserId
@@ -602,44 +598,10 @@ export const useCollectionPage = (
     [dispatch]
   )
 
-  const onClickPurchaseTrack = useCallback(
-    (record: CollectionPageTrackRecord) => {
-      dispatch(
-        usePremiumContentPurchaseModalActions.open({
-          contentId: record.track_id,
-          contentType: PurchaseableContentType.TRACK
-        })
-      )
-      dispatch(
-        trackModalOpened({
-          name: 'PremiumContentPurchaseModal',
-          trackingData: {
-            contentId: record.track_id,
-            contentType: PurchaseableContentType.TRACK,
-            source: ModalSource.TrackListItem
-          },
-          source: ModalSource.TrackListItem
-        })
-      )
-    },
-    [dispatch]
-  )
-
   const onClickRemove = useCallback(
-    (trackId: number, _index: number, uid: string, timestamp: number) => {
+    (trackId: number, _index: number, _uid: string, timestamp: number) => {
       if (!collection || !playlistId) return
-      if (isContentUSDCPurchaseGated(collection.stream_conditions)) {
-        dispatch(
-          albumTrackRemoveConfirmationModalActions.open({
-            trackId,
-            playlistId,
-            uid,
-            timestamp
-          })
-        )
-      } else {
-        dispatch(removeTrackFromPlaylist(trackId, playlistId, timestamp))
-      }
+      dispatch(removeTrackFromPlaylist(trackId, playlistId, timestamp))
     },
     [collection, playlistId, dispatch]
   )
@@ -966,7 +928,6 @@ export const useCollectionPage = (
     onFilterChange,
     onClickRow,
     onClickRepostTrack,
-    onClickPurchaseTrack,
     onClickRemove,
     onPlay,
     onPreview,

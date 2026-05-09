@@ -1,5 +1,4 @@
 import {
-  buyUSDCSagas,
   castSagas,
   chatSagas,
   reachabilitySagas as commonReachabilitySagas,
@@ -8,15 +7,12 @@ import {
   duplicateAddConfirmationModalUISagas as duplicateAddConfirmationModalSagas,
   mobileOverflowMenuUISagas as overflowMenuSagas,
   shareModalUISagas as shareModalSagas,
-  stripeModalUISagas as stripeModalSagas,
   toastSagas,
   modalsSagas,
   playbackSagas,
   playbackPositionSagas,
   gatedContentSagas,
-  purchaseContentSagas,
-  confirmerSagas,
-  withdrawUSDCSagas
+  confirmerSagas
 } from '@audius/common/store'
 import { sagaWithErrorHandler } from '@audius/common/utils'
 import { all, spawn } from 'typed-redux-saga'
@@ -25,7 +21,6 @@ import addToCollectionSagas from 'common/store/add-to-collection/sagas'
 import analyticsSagas from 'common/store/analytics/sagas'
 import backendSagas from 'common/store/backend/sagas'
 import collectionsSagas from 'common/store/cache/collections/webSagas'
-import rewardsPageSagas from 'common/store/pages/audio-rewards/sagas'
 import collectionSagas from 'common/store/pages/collection/sagas'
 import deactivateAccountSagas from 'common/store/pages/deactivate-account/sagas'
 import feedPageSagas from 'common/store/pages/feed/sagas'
@@ -73,7 +68,6 @@ export default function* rootSaga() {
     feedPageSagas(),
     passwordResetSagas(),
     profileSagas(),
-    rewardsPageSagas(),
     settingsSagas(),
     signOnSaga(),
     socialSagas(),
@@ -102,7 +96,6 @@ export default function* rootSaga() {
     firstUploadModalSagas(),
     scrollLockSagas(),
     shareModalSagas(),
-    stripeModalSagas(),
     overflowMenuSagas(),
     toastSagas(),
 
@@ -115,9 +108,6 @@ export default function* rootSaga() {
 
     // Gated content
     gatedContentSagas(),
-    buyUSDCSagas(),
-    purchaseContentSagas(),
-    withdrawUSDCSagas(),
 
     // Error
     errorSagas(),
@@ -149,7 +139,6 @@ export function* testRootSaga() {
     // passwordResetSagas(),
     profileSagas(),
     // reactionSagas(),
-    // rewardsPageSagas(),
     // savedSagas(),
     // searchResultsSagas(),
     // settingsSagas(),
@@ -159,8 +148,6 @@ export function* testRootSaga() {
     // trendingPageSagas(),
     // trendingUndergroundSagas(),
     // uploadSagas(),
-    // premiumTracksSagas(),
-
     modalsSagas(),
 
     // Cache
@@ -195,9 +182,6 @@ export function* testRootSaga() {
 
     // Gated content
     // gatedContentSagas(),
-    // buyUSDCSagas(),
-    // purchaseContentSagas(),
-    // withdrawUSDCSagas(),
 
     // Error
     errorSagas()

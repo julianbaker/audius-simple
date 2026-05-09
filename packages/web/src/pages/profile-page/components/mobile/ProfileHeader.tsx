@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 
-import { useArtistCreatedFanClub } from '@audius/common/api'
 import {
   imageCoverPhotoBlank,
   imageProfilePicEmpty
@@ -35,13 +34,11 @@ import { ArtistRecommendationsDropdown } from 'components/artist-recommendations
 import Skeleton from 'components/skeleton/Skeleton'
 import SubscribeButton from 'components/subscribe-button/SubscribeButton'
 import FollowsYouBadge from 'components/user-badges/FollowsYouBadge'
-import ProfilePageBadge from 'components/user-badges/ProfilePageBadge'
 import UserBadges from 'components/user-badges/UserBadges'
 import { UserGeneratedText } from 'components/user-generated-text'
 import { useCoverPhoto } from 'hooks/useCoverPhoto'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 
-import { BuyFanClubButton } from './BuyFanClubButton'
 import GrowingCoverPhoto from './GrowingCoverPhoto'
 import styles from './ProfileHeader.module.css'
 import { SocialLink } from './SocialLink'
@@ -215,10 +212,6 @@ const ProfileHeader = ({
     size: SquareSizes.SIZE_150_BY_150
   })
 
-  // Fan club detection
-  const { data: fanClub, isPending: isFanClubLoading } =
-    useArtistCreatedFanClub(userId)
-
   const record = useRecord()
 
   const onGoToInstagram = useCallback(() => {
@@ -383,7 +376,6 @@ const ProfileHeader = ({
             </div>
           </div>
           <Flex alignItems='center' gap='m'>
-            <ProfilePageBadge userId={userId} isCompact />
             <Flex gap='xl' justifyContent='center' flex={1}>
               {xHandle ? (
                 <SocialLink
@@ -451,11 +443,6 @@ const ProfileHeader = ({
             artistId={userId}
             onClose={onCloseArtistRecommendations}
           />
-
-          {/* Fan club buy button or tip button */}
-          {mode !== 'owner' && !isFanClubLoading && fanClub?.mint && (
-            <BuyFanClubButton userId={userId} />
-          )}
         </div>
       )}
       {mode === 'owner' && !isEditing && <UploadButton />}

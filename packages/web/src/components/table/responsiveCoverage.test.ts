@@ -14,12 +14,7 @@ const responsiveConsumerFiles = [
   'src/pages/collection-page/components/desktop/CollectionPage.tsx',
   'src/pages/dashboard-page/components/ArtistDashboardTracksTab.tsx',
   'src/pages/history-page/components/desktop/HistoryPage.tsx',
-  'src/pages/dashboard-page/components/ArtistDashboardAlbumsTab.tsx',
-  'src/pages/fan-clubs-launchpad-page/components/FanClubsTable.tsx',
-  'src/components/audio-transactions-table/AudioTransactionsTable.tsx',
-  'src/pages/pay-and-earn-page/components/SalesTable.tsx',
-  'src/pages/pay-and-earn-page/components/PurchasesTable.tsx',
-  'src/pages/pay-and-earn-page/components/WithdrawalsTable.tsx'
+  'src/pages/dashboard-page/components/ArtistDashboardAlbumsTab.tsx'
 ]
 
 const allowedNonPolicyTableConsumers = [
@@ -70,17 +65,12 @@ describe('responsive table coverage', () => {
   it('has a policy for each audited shared table consumer', () => {
     expect(Object.keys(RESPONSIVE_TABLE_POLICIES).sort()).toEqual(
       [
-        'fanClubsLeaderboard',
-        'audioTransactions',
         'collectionAlbumTracks',
         'collectionPlaylistTracks',
         'dashboardAlbums',
         'dashboardTracks',
         'historyTracks',
-        'libraryTracks',
-        'purchases',
-        'sales',
-        'withdrawals'
+        'libraryTracks'
       ].sort()
     )
   })

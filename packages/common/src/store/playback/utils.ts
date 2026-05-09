@@ -1,4 +1,4 @@
-import { Track, isContentUSDCPurchaseGated } from '~/models/Track'
+import { Track } from '~/models/Track'
 
 import { PlayerBehavior } from './types'
 
@@ -12,8 +12,7 @@ export function calculatePlayerBehavior(
     return { shouldSkip: false, shouldPreview: false }
   }
 
-  const isPreviewAvailable =
-    !!track.preview_cid && isContentUSDCPurchaseGated(track.stream_conditions)
+  const isPreviewAvailable = false
   const hasStreamAccess = !track.is_stream_gated || !!track.access?.stream
 
   let shouldPreview = false

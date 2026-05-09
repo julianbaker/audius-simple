@@ -35,8 +35,6 @@ import {
 import { Category, CategoryKey, CategoryView } from 'pages/search-page/types'
 
 import { ArtistSpotlightSection } from '../desktop/ArtistSpotlightSection'
-import { BestSellingAlbumsSection } from '../desktop/BestSellingAlbumsSection'
-import { FanClubsExploreSection } from '../desktop/FanClubsExploreSection'
 import { FeaturedPlaylistsSection } from '../desktop/FeaturedPlaylistsSection'
 import { FeaturedRemixContestsSection } from '../desktop/FeaturedRemixContestsSection'
 import { FeelingLuckySection } from '../desktop/FeelingLuckySection'
@@ -236,9 +234,7 @@ const SearchExplorePage = ({
           {showPlaylistContent ? <FeaturedPlaylistsSection /> : null}
           {showAlbumContent ? <TopAlbumsThisMonthSection /> : null}
           {showAlbumContent ? <NewAlbumReleasesSection /> : null}
-          {showAlbumContent ? <BestSellingAlbumsSection /> : null}
           {showTrackContent ? <FeaturedRemixContestsSection /> : null}
-          {categoryKey === CategoryView.ALL ? <FanClubsExploreSection /> : null}
           {isTracksTab ? <UndergroundTrendingTracksSection /> : null}
           {showUserContent ? <ArtistSpotlightSection /> : null}
           {showUserContent ? <LabelSpotlightSection /> : null}

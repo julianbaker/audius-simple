@@ -41,6 +41,7 @@ import {
 import { EventEntityTypeEnum, EventEventTypeEnum } from '@audius/sdk'
 import { useNavigate, useParams } from 'react-router'
 
+import { AttachVideoModal } from 'components/attach-video-modal/AttachVideoModal'
 import { ConfirmationModal } from 'components/confirmation-modal/ConfirmationModal'
 import { DatePicker } from 'components/edit/fields/DatePickerField'
 import { mergeReleaseDateValues } from 'components/edit/fields/visibility/mergeReleaseDateValues'
@@ -54,7 +55,6 @@ import {
   TimeInput,
   parseTime
 } from '../../components/host-remix-contest-modal/TimeInput'
-import { AttachVideoModal } from '../fan-club-detail-page/components/AttachVideoModal'
 
 import { AddSourceTrackModal } from './AddSourceTrackModal'
 import { ManageStemsModal } from './ManageStemsModal'
@@ -87,7 +87,7 @@ const messages = {
   coverPhotoUploadFailed:
     'Upload failed. Try again or leave blank to use the track artwork.',
   prizesLabel: 'Prizes',
-  prizesHelper: 'Describe all prizes, rewards, or other incentives.',
+  prizesHelper: 'Describe all prizes, perks, or other incentives.',
   prizesPlaceholder: '1st place gets $500. 2nd place gets $250…',
   sourceTracksLabel: 'Source Track',
   sourceTracksHelper:

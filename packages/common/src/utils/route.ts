@@ -2,14 +2,12 @@ import qs from 'query-string'
 
 import { ID, SearchCategory, SearchFilters } from '~/models'
 
-import { encodeUrlName, formatTickerForUrl } from './formatUtil'
+import { encodeUrlName } from './formatUtil'
 import { convertGenreLabelToValue, type GenreLabel } from './genres'
 
 // External Routes
 export const PRIVACY_POLICY = '/legal/privacy-policy'
 export const TERMS_OF_SERVICE = '/legal/terms-of-use'
-export const FAN_CLUB_TERMS = '/legal/fan-club-terms'
-export const FAN_CLUB_ACCEPTABLE_USE = '/legal/fan-club-acceptable-use'
 export const API_TERMS = '/legal/api-terms'
 export const DOWNLOAD_START_LINK = '/download?start_download=true'
 export const DOWNLOAD_LINK = '/download'
@@ -43,15 +41,12 @@ export const LIBRARY_ALBUMS_PAGE = '/library/albums'
 export const LIBRARY_PLAYLISTS_PAGE = '/library/playlists'
 export const HISTORY_PAGE = '/history'
 export const DASHBOARD_PAGE = '/dashboard'
-export const AUDIO_PAGE = '/audio'
-export const REWARDS_PAGE = '/rewards'
-export const AIRDROP_PAGE = '/rewards/airdrop'
-export const WALLET_AUDIO_PAGE = '/wallet/audio'
 export const UPLOAD_PAGE = '/upload'
 export const UPLOAD_ALBUM_PAGE = '/upload/album'
 export const UPLOAD_PLAYLIST_PAGE = '/upload/playlist'
 export const SETTINGS_PAGE = '/settings'
 export const HOME_PAGE = '/'
+export const HOMEPAGE_PAGE = '/home'
 export const NOT_FOUND_PAGE = '/404'
 export const SIGN_IN_PAGE = '/signin'
 export const SIGN_IN_CONFIRM_EMAIL_PAGE = '/signin/confirm-email'
@@ -69,35 +64,9 @@ export const CHECK_PAGE = '/check'
 export const DEACTIVATE_PAGE = '/deactivate'
 export const CHATS_PAGE = '/messages'
 export const CHAT_PAGE = '/messages/:id?'
-export const PAYMENTS_PAGE = '/payments'
-export const PURCHASES_PAGE = '/payments/purchases'
-export const SALES_PAGE = '/payments/sales'
-export const WITHDRAWALS_PAGE = '/payments/withdrawals'
-export const COIN_DETAIL_PAGE = '/coins/:ticker'
-export const COIN_DETAIL_BUY_PAGE = '/coins/:ticker/buy'
-export const COIN_REDEEM_PAGE = '/coins/:ticker/redeem/:code?'
-export const COIN_EXCLUSIVE_TRACKS_PAGE = '/coins/:ticker/exclusive-tracks'
-export const EDIT_COIN_DETAILS_PAGE = '/coins/:ticker/edit'
-/** Primary club detail route */
-export const CLUB_DETAIL_PAGE = '/clubs/:ticker'
-export const CLUB_DETAIL_BUY_PAGE = '/clubs/:ticker/buy'
-export const CLUB_REDEEM_PAGE = '/clubs/:ticker/redeem/:code?'
-export const CLUB_EXCLUSIVE_TRACKS_PAGE = '/clubs/:ticker/exclusive-tracks'
-export const EDIT_CLUB_DETAILS_PAGE = '/clubs/:ticker/edit'
-export const WALLET_PAGE = '/wallet'
-export const WALLET_GUIDE_PAGE = '/wallet/guide'
-export const CASH_PAGE = '/cash'
-export const COINS_CREATE_PAGE = '/coins/create'
-export const CLUBS_CREATE_PAGE = '/clubs/create'
-/** Legacy explore URL; app redirects to CLUBS_EXPLORE_PAGE. */
-export const COINS_EXPLORE_PAGE = '/coins'
-/** Fan club discovery (primary); same UI as legacy /coins. */
-export const CLUBS_EXPLORE_PAGE = '/clubs'
-export const PRIVATE_KEY_EXPORTER_SETTINGS_PAGE = '/settings/export-private-key'
 export const DEV_TOOLS_PAGE = '/dev-tools'
 export const SOLANA_TOOLS_PAGE = '/dev-tools/solana'
 export const USER_ID_PARSER_PAGE = '/dev-tools/user-id-parser'
-export const COIN_API_MOCKS_PAGE = '/dev-tools/coin-api-mocks'
 
 // Multi-stage sign up flow routes
 export enum SignUpPath {
@@ -137,7 +106,6 @@ export const SEARCH_PAGE_TRACKS = '/search/tracks'
 export const SEARCH_PAGE_ALBUMS = '/search/albums'
 export const SEARCH_PAGE_PLAYLISTS = '/search/playlists'
 export const SEARCH_DOWNLOADS_AVAILABLE = '/search/tracks?hasDownloads=true'
-export const SEARCH_PREMIUM_TRACKS = '/search/tracks?isPremium=true'
 export const PLAYLIST_PAGE = '/:handle/playlist/:playlistName'
 export const PLAYLIST_BY_PERMALINK_PAGE = '/:handle/playlist/:slug'
 export const EDIT_PLAYLIST_PAGE = '/:handle/playlist/:slug/edit'
@@ -170,13 +138,6 @@ export const REPOSTING_USERS_ROUTE = '/reposting_users'
 export const FAVORITING_USERS_ROUTE = '/favoriting_users'
 export const FOLLOWING_USERS_ROUTE = '/following'
 export const FOLLOWERS_USERS_ROUTE = '/followers'
-export const LEADERBOARD_USERS_ROUTE = '/leaderboard'
-export const COIN_DETAIL_MOBILE_WEB_ROUTE = '/coins/:ticker/details'
-export const CLUB_DETAIL_MOBILE_WEB_ROUTE = '/clubs/:ticker/details'
-export const COIN_EXCLUSIVE_TRACKS_MOBILE_ROUTE =
-  '/coins/:ticker/exclusive-tracks/mobile'
-export const CLUB_EXCLUSIVE_TRACKS_MOBILE_ROUTE =
-  '/clubs/:ticker/exclusive-tracks/mobile'
 export const ACCOUNT_SETTINGS_PAGE = '/settings/account'
 export const NOTIFICATION_SETTINGS_PAGE = '/settings/notifications'
 export const ABOUT_SETTINGS_PAGE = '/settings/about'
@@ -224,17 +185,11 @@ export const AUDIUS_DEV_STAKER_LINK = 'https://audius.org/protocol'
 export const AUDIUS_HOT_AND_NEW =
   '/audius/playlist/hot-new-on-audius-%F0%9F%94%A5-4281'
 export const AUDIUS_HELP_LINK = 'https://help.audius.co/'
-export const AUDIUS_FAN_CLUB_HELP_LINK =
-  'https://help.audius.co/product/fan-clubs'
-
 export const AUDIUS_CAREERS_LINK = 'https://www.tikilabs.com/careers'
 export const AUDIUS_PODCAST_LINK =
   'https://www.youtube.com/playlist?list=PLKEECkHRxmPbcG59urFnWgsm6EQ9GAbPb'
 export const AUDIUS_CYPHER_LINK = 'https://discord.gg/audius'
 export const AUDIUS_API_LINK = 'https://audius.org/api'
-
-export const AUDIUS_FAN_CLUBS_HELP_LINK =
-  'https://help.audius.co/product/fan-clubs'
 
 // Birdeye Links
 export const BIRDEYE_BASE_URL = 'https://birdeye.so'
@@ -249,26 +204,14 @@ export const authenticatedRoutes = [
   TRACK_EDIT_PAGE,
   UPLOAD_PAGE,
   SETTINGS_PAGE,
-  PRIVATE_KEY_EXPORTER_SETTINGS_PAGE,
   DEACTIVATE_PAGE,
   CHATS_PAGE,
-  CHAT_PAGE,
-  PURCHASES_PAGE,
-  SALES_PAGE,
-  PAYMENTS_PAGE,
-  WITHDRAWALS_PAGE,
-  COINS_CREATE_PAGE,
-  CLUBS_CREATE_PAGE,
-  WALLET_GUIDE_PAGE,
-  CASH_PAGE
+  CHAT_PAGE
 ]
 
 export const guestRoutes = [
   SAVED_PAGE,
-  LIBRARY_PAGE,
-  PURCHASES_PAGE,
-  SALES_PAGE,
-  PAYMENTS_PAGE
+  LIBRARY_PAGE
 ]
 
 export const publicSiteRoutes = [
@@ -276,8 +219,6 @@ export const publicSiteRoutes = [
   TERMS_OF_SERVICE,
   PRIVACY_POLICY,
   API_TERMS,
-  FAN_CLUB_TERMS,
-  FAN_CLUB_ACCEPTABLE_USE,
   DOWNLOAD_LINK,
   AUTH_REDIRECT
 ]
@@ -310,33 +251,15 @@ export const orderedRoutes = [
   LIBRARY_PAGE,
   HISTORY_PAGE,
   DASHBOARD_PAGE,
-  PAYMENTS_PAGE,
-  AUDIO_PAGE,
-  WALLET_AUDIO_PAGE,
-  COIN_DETAIL_PAGE,
-  CLUB_DETAIL_PAGE,
-  EDIT_COIN_DETAILS_PAGE,
-  EDIT_CLUB_DETAILS_PAGE,
-  WALLET_PAGE,
-  CASH_PAGE,
-  COINS_EXPLORE_PAGE,
-  CLUBS_EXPLORE_PAGE,
-  COINS_CREATE_PAGE,
-  CLUBS_CREATE_PAGE,
-  WALLET_GUIDE_PAGE,
-  REWARDS_PAGE,
   SETTINGS_PAGE,
   ACCOUNT_SETTINGS_PAGE,
   NOTIFICATION_SETTINGS_PAGE,
   ABOUT_SETTINGS_PAGE,
-  PRIVATE_KEY_EXPORTER_SETTINGS_PAGE,
   ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE,
   ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE,
   AUTHORIZED_APPS_SETTINGS_PAGE,
-  PURCHASES_PAGE,
-  SALES_PAGE,
-  WITHDRAWALS_PAGE,
   NOT_FOUND_PAGE,
+  HOMEPAGE_PAGE,
   HOME_PAGE,
   PLAYLIST_PAGE,
   ALBUM_PAGE,
@@ -350,6 +273,7 @@ export const orderedRoutes = [
 ]
 
 export const staticRoutes = new Set([
+  HOMEPAGE_PAGE,
   FEED_PAGE,
   TRENDING_PAGE,
   EXPLORE_PAGE,
@@ -369,17 +293,6 @@ export const staticRoutes = new Set([
   FAVORITES_PAGE,
   HISTORY_PAGE,
   DASHBOARD_PAGE,
-  PAYMENTS_PAGE,
-  AUDIO_PAGE,
-  WALLET_PAGE,
-  WALLET_GUIDE_PAGE,
-  COINS_EXPLORE_PAGE,
-  CLUBS_EXPLORE_PAGE,
-  COINS_CREATE_PAGE,
-  CLUBS_CREATE_PAGE,
-  WALLET_AUDIO_PAGE,
-  CASH_PAGE,
-  REWARDS_PAGE,
   TRACK_EDIT_PAGE,
   UPLOAD_PAGE,
   UPLOAD_ALBUM_PAGE,
@@ -410,14 +323,10 @@ export const staticRoutes = new Set([
   ACCOUNT_SETTINGS_PAGE,
   NOTIFICATION_SETTINGS_PAGE,
   ABOUT_SETTINGS_PAGE,
-  PRIVATE_KEY_EXPORTER_SETTINGS_PAGE,
   ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE,
   ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE,
   AUTHORIZED_APPS_SETTINGS_PAGE,
   TRENDING_GENRES,
-  PURCHASES_PAGE,
-  SALES_PAGE,
-  WITHDRAWALS_PAGE,
   CHAT_PAGE,
   CHATS_PAGE
 ])
@@ -485,15 +394,3 @@ export const searchPage = (searchOptions: SearchOptions) => {
     query: searchParams
   })
 }
-
-export const coinPage = (ticker: string) =>
-  `/coins/${formatTickerForUrl(ticker)}`
-
-export const clubPage = (ticker: string) =>
-  `/clubs/${formatTickerForUrl(ticker)}`
-
-export const coinRedeemPage = (ticker: string, code?: string) =>
-  `/coins/${formatTickerForUrl(ticker)}/redeem${code ? `/${code}` : ''}`
-
-export const clubRedeemPage = (ticker: string, code?: string) =>
-  `/clubs/${formatTickerForUrl(ticker)}/redeem${code ? `/${code}` : ''}`

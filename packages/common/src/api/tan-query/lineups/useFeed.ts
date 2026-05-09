@@ -7,8 +7,10 @@ import {
   FeedFilter,
   UserCollectionMetadata,
   ID,
-  UserTrackMetadata
+  UserTrackMetadata,
+  filterUnsupportedCryptoGatedTracks
 } from '~/models'
+import { filterUnsupportedCryptoGatedCollections } from '~/models/Collection'
 import { Nullable } from '~/utils/typeUtils'
 
 import { QUERY_KEYS } from '../queryKeys'
@@ -64,6 +66,7 @@ export const useFeed = (
     },
     queryKey,
     queryFn: async ({ pageParam }) => {
+      if (!currentUserId) return []
       const isFirstPage = pageParam === 0
       const currentPageSize = isFirstPage ? initialPageSize : loadMorePageSize
       const sdk = await audiusSdk()
@@ -95,12 +98,26 @@ export const useFeed = (
           collections: [] as UserCollectionMetadata[]
         }
       )
+      const supportedTracks = filterUnsupportedCryptoGatedTracks(tracks)
+      const supportedCollections =
+        filterUnsupportedCryptoGatedCollections(collections)
+      const supportedTrackIds = new Set(
+        supportedTracks.map((track) => track.track_id)
+      )
+      const supportedCollectionIds = new Set(
+        supportedCollections.map((collection) => collection.playlist_id)
+      )
+      const supportedFeed = feed.filter((item) =>
+        'track_id' in item
+          ? supportedTrackIds.has(item.track_id)
+          : supportedCollectionIds.has(item.playlist_id)
+      )
 
       // Prime caches
-      primeTrackData({ tracks, queryClient })
-      primeCollectionData({ collections, queryClient })
+      primeTrackData({ tracks: supportedTracks, queryClient })
+      primeCollectionData({ collections: supportedCollections, queryClient })
 
-      return feed.map((item) =>
+      return supportedFeed.map((item) =>
         'track_id' in item
           ? { id: item.track_id, type: EntityType.TRACK }
           : { id: item.playlist_id, type: EntityType.PLAYLIST }
@@ -108,7 +125,7 @@ export const useFeed = (
     },
     select: (data) => data?.pages.flat(),
     ...options,
-    enabled: currentUserId !== null
+    enabled: options?.enabled !== false && !!currentUserId
   })
 
   const data = query.data ?? []

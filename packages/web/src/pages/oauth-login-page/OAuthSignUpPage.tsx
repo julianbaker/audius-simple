@@ -96,9 +96,7 @@ export const OAuthSignUpPage = () => {
       if (error && !isUserError) {
         reportToSentry({ level: ErrorLevel.Error, error })
       }
-    },
-    onPendingTransactionApproval: () => {},
-    onReceiveTransactionApproval: () => {}
+    }
   })
 
   oauthContextRef.current = { apiKey, appName, scope }

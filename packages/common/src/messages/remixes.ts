@@ -27,7 +27,7 @@ export const remixMessages = {
   descriptionError: 'Contest description is required',
   prizeInfoLabel: 'Prizes',
   prizeInfoPlaceholder:
-    'Describe what winners will receive. Be clear about how many winners there will be, and what each prize includes (e.g. cash, reposts, feedback, collaborations, etc.)',
+    'Describe what winners will receive. Be clear about how many winners there will be, and what each prize includes (e.g. reposts, feedback, collaborations, etc.)',
   deadlineLabel: 'Submission Deadline*',
   endDateLabel: 'Last day to submit to contest',
   endDateError: 'Contest end date must be in the future within 90 days',

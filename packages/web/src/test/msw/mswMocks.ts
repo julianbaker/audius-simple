@@ -10,11 +10,6 @@ import { http, HttpResponse } from 'msw'
 
 import { queryClient } from 'services/query-client'
 import { testCollection } from 'test/mocks/fixtures/collections'
-import {
-  mockFanClub,
-  mockUserCoinHasBalance,
-  mockCoinMembers
-} from 'test/mocks/fixtures/fanClubs'
 import { testTrack } from 'test/mocks/fixtures/tracks'
 import { artistUser, nonArtistUser } from 'test/mocks/fixtures/users'
 
@@ -87,72 +82,12 @@ export const mockCurrentAccount = (
 }
 
 /**
- * Wallets
- */
-export const mockUserConnectedWallets = (user: typeof artistUser) =>
-  http.get(`${apiEndpoint}/v1/users/${user.id}/connected_wallets`, () =>
-    HttpResponse.json({
-      data: { erc_wallets: [], spl_wallets: [] }
-    })
-  )
-
-/**
  * Events
  */
 export const mockEvents = (/* todo: */) =>
   http.get(`${apiEndpoint}/v1/events/entity`, () =>
     HttpResponse.json({ data: [] })
   )
-
-/**
- * Fan Clubs
- */
-export const mockCoinByMint = (coin: typeof mockFanClub) =>
-  http.get(`${apiEndpoint}/v1/coins/${coin.mint}`, () =>
-    HttpResponse.json({ data: coin })
-  )
-
-export const mockCoinByTicker = (coin: typeof mockFanClub) =>
-  http.get(`${apiEndpoint}/v1/coins/ticker/${coin.ticker}`, () =>
-    HttpResponse.json({ data: coin })
-  )
-
-export const mockCoinMembersCount = (mint: string, count: number) =>
-  http.get(`${apiEndpoint}/v1/coins/${mint}/members/count`, () =>
-    HttpResponse.json({ data: count })
-  )
-
-export const mockUserCoinsByMint = (
-  userId: string,
-  mint: string,
-  holdings: typeof mockUserCoinHasBalance
-) =>
-  http.get(`${apiEndpoint}/v1/users/${userId}/coins/${mint}`, () =>
-    HttpResponse.json({ data: holdings })
-  )
-
-export const mockCoinMembersList = (
-  mint: string,
-  members: typeof mockCoinMembers
-) =>
-  http.get(`${apiEndpoint}/v1/coins/${mint}/members`, () =>
-    HttpResponse.json({ data: members })
-  )
-export const mockUserCreatedCoin = (
-  userId: string,
-  coin: typeof mockFanClub
-) => {
-  return http.get(`${apiEndpoint}/v1/coins`, ({ request }) => {
-    const url = new URL(request.url)
-    const ownerId = url.searchParams.get('owner_id')
-
-    if (ownerId && ownerId === userId) {
-      return HttpResponse.json({ data: [coin] })
-    }
-
-    return HttpResponse.json({ data: [] })
-  })
-}
 
 /**
  * Collections

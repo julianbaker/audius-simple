@@ -155,9 +155,7 @@ const userMetadataSchema = {
   playlist_library: null,
   events: null,
   is_deactivated: false,
-  artist_pick_track_id: null,
-  coin_flair_mint: null,
-  spl_usdc_payout_wallet: null
+  artist_pick_track_id: null
 }
 
 export const newUserMetadata = (

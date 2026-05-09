@@ -1,6 +1,5 @@
 import { FavoriteType } from '@audius/common/models'
 import {
-  coinLeaderboardUserListActions,
   repostsUserListActions as repostActions,
   notificationsUserListActions as notificationActions,
   mutualsUserListActions,
@@ -9,9 +8,7 @@ import {
   favoritesUserListActions as favoritesActions,
   relatedArtistsUserListActions,
   RepostType,
-  remixersUserListActions,
-  purchasersUserListActions,
-  PurchaseableContentType
+  remixersUserListActions
 } from '@audius/common/store'
 import { takeEvery, put } from 'redux-saga/effects'
 
@@ -28,18 +25,6 @@ function* watchSetUsers() {
       const { userListType, entityType } = payload
       if (userListType === UserListType.NOTIFICATION && 'entity' in payload) {
         yield put(notificationActions.setNotification(payload.entity))
-        return
-      }
-
-      if (
-        userListType === UserListType.COIN_LEADERBOARD &&
-        'entity' in payload
-      ) {
-        yield put(
-          coinLeaderboardUserListActions.setCoinLeaderboard(
-            payload.entity as string
-          )
-        )
         return
       }
 
@@ -80,18 +65,6 @@ function* watchSetUsers() {
             break
           case UserListType.REMIXER:
             yield put(remixersUserListActions.setRemixers(id))
-            break
-          case UserListType.PURCHASER:
-            yield put(
-              purchasersUserListActions.setPurchasers(
-                entityType === UserListEntityType.USER ? undefined : id,
-                entityType === UserListEntityType.TRACK
-                  ? PurchaseableContentType.TRACK
-                  : entityType === UserListEntityType.COLLECTION
-                    ? PurchaseableContentType.ALBUM
-                    : undefined
-              )
-            )
             break
           default:
             break

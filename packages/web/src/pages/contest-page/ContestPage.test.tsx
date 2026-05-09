@@ -93,7 +93,7 @@ const contest = {
   endDate: '2099-12-31T23:59:00Z',
   eventData: {
     description: 'Remix my track',
-    prizeInfo: 'Cash prizes for the top three!',
+    prizeInfo: 'Prize placements for the top three!',
     winners: []
   }
 }

@@ -45,8 +45,6 @@ export const AlbumsTabPage = () => {
       return emptyStateMessages.emptyAlbumAllHeader
     } else if (selectedCategory === LibraryCategory.Favorite) {
       return emptyStateMessages.emptyAlbumFavoritesHeader
-    } else if (selectedCategory === LibraryCategory.Purchase) {
-      return emptyStateMessages.emptyAlbumPurchasedHeader
     } else {
       return emptyStateMessages.emptyAlbumRepostsHeader
     }

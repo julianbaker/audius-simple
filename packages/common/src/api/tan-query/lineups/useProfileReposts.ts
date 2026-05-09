@@ -7,7 +7,13 @@ import {
 
 import { repostActivityFromSDK, transformAndCleanList } from '~/adapters'
 import { useQueryContext, primeUserData } from '~/api/tan-query/utils'
-import { UserTrackMetadata, UserCollectionMetadata, ID } from '~/models'
+import {
+  UserTrackMetadata,
+  UserCollectionMetadata,
+  ID,
+  filterUnsupportedCryptoGatedTracks
+} from '~/models'
+import { filterUnsupportedCryptoGatedCollections } from '~/models/Collection'
 
 import { QUERY_KEYS } from '../queryKeys'
 import { QueryKey, LineupData, QueryOptions } from '../types'
@@ -69,27 +75,44 @@ export const useProfileReposts = (
         (activity) => repostActivityFromSDK(activity)?.item
       )
 
+      const supportedTracks = filterUnsupportedCryptoGatedTracks(
+        reposts.filter(
+          (item): item is UserTrackMetadata => 'track_id' in item
+        )
+      )
+      const supportedCollections =
+        filterUnsupportedCryptoGatedCollections(
+          reposts.filter(
+            (item): item is UserCollectionMetadata => 'playlist_id' in item
+          )
+        )
+      const supportedTrackIds = new Set(
+        supportedTracks.map((track) => track.track_id)
+      )
+      const supportedCollectionIds = new Set(
+        supportedCollections.map((collection) => collection.playlist_id)
+      )
+      const supportedReposts = reposts.filter((item) =>
+        'track_id' in item
+          ? supportedTrackIds.has(item.track_id)
+          : supportedCollectionIds.has(item.playlist_id)
+      )
+
       primeUserData({
-        users: reposts
-          .filter((item): item is UserTrackMetadata => 'track_id' in item)
-          .map((item) => item.user),
+        users: supportedTracks.map((item) => item.user),
         queryClient
       })
       primeTrackData({
-        tracks: reposts.filter(
-          (item): item is UserTrackMetadata => 'track_id' in item
-        ),
+        tracks: supportedTracks,
         queryClient
       })
       primeCollectionData({
-        collections: reposts.filter(
-          (item): item is UserCollectionMetadata => 'playlist_id' in item
-        ),
+        collections: supportedCollections,
         queryClient
       })
 
       // Return only ids
-      return reposts.map((t) =>
+      return supportedReposts.map((t) =>
         'track_id' in t
           ? { id: t.track_id, type: EntityType.TRACK }
           : { id: t.playlist_id, type: EntityType.PLAYLIST }

@@ -29,12 +29,6 @@ const DownloadPage = lazy(() => import('./pages/download-page/DownloadPage'))
 const TermsOfUsePage = lazy(
   () => import('./pages/terms-of-use-page/TermsOfUsePage')
 )
-const FanClubTermsPage = lazy(
-  () => import('./pages/fan-club-terms-page/FanClubTermsPage')
-)
-const FanClubAcceptableUsePage = lazy(
-  () => import('./pages/fan-club-acceptable-use-page/FanClubAcceptableUsePage')
-)
 
 const ROOT_ID = 'root'
 const SCROLL_LOCK_CLASS = 'scrollLock'
@@ -142,26 +136,6 @@ export const PublicSite = (props: PublicSiteProps) => {
                         path='/legal/privacy-policy'
                         element={
                           <PrivacyPolicyPage
-                            isMobile={isMobileOrNarrow}
-                            openNavScreen={openNavScreen}
-                            setRenderPublicSite={setRenderPublicSite}
-                          />
-                        }
-                      />
-                      <Route
-                        path='/legal/fan-club-terms'
-                        element={
-                          <FanClubTermsPage
-                            isMobile={isMobileOrNarrow}
-                            openNavScreen={openNavScreen}
-                            setRenderPublicSite={setRenderPublicSite}
-                          />
-                        }
-                      />
-                      <Route
-                        path='/legal/fan-club-acceptable-use'
-                        element={
-                          <FanClubAcceptableUsePage
                             isMobile={isMobileOrNarrow}
                             openNavScreen={openNavScreen}
                             setRenderPublicSite={setRenderPublicSite}

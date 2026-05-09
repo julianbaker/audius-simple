@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 import { isNullOrUndefined, Nullable } from '~/utils/typeUtils'
 
-import { StringUSDC, StringWei } from '../../models/Wallet'
+import { StringWei } from '../../models/Wallet'
 
 type WalletState = {
   balance: Nullable<StringWei>
@@ -12,7 +12,6 @@ type WalletState = {
   totalBalanceLoadDidFail: Nullable<boolean>
   localBalanceDidChange: boolean
   freezeBalanceUntil: Nullable<number>
-  usdcBalance: Nullable<StringUSDC>
 }
 
 const initialState: WalletState = {
@@ -22,8 +21,7 @@ const initialState: WalletState = {
   totalBalance: null,
   totalBalanceLoadDidFail: false,
   localBalanceDidChange: false,
-  freezeBalanceUntil: null,
-  usdcBalance: null
+  freezeBalanceUntil: null
 }
 
 const slice = createSlice({
@@ -61,36 +59,9 @@ const slice = createSlice({
         state.totalBalanceLoadDidFail = totalBalanceLoadDidFail
       }
     },
-    setUSDCBalance: (
-      state,
-      { payload: { amount } }: PayloadAction<{ amount: StringUSDC }>
-    ) => {
-      state.usdcBalance = amount
-    },
-    // Saga Actions
-    claim: () => {},
-    claimSucceeded: () => {},
-    claimFailed: (_state, _action: PayloadAction<{ error?: string }>) => {},
-    send: (
-      _state,
-      _action: PayloadAction<{
-        recipientWallet: string
-        amount: StringWei
-      }>
-    ) => {},
-    sendSucceeded: () => {},
-    sendFailed: (_state, _action: PayloadAction<{ error?: string }>) => {}
+    // Balance is kept for internal account state only.
   }
 })
 
-export const {
-  setUSDCBalance,
-  claim,
-  claimSucceeded,
-  claimFailed,
-  send,
-  sendSucceeded,
-  sendFailed
-} = slice.actions
 export default slice.reducer
 export const actions = slice.actions

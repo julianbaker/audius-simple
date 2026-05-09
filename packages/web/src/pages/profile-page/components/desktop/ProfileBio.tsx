@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { ID, Name } from '@audius/common/models'
+import { Name } from '@audius/common/models'
 import {
   Flex,
   IconCaretDown,
@@ -12,7 +12,6 @@ import { ResizeObserver } from '@juggle/resize-observer'
 import useMeasure from 'react-use-measure'
 
 import { make, useRecord } from 'common/store/analytics/actions'
-import ProfilePageBadge from 'components/user-badges/ProfilePageBadge'
 import { UserGeneratedText } from 'components/user-generated-text'
 
 import SocialLink, { Type } from '../SocialLink'
@@ -23,7 +22,6 @@ const messages = {
 }
 
 type ProfileBioProps = {
-  userId: ID
   handle: string
   bio: string
   location: string
@@ -38,7 +36,6 @@ type ProfileBioProps = {
 const MAX_BIO_SIZE = 16 * 4
 
 export const ProfileBio = ({
-  userId,
   handle,
   bio,
   location,
@@ -201,7 +198,6 @@ export const ProfileBio = ({
 
   return (
     <Flex column gap='l'>
-      <ProfilePageBadge userId={userId} />
       {bio ? (
         <UserGeneratedText
           size='s'

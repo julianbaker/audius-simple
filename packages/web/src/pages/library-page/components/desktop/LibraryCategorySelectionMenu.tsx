@@ -12,7 +12,6 @@ import {
   FilterButton,
   SelectablePill,
   IconHeart,
-  IconCart,
   IconRepost
 } from '@audius/harmony'
 import { useDispatch, useSelector } from 'react-redux'
@@ -36,15 +35,8 @@ const ALL_CATEGORIES = [
     label: 'Reposts',
     value: LibraryCategory.Repost,
     icon: IconRepost
-  },
-  {
-    label: 'Premium',
-    value: LibraryCategory.Purchase,
-    icon: IconCart
   }
 ]
-
-const CATEGORIES_WITHOUT_PURCHASED = ALL_CATEGORIES.slice(0, -1)
 
 type LibraryCategorySelectionMenuProps = {
   currentTab: LibraryPageTabs
@@ -87,10 +79,7 @@ export const LibraryCategorySelectionMenu = (
     [selectCategory]
   )
 
-  const categories =
-    currentTab !== LibraryPageTabs.PLAYLISTS
-      ? ALL_CATEGORIES
-      : CATEGORIES_WITHOUT_PURCHASED
+  const categories = ALL_CATEGORIES
 
   if (mode === 'dropdown') {
     return (

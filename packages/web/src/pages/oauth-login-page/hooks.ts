@@ -13,7 +13,6 @@ import { useDispatch } from 'react-redux'
 import { useLocation } from 'react-router'
 
 import { make, useRecord } from 'common/store/analytics/actions'
-import { audiusSdk } from 'services/audius-sdk'
 import { identityService } from 'services/audius-sdk/identity'
 import * as errorActions from 'store/errors/actions'
 import { reportToSentry } from 'store/errors/reportToSentry'
@@ -27,12 +26,7 @@ import {
   getDeveloperApp,
   getIsAppAuthorized,
   getIsRedirectValid,
-  getIsUserConnectedToDashboardWallet,
-  handleAuthorizeConnectDashboardWallet,
-  handleAuthorizeDisconnectDashboardWallet,
-  isValidApiKey,
-  validateDashboardWalletParams,
-  DashboardWalletParams
+  isValidApiKey
 } from './utils'
 
 // Collapse space-separated OAuth scopes (e.g. 'read write') to the highest privilege.
@@ -69,8 +63,7 @@ const useParsedQueryParams = () => {
     display: displayQueryParam,
     response_type: responseType,
     code_challenge: codeChallenge,
-    code_challenge_method: codeChallengeMethod,
-    ...rest
+    code_challenge_method: codeChallengeMethod
   } = queryString.parse(search)
 
   const scope = collapseScopes(rawScope)
@@ -115,14 +108,15 @@ const useParsedQueryParams = () => {
     return null
   }, [origin])
 
-  const { error, txParams } = useMemo(() => {
+  const { error } = useMemo(() => {
     let error: string | null = null
-    let txParams: DashboardWalletParams | null = null
     if (isRedirectValid === false) {
       error = messages.redirectURIInvalidError
     } else if (parsedRedirectUri === 'postmessage' && !parsedOrigin) {
       // Only applicable if redirect URI set to `postMessage`
       error = messages.originInvalidError
+    } else if (tx) {
+      error = messages.txError
     } else if (scope !== 'read' && scope !== 'write') {
       error = messages.scopeError
     } else if (
@@ -151,21 +145,8 @@ const useParsedQueryParams = () => {
           error = messages.invalidCodeChallengeMethodError
         }
       }
-      // Optional dashboard wallet tx params
-      if (!error && tx) {
-        const { error: txParamsError, txParams: txParamsRes } =
-          validateDashboardWalletParams({
-            tx,
-            params: rest,
-            willUsePostMessage: parsedRedirectUri === 'postmessage'
-          })
-        txParams = txParamsRes
-        if (txParamsError) {
-          error = txParamsError
-        }
-      }
     }
-    return { txParams, error }
+    return { error }
     // This is exhaustive despite what eslint thinks:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRedirectValid, parsedOrigin, parsedRedirectUri, search])
@@ -185,8 +166,6 @@ const useParsedQueryParams = () => {
     isRedirectValid,
     parsedOrigin,
     error,
-    tx,
-    txParams,
     display,
     responseType,
     codeChallenge,
@@ -195,9 +174,7 @@ const useParsedQueryParams = () => {
 }
 
 export const useOAuthSetup = ({
-  onError,
-  onPendingTransactionApproval,
-  onReceiveTransactionApproval
+  onError
 }: {
   onError: ({
     isUserError,
@@ -208,8 +185,6 @@ export const useOAuthSetup = ({
     errorMessage: string
     error?: Error
   }) => void
-  onPendingTransactionApproval: () => void
-  onReceiveTransactionApproval: () => void
 }) => {
   const record = useRecord()
   const dispatch = useDispatch()
@@ -225,8 +200,6 @@ export const useOAuthSetup = ({
     parsedRedirectUri,
     isRedirectValid,
     parsedOrigin,
-    txParams,
-    tx,
     display,
     responseType,
     codeChallenge,
@@ -338,31 +311,6 @@ export const useOAuthSetup = ({
       setUserEmail(null)
     }
   }, [isLoggedIn, dispatch])
-
-  useEffect(() => {
-    const verifyValidWalletIfApplicable = async () => {
-      if (
-        txParams?.wallet &&
-        (tx === 'disconnect_dashboard_wallet' ||
-          tx === 'connect_dashboard_wallet')
-      ) {
-        const sdk = await audiusSdk()
-        const res = await sdk.dashboardWalletUsers.bulkGetDashboardWalletUsers({
-          wallets: [txParams.wallet]
-        })
-        const walletHasConnectedUser = res.data?.length === 1
-        if (walletHasConnectedUser && tx === 'connect_dashboard_wallet') {
-          setQueryParamsError(messages.connectWalletAlreadyConnectedError)
-        } else if (
-          !walletHasConnectedUser &&
-          tx === 'disconnect_dashboard_wallet'
-        ) {
-          setQueryParamsError(messages.disconnectWalletNotConnectedError)
-        }
-      }
-    }
-    verifyValidWalletIfApplicable()
-  }, [tx, txParams?.wallet])
 
   const formResponseAndRedirect = useCallback(
     async ({
@@ -480,28 +428,6 @@ export const useOAuthSetup = ({
     dispatch
   ])
 
-  useEffect(() => {
-    const verifyDisconnectWalletUser = async () => {
-      if (
-        accountUserId != null &&
-        txParams?.wallet != null &&
-        tx === 'disconnect_dashboard_wallet'
-      ) {
-        const isCorrectUser = await getIsUserConnectedToDashboardWallet({
-          userId: accountUserId,
-          wallet: txParams.wallet
-        })
-        if (!isCorrectUser) {
-          onError({
-            isUserError: true,
-            errorMessage: messages.disconnectDashboardWalletWrongUserError
-          })
-        }
-      }
-    }
-    verifyDisconnectWalletUser()
-  }, [accountUserId, onError, tx, txParams?.wallet])
-
   const authorize = async ({ account }: { account: UserMetadata }) => {
     let shouldCreateWriteGrant = false
 
@@ -530,33 +456,6 @@ export const useOAuthSetup = ({
           error: e instanceof Error ? e : new Error(error)
         })
         return
-      }
-
-      // Handle dashboard wallet tx if present
-      if (tx && txParams) {
-        if (tx === 'connect_dashboard_wallet') {
-          const success = await handleAuthorizeConnectDashboardWallet({
-            state,
-            originUrl: parsedOrigin,
-            onError,
-            onWaitForWalletSignature: onPendingTransactionApproval,
-            onReceivedWalletSignature: onReceiveTransactionApproval,
-            account,
-            txParams
-          })
-          if (!success) {
-            return
-          }
-        } else if (tx === 'disconnect_dashboard_wallet') {
-          const success = await handleAuthorizeDisconnectDashboardWallet({
-            account,
-            txParams,
-            onError
-          })
-          if (!success) {
-            return
-          }
-        }
       }
     }
 
@@ -629,8 +528,6 @@ export const useOAuthSetup = ({
     appImage,
     userEmail,
     authorize,
-    tx,
-    txParams,
     display
   }
 }

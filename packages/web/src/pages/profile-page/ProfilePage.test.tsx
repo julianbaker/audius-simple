@@ -12,15 +12,12 @@ import {
   beforeEach
 } from 'vitest'
 
-import { mockFanClub } from 'test/mocks/fixtures/fanClubs'
 import { artistUser, nonArtistUser } from 'test/mocks/fixtures/users'
 import {
   mockUserByHandle,
   mockRelatedUsers,
-  mockUserConnectedWallets,
   mockNfts,
-  mockEvents,
-  mockUserCreatedCoin
+  mockEvents
 } from 'test/msw/mswMocks'
 import {
   RenderOptions,
@@ -32,15 +29,6 @@ import {
 } from 'test/test-utils'
 
 import ProfilePage from './ProfilePage'
-
-// Mock appkitModal & wagmiAdapter to prevent errors in useExternalWalletAddress
-vi.mock('app/ReownAppKitModal', () => ({
-  appkitModal: {
-    getAccount: vi.fn().mockReturnValue(undefined),
-    subscribeEvents: vi.fn().mockReturnValue(() => {})
-  },
-  wagmiAdapter: {}
-}))
 
 // Need to mock the main content scroll element - otherwise things break
 const mockScrollElement = {
@@ -70,7 +58,6 @@ export function renderProfilePage(
   mswServer.use(
     mockUserByHandle(user),
     mockRelatedUsers(user),
-    mockUserConnectedWallets(user),
     mockNfts(),
     mockEvents()
   )
@@ -220,37 +207,6 @@ describe('ProfilePage', () => {
   it.skip('shows user with active remix context', async () => {
     renderProfilePage(nonArtistUser)
     // TODO
-  })
-
-  it('shows fan club UI when the profile belongs to an artist with an owned coin', async () => {
-    mswServer.use(mockUserCreatedCoin(artistUser.id, mockFanClub))
-
-    // Mock a different current user to simulate viewing another user's profile
-    renderProfilePage(
-      artistUser, // Use the artistUser who owns the coin
-      {
-        reduxState: {
-          account: {
-            userId: 987 // Different from artistUser.id
-          }
-        }
-      }
-    )
-
-    // Wait for the profile to load (name may have trailing space in mobile header)
-    expect(
-      await screen.findByRole('heading', {
-        name: new RegExp(`^${artistUser.name}\\s*$`)
-      })
-    ).toBeInTheDocument()
-
-    // Verify that coin-related elements are present when user has coins
-    const viewFanClubButton = await screen.findByRole('button', {
-      name: 'View Fan Club'
-    })
-    expect(viewFanClubButton).toBeInTheDocument()
-    expect(await screen.findByText('$MOCK')).toBeInTheDocument()
-    expect(screen.queryByText('Tip $AUDIO')).not.toBeInTheDocument()
   })
 
   it('should navigate to the correct tab when using sub-routes', async () => {

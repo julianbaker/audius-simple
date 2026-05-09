@@ -5,7 +5,6 @@ import {
   ID,
   CoverArtSizes,
   AccessConditions,
-  isContentUSDCPurchaseGated,
   GatedContentStatus
 } from '@audius/common/models'
 import { Nullable } from '@audius/common/utils'
@@ -111,7 +110,6 @@ export type TrackListItemProps = {
   isPlaying?: boolean
   isDeleted: boolean
   isLocked: boolean
-  isPremium?: boolean
   coverArtSizes?: CoverArtSizes
   trackTitle: string
   trackId: ID
@@ -144,21 +142,17 @@ const TrackListItem = ({
   isUnlisted,
   isDeleted,
   isLocked,
-  isPremium,
   onRemove,
   togglePlay,
   trackItemAction,
   onClickOverflow,
-  streamConditions,
   isReorderable = false,
   isDragging = false
 }: TrackListItemProps) => {
   const messages = getMessages({ isDeleted })
-  const isUsdcPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
 
   const onClickTrack = () => {
-    if (uid && !isDeleted && (!isLocked || isUsdcPurchaseGated) && togglePlay)
-      togglePlay(uid, trackId)
+    if (uid && !isDeleted && !isLocked && togglePlay) togglePlay(uid, trackId)
   }
 
   const onRemoveTrack = (e: MouseEvent<Element>) => {
@@ -192,7 +186,6 @@ const TrackListItem = ({
             playing={true}
             paused={!isPlaying}
             hideDefault={false}
-            isTrackPremium={isPremium}
             isLocked={isLocked}
           />
         </div>
@@ -203,7 +196,7 @@ const TrackListItem = ({
         <SeoLink
           to={permalink}
           className={cn(styles.trackTitle, {
-            [styles.lockedTrackTitle]: !isDeleted && isLocked && !isPremium
+            [styles.lockedTrackTitle]: !isDeleted && isLocked
           })}
         >
           {trackTitle}

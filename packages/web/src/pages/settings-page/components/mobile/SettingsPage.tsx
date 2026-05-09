@@ -13,8 +13,7 @@ import {
   settingsPageActions,
   themeSelectors,
   themeActions,
-  musicConfettiActions,
-  useTierAndVerifiedForUser
+  musicConfettiActions
 } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import {
@@ -29,7 +28,6 @@ import {
   SegmentedControl,
   Text,
   IconAudiusLogoHorizontalColor,
-  IconLogoCircleUSDCPng,
   Image
 } from '@audius/harmony'
 import cn from 'classnames'
@@ -69,8 +67,7 @@ const {
   ACCOUNT_SETTINGS_PAGE,
   HISTORY_PAGE,
   ABOUT_SETTINGS_PAGE,
-  NOTIFICATION_SETTINGS_PAGE,
-  PAYMENTS_PAGE
+  NOTIFICATION_SETTINGS_PAGE
 } = route
 
 export enum SubPage {
@@ -90,8 +87,6 @@ const messages = {
   title: 'Settings',
   description: 'Configure your Audius account',
   historyTitle: 'Listening History',
-  usdcWallets: 'USDC Wallet',
-  audioWallet: '$AUDIO Wallet',
   matrixMode: 'Matrix',
   verificationSuccessMessage:
     'Verification request received, pending review. Check back soon!',
@@ -129,11 +124,7 @@ export const SettingsPage = (props: SettingsPageProps) => {
   const theme = useSelector(getTheme)
   const themePalette = useSelector(getThemePalette)
   const themeMode = useSelector(getThemeMode)
-  const { tier } = useTierAndVerifiedForUser(userId)
-  const showMatrix =
-    tier === 'gold' ||
-    tier === 'platinum' ||
-    process.env.NODE_ENV === 'development'
+  const showMatrix = process.env.NODE_ENV === 'development'
 
   const effectivePalette =
     themePalette ??
@@ -307,11 +298,6 @@ export const SettingsPage = (props: SettingsPageProps) => {
               prefix={<i className='emoji small headphone' />}
               title={messages.historyTitle}
               to={HISTORY_PAGE}
-            />
-            <Row
-              prefix={<IconLogoCircleUSDCPng size='s' />}
-              title={messages.usdcWallets}
-              to={PAYMENTS_PAGE}
             />
           </Grouping>
           <Grouping>

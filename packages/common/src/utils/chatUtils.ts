@@ -19,27 +19,16 @@ export const CHAT_BLOG_POST_URL =
 
 const messages = {
   blastTitleFollowers: 'All Followers',
-  blastTitleCustomers: 'Purchasers',
   blastTitleRemixers: 'Remix Creators',
-  blastTitleCustomers2: 'All Purchasers',
   blastTitleRemixers2: 'Remixed',
-  blastTitleCoinHolders: (ticker: string) => `$${ticker} Members`,
   blastFollowersDescription: 'Everyone who follows you.',
-  blastCustomersDescription: 'Everyone who has paid for your content.',
   blastRemixersDescription: 'Everyone who has remixed your tracks.',
-  blastCoinHoldersDescription: (symbol: string) =>
-    `Everyone who holds $${symbol}.`,
   blastCTABase: 'Send a message blast to ',
   blastCTAFollowers: 'each of your followers',
-  blastCTACustomers: (audienceContentId?: string) =>
-    audienceContentId
-      ? 'all purchasers'
-      : 'everyone who has purchased your content',
   blastCTARemixers: (audienceContentId?: string) =>
     audienceContentId
       ? 'everyone who remixed this track'
-      : 'everyone who has remixed your tracks',
-  blastCTACoinHolders: (ticker: string) => `everyone who holds $${ticker}`
+      : 'everyone who has remixed your tracks'
 }
 
 /**
@@ -183,21 +172,15 @@ export const makeBlastChatId = ({
 }
 
 export const getChatBlastTitle = ({
-  audience,
-  coinSymbol
+  audience
 }: {
   audience: ChatBlastAudience
-  coinSymbol?: string
 }) => {
   switch (audience) {
     case ChatBlastAudience.FOLLOWERS:
       return messages.blastTitleFollowers
-    case ChatBlastAudience.CUSTOMERS:
-      return messages.blastTitleCustomers
     case ChatBlastAudience.REMIXERS:
       return messages.blastTitleRemixers
-    case ChatBlastAudience.COIN_HOLDERS:
-      return messages.blastTitleCoinHolders(coinSymbol ?? '')
     default:
       return ''
   }
@@ -205,47 +188,33 @@ export const getChatBlastTitle = ({
 
 export const getChatBlastSecondaryTitle = ({
   audience,
-  audienceContentId,
-  coinSymbol
+  audienceContentId
 }: {
   audience: ChatBlastAudience
   audienceContentId?: string
-  coinSymbol?: string
 }) => {
   switch (audience) {
     case ChatBlastAudience.FOLLOWERS:
       return messages.blastTitleFollowers
-    case ChatBlastAudience.CUSTOMERS:
-      return audienceContentId
-        ? messages.blastTitleCustomers
-        : messages.blastTitleCustomers2
     case ChatBlastAudience.REMIXERS:
       return audienceContentId
         ? messages.blastTitleRemixers2
         : messages.blastTitleRemixers
-    case ChatBlastAudience.COIN_HOLDERS:
-      return messages.blastTitleCoinHolders(coinSymbol ?? '')
     default:
       return ''
   }
 }
 
 export const getChatBlastAudienceDescription = ({
-  audience,
-  coinSymbol
+  audience
 }: {
   audience: ChatBlastAudience
-  coinSymbol?: string
 }) => {
   switch (audience) {
     case ChatBlastAudience.FOLLOWERS:
       return messages.blastFollowersDescription
-    case ChatBlastAudience.CUSTOMERS:
-      return messages.blastCustomersDescription
     case ChatBlastAudience.REMIXERS:
       return messages.blastRemixersDescription
-    case ChatBlastAudience.COIN_HOLDERS:
-      return messages.blastCoinHoldersDescription(coinSymbol ?? '')
     default:
       return ''
   }
@@ -253,27 +222,17 @@ export const getChatBlastAudienceDescription = ({
 
 export const getChatBlastCTA = ({
   audience,
-  audienceContentId,
-  coinSymbol
+  audienceContentId
 }: {
   audience: ChatBlastAudience
   audienceContentId?: string
-  coinSymbol?: string
 }) => {
   switch (audience) {
     case ChatBlastAudience.FOLLOWERS:
       return messages.blastCTABase + messages.blastCTAFollowers
-    case ChatBlastAudience.CUSTOMERS:
-      return (
-        messages.blastCTABase + messages.blastCTACustomers(audienceContentId)
-      )
     case ChatBlastAudience.REMIXERS:
       return (
         messages.blastCTABase + messages.blastCTARemixers(audienceContentId)
-      )
-    case ChatBlastAudience.COIN_HOLDERS:
-      return (
-        messages.blastCTABase + messages.blastCTACoinHolders(coinSymbol ?? '')
       )
     default:
       return ''

@@ -1,11 +1,7 @@
 import { MouseEvent, Ref, forwardRef, useCallback } from 'react'
 
-import { useTrack, useCurrentUserId } from '@audius/common/api'
-import {
-  ID,
-  SquareSizes,
-  isContentUSDCPurchaseGated
-} from '@audius/common/models'
+import { useTrack } from '@audius/common/api'
+import { ID, SquareSizes } from '@audius/common/models'
 import { formatCount } from '@audius/common/utils'
 import { Flex, Skeleton, Text } from '@audius/harmony'
 import IconHeart from '@audius/harmony/src/assets/icons/Heart.svg'
@@ -15,7 +11,6 @@ import { useLinkClickHandler } from 'react-router'
 
 import { Card, CardProps, CardFooter, CardContent } from 'components/card'
 import { TextLink, UserLink } from 'components/link'
-import { LockedStatusBadge } from 'components/locked-status-badge'
 
 import { TrackArtwork } from './TrackArtwork'
 import { TrackDogEar } from './TrackDogEar'
@@ -82,7 +77,6 @@ export const TrackCard = forwardRef(
       ...other
     } = props
 
-    const { data: currentUserId } = useCurrentUserId()
     const { data: track, isPending } = useTrack(id, {
       select: (track) =>
         pick(
@@ -91,21 +85,11 @@ export const TrackCard = forwardRef(
           'permalink',
           'owner_id',
           'repost_count',
-          'save_count',
-          'access',
-          'stream_conditions'
+          'save_count'
         )
     })
 
-    const {
-      title,
-      permalink,
-      owner_id,
-      repost_count,
-      save_count,
-      access,
-      stream_conditions
-    } = track ?? {}
+    const { title, permalink, owner_id, repost_count, save_count } = track ?? {}
 
     const handleNavigate = useLinkClickHandler<HTMLDivElement>(permalink ?? '')
 
@@ -121,9 +105,6 @@ export const TrackCard = forwardRef(
     if (isPending || loading) {
       return <TrackCardSkeleton size={size} {...other} />
     }
-
-    const isOwner = currentUserId === owner_id
-    const isPurchase = isContentUSDCPurchaseGated(stream_conditions)
 
     return (
       <Card ref={ref} onClick={handleClick} size={size} {...other}>
@@ -159,9 +140,6 @@ export const TrackCard = forwardRef(
               {formatCount(save_count || 0)}
             </Text>
           </Flex>
-          {isPurchase && !isOwner ? (
-            <LockedStatusBadge variant='premium' locked={!access?.stream} />
-          ) : null}
         </CardFooter>
       </Card>
     )

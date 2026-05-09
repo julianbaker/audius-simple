@@ -21,9 +21,7 @@ type EntityWithUser<T extends EntityType> = T & {
 }
 
 type EntityTypes<T extends Notification> = T extends {
-  type:
-    | NotificationType.AddTrackToPlaylist
-    | NotificationType.TrackAddedToPurchasedAlbum
+  type: NotificationType.AddTrackToPlaylist
 }
   ? {
       track: EntityWithUser<Track> | null
@@ -36,9 +34,7 @@ type EntityTypes<T extends Notification> = T extends {
 type PlaylistNotification = Extract<
   Notification,
   {
-    type:
-      | NotificationType.AddTrackToPlaylist
-      | NotificationType.TrackAddedToPurchasedAlbum
+    type: NotificationType.AddTrackToPlaylist
   }
 >
 
@@ -59,8 +55,7 @@ export const useNotificationEntities = <T extends Notification>(
     n: Notification
   ): n is PlaylistNotification & { playlistOwnerId: number } => {
     return (
-      (n.type === NotificationType.AddTrackToPlaylist ||
-        n.type === NotificationType.TrackAddedToPurchasedAlbum) &&
+      n.type === NotificationType.AddTrackToPlaylist &&
       'playlistOwnerId' in n &&
       typeof n.playlistOwnerId === 'number'
     )
@@ -117,8 +112,7 @@ export const useNotificationEntities = <T extends Notification>(
 
   // Return appropriate data based on notification type
   if (
-    notification.type === NotificationType.AddTrackToPlaylist ||
-    notification.type === NotificationType.TrackAddedToPurchasedAlbum
+    notification.type === NotificationType.AddTrackToPlaylist
   ) {
     const currentUser = currentUserId ? trackUsers?.[currentUserId] : null
     return {

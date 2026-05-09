@@ -22,19 +22,10 @@ const { SEARCH_BASE_ROUTE, SEARCH_PAGE } = route
 
 export const useShowSearchResults = () => {
   const searchParamsResult = useSearchParams()
-  const { query, genre, mood, isPremium, hasDownloads, isVerified, bpm, key } =
+  const { query, genre, mood, hasDownloads, isVerified, bpm, key } =
     searchParamsResult
 
-  return (
-    query ||
-    genre ||
-    mood ||
-    isVerified ||
-    hasDownloads ||
-    bpm ||
-    key ||
-    isPremium
-  )
+  return query || genre || mood || isVerified || hasDownloads || bpm || key
 }
 
 export const useSearchCategory = () => {
@@ -93,7 +84,6 @@ type UseSearchParamsResult = {
   key?: string
   isVerified?: boolean
   hasDownloads?: boolean
-  isPremium?: boolean
   sortMethod?: SearchSortMethod
 }
 export const useSearchParams = (): UseSearchParamsResult => {
@@ -107,7 +97,6 @@ export const useSearchParams = (): UseSearchParamsResult => {
   const key = urlSearchParams.get('key')
   const isVerified = urlSearchParams.get('isVerified')
   const hasDownloads = urlSearchParams.get('hasDownloads')
-  const isPremium = urlSearchParams.get('isPremium')
 
   const searchParams = useMemo(
     () =>
@@ -119,20 +108,9 @@ export const useSearchParams = (): UseSearchParamsResult => {
         key: key || undefined,
         isVerified: isVerified === 'true' ? true : undefined,
         hasDownloads: hasDownloads === 'true' ? true : undefined,
-        isPremium: isPremium === 'true' ? true : undefined,
         sortMethod: sortMethod || undefined
       }) as UseSearchParamsResult,
-    [
-      query,
-      genre,
-      mood,
-      bpm,
-      key,
-      isVerified,
-      hasDownloads,
-      isPremium,
-      sortMethod
-    ]
+    [query, genre, mood, bpm, key, isVerified, hasDownloads, sortMethod]
   )
   return searchParams
 }

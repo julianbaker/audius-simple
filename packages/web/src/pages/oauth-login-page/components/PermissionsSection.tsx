@@ -13,7 +13,6 @@ import LoadingSpinner from 'components/loading-spinner/LoadingSpinner'
 
 import styles from '../OAuthLoginPage.module.css'
 import { messages } from '../messages'
-import { DashboardWalletParams, DashboardWalletTx } from '../utils'
 
 type PermissionDetailProps = PropsWithChildren<{}>
 const PermissionDetail = ({ children }: PermissionDetailProps) => {
@@ -26,31 +25,16 @@ const PermissionDetail = ({ children }: PermissionDetailProps) => {
   )
 }
 
-const getDashboardWalletPermissionTitle = (tx: DashboardWalletTx | null) => {
-  switch (tx) {
-    case 'connect_dashboard_wallet':
-      return messages.connectDashboardWalletAccess
-    case 'disconnect_dashboard_wallet':
-      return messages.disconnectDashboardWalletAccess
-    default:
-      return null
-  }
-}
-
 export const PermissionsSection = ({
   scope,
   isLoggedIn,
   isLoading,
-  userEmail,
-  txParams,
-  tx
+  userEmail
 }: {
   scope: string | string[] | null
-  tx: DashboardWalletTx | null
   isLoggedIn: boolean
   isLoading: boolean
   userEmail: string | null
-  txParams?: DashboardWalletParams
 }) => {
   return (
     <Flex direction='column' gap='s'>
@@ -70,18 +54,12 @@ export const PermissionsSection = ({
             </Flex>
             <Text variant='body' size='m' color='default'>
               {scope === 'write'
-                ? (getDashboardWalletPermissionTitle(tx) ??
-                  messages.writeAccountAccess)
+                ? messages.writeAccountAccess
                 : messages.readOnlyAccountAccess}
             </Text>
           </Flex>
-          {scope === 'write' && !tx ? (
+          {scope === 'write' ? (
             <PermissionDetail>{messages.writeAccessGrants}</PermissionDetail>
-          ) : null}
-          {scope === 'write' && tx && txParams ? (
-            <PermissionDetail>
-              {txParams.wallet.slice(0, 6)}...{txParams.wallet.slice(-4)}
-            </PermissionDetail>
           ) : null}
           {scope === 'read' ? (
             <PermissionDetail>{messages.readOnlyGrants}</PermissionDetail>

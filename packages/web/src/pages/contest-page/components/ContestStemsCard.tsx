@@ -7,25 +7,19 @@ import {
   useTrackByPermalink,
   useUser
 } from '@audius/common/api'
-import { useDownloadableContentAccess } from '@audius/common/hooks'
 import {
   DownloadQuality,
-  ModalSource,
   ID,
   SquareSizes,
   stemCategoryFriendlyNames
 } from '@audius/common/models'
 import {
   useDownloadTrackArchiveModal,
-  usePremiumContentPurchaseModal,
-  useWaitForDownloadModal,
-  PurchaseableContentType
+  useWaitForDownloadModal
 } from '@audius/common/store'
 import { formatBytes } from '@audius/common/utils'
-import { USDC } from '@audius/fixed-decimal'
 import {
   Box,
-  Button,
   Divider,
   Flex,
   IconButton,
@@ -45,7 +39,6 @@ import { useTrackCoverArt } from 'hooks/useTrackCoverArt'
 const messages = {
   heading: 'STEMS & DOWNLOADS',
   publicFree: 'Public Free',
-  unlockAll: (price: string) => `Unlock All ${price}`,
   download: 'Download',
   downloadAll: 'Download All',
   stemsCount: (n: number) => (n === 1 ? '1 Stem' : `${n} Stems`),
@@ -85,12 +78,6 @@ export const ContestStemsCard = ({ trackId }: ContestStemsCardProps) => {
     trackId,
     size: SquareSizes.SIZE_150_BY_150
   })
-  const { price, shouldDisplayPremiumDownloadLocked } =
-    useDownloadableContentAccess({ trackId })
-  const formattedPrice = price ? USDC(price / 100).toLocaleString() : undefined
-
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
   const { onOpen: openDownloadTrackArchiveModal } =
     useDownloadTrackArchiveModal()
   const { onOpen: openWaitForDownloadModal } = useWaitForDownloadModal()
@@ -135,17 +122,6 @@ export const ContestStemsCard = ({ trackId }: ContestStemsCardProps) => {
       })
     },
     [openDownloadTrackArchiveModal, trackId, stemsCount, track]
-  )
-
-  const handleUnlockAll = useRequiresAccountCallback(
-    (e: MouseEvent) => {
-      e.stopPropagation()
-      openPremiumContentPurchaseModal(
-        { contentId: trackId, contentType: PurchaseableContentType.TRACK },
-        { source: ModalSource.TrackDetails }
-      )
-    },
-    [openPremiumContentPurchaseModal, trackId]
   )
 
   // Action: per-row download. Mirrors the `handleDownload` path on
@@ -298,24 +274,13 @@ export const ContestStemsCard = ({ trackId }: ContestStemsCardProps) => {
           onClick={(e) => e.stopPropagation()}
         >
           {stemsCount > 0 ? <StemCountPill count={stemsCount} /> : <Box />}
-          {shouldDisplayPremiumDownloadLocked && formattedPrice ? (
-            <Button
-              size='small'
-              variant='primary'
-              color='lightGreen'
-              onClick={handleUnlockAll}
-            >
-              {messages.unlockAll(formattedPrice)}
-            </Button>
-          ) : (
-            <PlainButton
-              variant='default'
-              iconRight={IconReceive}
-              onClick={handleDownloadAll}
-            >
-              {stemsCount > 0 ? messages.downloadAll : messages.download}
-            </PlainButton>
-          )}
+          <PlainButton
+            variant='default'
+            iconRight={IconReceive}
+            onClick={handleDownloadAll}
+          >
+            {stemsCount > 0 ? messages.downloadAll : messages.download}
+          </PlainButton>
         </Flex>
       </Flex>
 

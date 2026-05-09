@@ -8,7 +8,6 @@ import { useField, useFormikContext } from 'formik'
 import { useDispatch } from 'react-redux'
 import { usePrevious } from 'react-use'
 
-import { useModalState } from 'common/hooks/useModalState'
 import {
   setField,
   setValueField,
@@ -31,15 +30,13 @@ export const GuestEmailHint = (props: GuestEmailHintProps) => {
   const { isValidating } = useFormikContext()
   const dispatch = useDispatch()
   const lastShownError = usePrevious(error)
-  const [, setIsOpen] = useModalState('PremiumContentPurchaseModal')
 
   const handleClickConfirmEmail = useCallback(() => {
     dispatch(setField('isGuest', true))
     dispatch(setValueField('email', email))
     dispatch(setValueField('password', TEMPORARY_PASSWORD))
     dispatch(signIn(email, TEMPORARY_PASSWORD))
-    setIsOpen(false)
-  }, [dispatch, email, setIsOpen])
+  }, [dispatch, email])
 
   const showGuestError =
     error === emailSchemaMessages.guestAccountExists ||

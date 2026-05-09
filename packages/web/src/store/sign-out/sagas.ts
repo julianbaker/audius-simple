@@ -5,17 +5,13 @@ import {
   signOutActions,
   getContext
 } from '@audius/common/store'
-import { disconnect } from '@wagmi/core'
-import { takeLatest, put, call } from 'redux-saga/effects'
+import { takeLatest, put } from 'redux-saga/effects'
 
-import { wagmiAdapter } from 'app/ReownAppKitModal'
 import { make } from 'common/store/analytics/actions'
 import { signOut } from 'store/sign-out/signOut'
 import { push } from 'utils/navigation'
 const { resetAccount, unsubscribeBrowserPushNotifications } = accountActions
 const { signOut: signOutAction } = signOutActions
-
-const wagmiConfig = wagmiAdapter.wagmiConfig
 
 function* watchSignOut() {
   const localStorage = yield* getContext('localStorage')
@@ -24,9 +20,6 @@ function* watchSignOut() {
   yield takeLatest(
     signOutAction.type,
     function* (action: ReturnType<typeof signOutAction>) {
-      if (wagmiConfig.state.status === 'connected') {
-        yield call(disconnect, wagmiConfig)
-      }
       yield put(resetAccount())
       // NOTE: Weird workaround here - queryClient.clear() is necessary to delete all of the cache
       // HOWEVER, this does NOT trigger a rerender on any active queries.

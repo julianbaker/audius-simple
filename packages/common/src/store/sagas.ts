@@ -7,13 +7,11 @@
 // import signOutSagas from 'common/store/sign-out/sagas'
 
 import { accountSagas } from '~/store/account'
-import { buyUSDCSagas } from '~/store/buy-usdc'
 import { sagas as castSagas } from '~/store/cast/sagas'
 import { gatedContentSagas } from '~/store/gated-content'
 import { chatSagas } from '~/store/pages/chat'
 import { playbackSagas } from '~/store/playback'
 import { playbackPositionSagas } from '~/store/playback-position'
-import { purchaseContentSagas } from '~/store/purchase-content'
 import remoteConfigSagas from '~/store/remote-config/sagas'
 import {
   toastSagas,
@@ -21,8 +19,6 @@ import {
   duplicateAddConfirmationModalUISagas,
   mobileOverflowMenuUISagas,
   shareModalUISagas,
-  stripeModalUISagas,
-  withdrawUSDCSagas,
   modalsSagas
 } from '~/store/ui'
 
@@ -37,22 +33,18 @@ import { CommonStoreContext } from './storeContext'
  */
 export const sagas = (_ctx: CommonStoreContext) => ({
   account: accountSagas,
-  buyUSDC: buyUSDCSagas,
   remoteConfig: remoteConfigSagas,
   cast: castSagas,
   gatedContent: gatedContentSagas,
-  purchaseContent: purchaseContentSagas,
   chat: chatSagas,
   toast: toastSagas,
   shareModalUI: shareModalUISagas,
-  stripeModalUI: stripeModalUISagas,
   mobileOverflowMenuUI: mobileOverflowMenuUISagas,
   modals: modalsSagas,
   deletePlaylistConfirmationModalUI: deletePlaylistConfirmationModalUISagas,
   duplidateAddConfirmationModalUI: duplicateAddConfirmationModalUISagas,
   playback: playbackSagas,
-  playbackPosition: playbackPositionSagas,
-  withdrawUSDC: withdrawUSDCSagas
+  playbackPosition: playbackPositionSagas
 
   // signOut: signOutSagas
   // recoveryEmail: recoveryEmailSagas
@@ -66,7 +58,6 @@ export const sagas = (_ctx: CommonStoreContext) => ({
   // store/social/tracks/sagas.ts
   // store/social/users/sagas.ts
   // store/social/collections/sagas.ts
-  // pages/audio-rewards-page/store/sagas.ts
   // store/wallet/sagas.ts
   // store/lineup/sagas.js
   // pages/feed/store/lineups/feed/sagas.js
@@ -88,8 +79,6 @@ export const sagas = (_ctx: CommonStoreContext) => ({
   // pages/trending-page/store/lineups/trending/sagas.ts
   // pages/trending-underground-page/store/lineups/tracks/sagas.ts
   // pages/trending-underground-page/store/sagas.ts
-  // pages/premium-tracks/sagas.ts
-  // pages/premium-tracks/lineups/tracks/sagas.ts
   // pages/smart-collection/store/sagas.ts
   // store/application/ui/theme/sagas.ts
   // pages/search-page/store/sagas.ts

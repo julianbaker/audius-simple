@@ -3,11 +3,9 @@ import { useCallback, useEffect, useState } from 'react'
 import {
   DownloadTrackAvailabilityType,
   StemCategory,
-  StemUploadWithFile,
-  isContentUSDCPurchaseGated
+  StemUploadWithFile
 } from '@audius/common/models'
 import { removeNullable, Nullable } from '@audius/common/utils'
-import { USDC } from '@audius/fixed-decimal'
 import { Text, Divider } from '@audius/harmony'
 import { useField } from 'formik'
 import { usePrevious } from 'react-use'
@@ -20,7 +18,6 @@ import { StemFilesView } from './StemFilesView'
 import styles from './StemsAndDownloadsField.module.css'
 import { SwitchRowField } from './SwitchRowField'
 import { DownloadAvailability } from './download-availability/DownloadAvailability'
-import { USDCPurchaseRemoteConfig } from './price-and-audience/priceAndAudienceSchema'
 import {
   IS_DOWNLOAD_GATED,
   DOWNLOAD_CONDITIONS,
@@ -29,9 +26,7 @@ import {
   IS_DOWNLOADABLE,
   IS_ORIGINAL_AVAILABLE,
   STEMS,
-  DOWNLOAD_PRICE,
-  StemsAndDownloadsFormValues,
-  IS_OWNED_BY_USER
+  StemsAndDownloadsFormValues
 } from './types'
 
 const messages = {
@@ -41,19 +36,11 @@ const messages = {
     header: 'Full Track Download',
     description: 'Provide a full lossless copy of your track for download.'
   },
-  priceTooLow: (minPrice: number) =>
-    `Price must be at least $${USDC(minPrice / 100).toLocaleString()}.`,
-  priceTooHigh: (maxPrice: number) =>
-    `Price must be less than $${USDC(maxPrice / 100).toLocaleString()}.`,
   gatedNoDownloadableAssets:
     'You must enable full track download or upload a stem file before setting download availability.'
 }
 
-type StemsAndDownloadsSchemaProps = USDCPurchaseRemoteConfig
-export const stemsAndDownloadsSchema = ({
-  minContentPriceCents,
-  maxContentPriceCents
-}: StemsAndDownloadsSchemaProps) =>
+export const stemsAndDownloadsSchema = () =>
   z
     .object({
       [IS_DOWNLOADABLE]: z.boolean(),
@@ -61,56 +48,16 @@ export const stemsAndDownloadsSchema = ({
       [IS_ORIGINAL_AVAILABLE]: z.boolean(),
       [DOWNLOAD_CONDITIONS]: z.any(),
       [STREAM_CONDITIONS]: z.any(),
-      [DOWNLOAD_AVAILABILITY_TYPE]: z.nativeEnum(DownloadTrackAvailabilityType),
-      [IS_OWNED_BY_USER]: z.boolean()
+      [DOWNLOAD_AVAILABILITY_TYPE]: z.nativeEnum(DownloadTrackAvailabilityType)
     })
-    .refine(
-      (values) => {
-        const formValues = values as StemsAndDownloadsFormValues
-        const downloadConditions = formValues[DOWNLOAD_CONDITIONS]
-        if (
-          formValues[DOWNLOAD_AVAILABILITY_TYPE] ===
-            DownloadTrackAvailabilityType.USDC_PURCHASE &&
-          isContentUSDCPurchaseGated(downloadConditions)
-        ) {
-          const { price } = downloadConditions.usdc_purchase
-          return price > 0 && price >= minContentPriceCents
-        }
-        return true
-      },
-      {
-        message: messages.priceTooLow(minContentPriceCents),
-        path: [DOWNLOAD_PRICE]
-      }
-    )
-    .refine(
-      (values) => {
-        const formValues = values as StemsAndDownloadsFormValues
-        const downloadConditions = formValues[DOWNLOAD_CONDITIONS]
-        if (
-          formValues[DOWNLOAD_AVAILABILITY_TYPE] ===
-            DownloadTrackAvailabilityType.USDC_PURCHASE &&
-          isContentUSDCPurchaseGated(downloadConditions)
-        ) {
-          return downloadConditions.usdc_purchase.price <= maxContentPriceCents
-        }
-        return true
-      },
-      {
-        message: messages.priceTooHigh(maxContentPriceCents),
-        path: [DOWNLOAD_PRICE]
-      }
-    )
     .refine(
       // cannot be download gated if no downloadable assets
       (values) => {
         const formValues = values as StemsAndDownloadsFormValues
         const streamConditions = formValues[STREAM_CONDITIONS]
         const availabilityType = formValues[DOWNLOAD_AVAILABILITY_TYPE]
-        const isDownloadGated = [
-          DownloadTrackAvailabilityType.FOLLOWERS,
-          DownloadTrackAvailabilityType.USDC_PURCHASE
-        ].includes(availabilityType)
+        const isDownloadGated =
+          availabilityType === DownloadTrackAvailabilityType.FOLLOWERS
         const isDownloadable = formValues[IS_DOWNLOADABLE]
         const stems = formValues[STEMS]
         const hasStems = stems.length > 0
@@ -157,10 +104,8 @@ export const StemsAndDownloadsMenuFields = (
   // set the track to be downloadable and allow lossless files
   useEffect(() => {
     const firstTimeDownloadGated =
-      [
-        DownloadTrackAvailabilityType.FOLLOWERS,
-        DownloadTrackAvailabilityType.USDC_PURCHASE
-      ].includes(availabilityType) && !isAvailabilityTouched
+      availabilityType === DownloadTrackAvailabilityType.FOLLOWERS &&
+      !isAvailabilityTouched
     if (firstTimeDownloadGated) {
       setIsDownloadable(true)
       setIsAvailabilityTouched(true)

@@ -18,8 +18,6 @@ import {
   ID,
   Name,
   isContentFollowGated,
-  isContentTokenGated,
-  isContentUSDCPurchaseGated,
   GatedContentStatus,
   UserTrackMetadata,
   UserCollectionMetadata
@@ -30,12 +28,12 @@ import { musicConfettiActions } from '~/store/music-confetti'
 import { usersSocialActions } from '~/store/social'
 import { Nullable } from '~/utils/typeUtils'
 
-import { PurchaseableContentType } from '../purchase-content'
 import { getSDK } from '../sdkUtils'
 
 import { actions as gatedContentActions } from './slice'
 
 const DEFAULT_GATED_TRACK_POLL_INTERVAL_MS = 1000
+type GatedContentType = 'track' | 'album'
 
 const {
   revokeAccess,
@@ -54,7 +52,7 @@ export function* pollGatedContent({
   isSourceTrack
 }: {
   contentId: ID
-  contentType: PurchaseableContentType
+  contentType: GatedContentType
   currentUserId: number
   isSourceTrack?: boolean
 }) {
@@ -67,7 +65,7 @@ export function* pollGatedContent({
     DEFAULT_GATED_TRACK_POLL_INTERVAL_MS
 
   // get initial track metadata to determine whether we are polling for stream or download access
-  const isAlbum = contentType === PurchaseableContentType.ALBUM
+  const isAlbum = contentType === 'album'
   const cachedEntity = isAlbum
     ? yield* queryCollection(contentId)
     : yield* queryTrack(contentId)
@@ -128,16 +126,8 @@ export function* pollGatedContent({
       }
 
       const getEventName = () => {
-        if (isContentUSDCPurchaseGated(apiEntity.stream_conditions)) {
-          return isAlbum
-            ? Name.USDC_PURCHASE_GATED_COLLECTION_UNLOCKED
-            : Name.USDC_PURCHASE_GATED_TRACK_UNLOCKED
-        }
         if (isContentFollowGated(apiEntity.stream_conditions)) {
           return Name.FOLLOW_GATED_TRACK_UNLOCKED
-        }
-        if (isContentTokenGated(apiEntity.stream_conditions)) {
-          return Name.TOKEN_GATED_TRACK_UNLOCKED
         }
         return null
       }
@@ -168,13 +158,9 @@ export function* pollGatedContent({
       }
       const eventName =
         !isAlbum &&
-        (isContentUSDCPurchaseGated(apiEntity.download_conditions)
-          ? Name.USDC_PURCHASE_GATED_DOWNLOAD_TRACK_UNLOCKED
-          : isContentFollowGated(apiEntity.download_conditions)
-            ? Name.FOLLOW_GATED_DOWNLOAD_TRACK_UNLOCKED
-            : isContentTokenGated(apiEntity.download_conditions)
-              ? Name.TOKEN_GATED_DOWNLOAD_TRACK_UNLOCKED
-              : null)
+        (isContentFollowGated(apiEntity.download_conditions)
+          ? Name.FOLLOW_GATED_DOWNLOAD_TRACK_UNLOCKED
+          : null)
       if (eventName) {
         analytics.track({
           eventName,
@@ -236,7 +222,7 @@ function* updateFollowGatedTracks(
     Array.from(tracksToPoll).map((trackId) => {
       return call(pollGatedContent, {
         contentId: trackId,
-        contentType: PurchaseableContentType.TRACK,
+        contentType: 'track',
         currentUserId,
         isSourceTrack: sourceTrackId === trackId
       })

@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 
 import { useQueryContext } from '~/api/tan-query/utils/QueryContext'
 import { ID } from '~/models'
+import { filterUnsupportedCryptoGatedCollections } from '~/models/Collection'
 
 import { TQCollection } from '../models'
 import { QueryOptions } from '../types'
@@ -54,11 +55,18 @@ export const useCollections = (
   })
 
   const { data: collections } = queriesResults
+  const filteredCollections = useMemo(
+    () => filterUnsupportedCryptoGatedCollections(collections ?? []),
+    [collections]
+  )
 
-  const byId = useMemo(() => keyBy(collections, 'playlist_id'), [collections])
+  const byId = useMemo(
+    () => keyBy(filteredCollections, 'playlist_id'),
+    [filteredCollections]
+  )
 
   return {
-    data: collections,
+    data: filteredCollections,
     byId,
     status: queriesResults.status,
     isPending: queriesResults.isPending,

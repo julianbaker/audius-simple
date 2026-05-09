@@ -15,10 +15,9 @@ import { ID } from '~/models/Identifiers'
 import {
   TrackAccessType,
   isContentFollowGated,
-  isContentTokenGated,
-  isContentUSDCPurchaseGated
+  isContentUnsupportedCryptoGated,
+  stripUnsupportedCryptoGatedConditions
 } from '~/models/Track'
-import { createUserBankIfNeeded } from '~/services/audius-backend'
 import { CommonState } from '~/store/commonStore'
 import { stemsUploadSelectors } from '~/store/stems-upload'
 import { replaceTrackProgressModalActions } from '~/store/ui/modals/replace-track-progress-modal'
@@ -29,8 +28,6 @@ import { formatMusicalKey } from '~/utils/musicalKeys'
 
 import { TQTrack } from '../models'
 import { QUERY_KEYS } from '../queryKeys'
-import { addPremiumMetadata } from '../upload/usePublishTracks'
-import { useCurrentAccountUser } from '../users/account/accountSelectors'
 import { useCurrentUserId } from '../users/account/useCurrentUserId'
 import { getUserQueryKey } from '../users/useUser'
 import { handleStemUpdates } from '../utils/handleStemUpdates'
@@ -59,10 +56,6 @@ const getTrackAccess = ({
   if (is_stream_gated && stream_conditions) {
     if (isContentFollowGated(stream_conditions)) {
       return TrackAccessType.FOLLOW_GATED
-    } else if (isContentTokenGated(stream_conditions)) {
-      return TrackAccessType.TOKEN_GATED
-    } else if (isContentUSDCPurchaseGated(stream_conditions)) {
-      return TrackAccessType.USDC_GATED
     }
   }
   return TrackAccessType.PUBLIC
@@ -109,7 +102,6 @@ export const useUpdateTrack = () => {
   const store = useStore()
   const { mutate: deleteTrack } = useDeleteTrack()
   const { data: userId } = useCurrentUserId()
-  const { data: accountUser } = useCurrentAccountUser()
 
   return useMutation({
     mutationFn: async ({
@@ -131,31 +123,26 @@ export const useUpdateTrack = () => {
       // `editTrackAsync` saga preprocessing.
       applyEditTrackFormatting(metadata, previousMetadata)
 
-      const metadataWithSplits = addPremiumMetadata(
-        userId,
-        metadata as TrackMetadataForUpload
+      const streamConditions = stripUnsupportedCryptoGatedConditions(
+        metadata.stream_conditions
       )
-      const sdkMetadata = trackMetadataForUploadToSdk(metadataWithSplits)
-
-      const ethAddress = accountUser?.wallet
-      if (
-        ethAddress &&
-        (isContentUSDCPurchaseGated(metadataWithSplits.stream_conditions) ||
-          isContentUSDCPurchaseGated(metadataWithSplits.download_conditions))
-      ) {
-        createUserBankIfNeeded(sdk, {
-          mint: 'USDC',
-          ethAddress,
-          recordAnalytics: analytics.track
-        }).catch((error) => {
-          reportToSentry({
-            error,
-            additionalInfo: { trackId, userId, ethAddress },
-            feature: Feature.Edit,
-            name: 'Ensure USDC userbank on track edit'
-          })
-        })
-      }
+      const downloadConditions = stripUnsupportedCryptoGatedConditions(
+        metadata.download_conditions
+      )
+      const sanitizedMetadata = {
+        ...metadata,
+        is_stream_gated: !!streamConditions,
+        stream_conditions: streamConditions,
+        ...(isContentUnsupportedCryptoGated(metadata.stream_conditions)
+          ? { preview_start_seconds: null }
+          : {}),
+        is_download_gated: !!downloadConditions,
+        download_conditions: downloadConditions,
+        ...(isContentUnsupportedCryptoGated(metadata.download_conditions)
+          ? { is_downloadable: false, is_original_available: false }
+          : {})
+      } as TrackMetadataForUpload
+      const sdkMetadata = trackMetadataForUploadToSdk(sanitizedMetadata)
 
       const response = await sdk.tracks.updateTrack({
         audioFile,

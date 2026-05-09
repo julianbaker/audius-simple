@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   useDeleteTrack,
+  useCurrentUserId,
   useStems,
   useTrack,
   useUpdateTrack
@@ -21,7 +22,6 @@ import {
   Divider,
   Flex,
   IconButton,
-  IconCart,
   IconCloudUpload,
   IconReceive,
   IconTrash,
@@ -49,7 +49,6 @@ const messages = {
   availabilityHelper: 'Specify who has access to download your files.',
   public: 'Public',
   followers: 'Followers',
-  premium: 'Premium',
   uploadHeading: 'Upload Additional Files',
   uploadHelper: 'Provide FLAC, WAV, ALAC, or AIFF for highest audio quality.',
   uploadPlaceholder: 'Drag-and-drop audio files here, or ',
@@ -62,7 +61,7 @@ const messages = {
   cancel: 'Cancel'
 }
 
-type Availability = 'public' | 'followers' | 'premium'
+type Availability = 'public' | 'followers'
 
 type ManageStemsModalProps = {
   isOpen: boolean
@@ -96,6 +95,7 @@ export const ManageStemsModal = ({
 
   const { mutate: updateTrack, isPending: isSaving } = useUpdateTrack()
   const { mutate: deleteTrack } = useDeleteTrack()
+  const { data: currentUserId } = useCurrentUserId()
   const dispatch = useDispatch()
 
   // Existing stems on the track (already uploaded). Refetched in real-time
@@ -131,11 +131,6 @@ export const ManageStemsModal = ({
       setAvailability('public')
     } else if ('follow_user_id' in (cond ?? {})) {
       setAvailability('followers')
-    } else if (
-      'usdc_purchase' in (cond ?? {}) ||
-      'nft_collection' in (cond ?? {})
-    ) {
-      setAvailability('premium')
     } else {
       setAvailability('public')
     }
@@ -184,15 +179,12 @@ export const ManageStemsModal = ({
 
   const handleSave = useCallback(() => {
     if (!trackId) return
-    // Only "public" availability is round-trippable without more form
-    // state (we'd need a USDC price or NFT gate to save premium; the
-    // follower-gate needs the host's own user id). For anything richer,
-    // the user should go through the full track edit page — link
-    // in-modal rather than silently failing.
     const nextConditions: AccessConditions | null =
       availability === 'public'
         ? null
-        : (trackMeta?.download_conditions ?? null)
+        : currentUserId
+          ? { follow_user_id: currentUserId }
+          : (trackMeta?.download_conditions ?? null)
 
     updateTrack({
       trackId,
@@ -206,6 +198,7 @@ export const ManageStemsModal = ({
     trackId,
     isDownloadable,
     availability,
+    currentUserId,
     trackMeta?.download_conditions,
     updateTrack,
     onClose
@@ -260,11 +253,6 @@ export const ManageStemsModal = ({
                   key: 'followers',
                   text: messages.followers,
                   icon: <IconUserFollowing size='s' color='default' />
-                },
-                {
-                  key: 'premium',
-                  text: messages.premium,
-                  icon: <IconCart size='s' color='default' />
                 }
               ]}
             />

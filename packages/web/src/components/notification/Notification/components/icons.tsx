@@ -41,10 +41,6 @@ export const IconRelease = () => {
   return <IconStars color='accent' className={styles.iconRelease} />
 }
 
-export const IconRewards = ({ children }: { children: ReactNode }) => {
-  return <span className={styles.iconRewards}>{children}</span>
-}
-
 export const IconTrending = () => {
   return <IconTrendingBase color='accent' className={styles.iconTrending} />
 }

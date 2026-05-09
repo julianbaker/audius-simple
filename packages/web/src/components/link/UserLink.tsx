@@ -22,7 +22,6 @@ type UserLinkProps = Omit<TextLinkProps, 'to' | 'popover'> & {
   noOverflow?: boolean
   center?: boolean
   fullWidth?: boolean
-  hideFanClubBadge?: boolean
   css?: CSSObject | CSSObject[]
 }
 
@@ -37,7 +36,6 @@ export const UserLink = (props: UserLinkProps) => {
     noOverflow,
     center,
     fullWidth,
-    hideFanClubBadge,
     css: cssProp,
     ...other
   } = props
@@ -75,7 +73,6 @@ export const UserLink = (props: UserLinkProps) => {
         display: 'inline-flex',
         verticalAlign: 'middle'
       }}
-      hideFanClubBadge={hideFanClubBadge}
     />
   )
 

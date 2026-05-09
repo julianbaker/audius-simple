@@ -1,13 +1,10 @@
 import { useCollection, useCurrentUserId } from '@audius/common/api'
-import { ModalSource, isContentUSDCPurchaseGated } from '@audius/common/models'
-import { PurchaseableContentType } from '@audius/common/store'
 import { dayjs, formatReleaseDate } from '@audius/common/utils'
 import {
   Text,
   IconVisibilityHidden,
   IconPencil,
   Flex,
-  IconCart,
   useTheme,
   MusicBadge,
   IconCalendarMonth
@@ -30,7 +27,6 @@ import { CollectionActionButtons } from './CollectionActionButtons'
 import styles from './CollectionHeader.module.css'
 
 const messages = {
-  premiumLabel: 'premium',
   by: 'By ',
   hidden: 'Hidden',
   releases: (releaseDate: string) =>
@@ -104,17 +100,12 @@ export const CollectionHeader = (props: CollectionHeaderProps) => {
 
   const isLoading = loading
 
-  const isPremium =
-    isStreamGated && isContentUSDCPurchaseGated(streamConditions)
-
   const renderTypeLabel = () =>
     isLoading ? (
       <Skeleton height='16px' width='84px' />
     ) : (
       <Flex gap='s' mt='s' alignItems='center'>
-        {isPremium ? <IconCart size='s' color='subdued' /> : null}
         <Text variant='label' color='subdued'>
-          {isPremium ? `${messages.premiumLabel} ` : ''}
           {type}
         </Text>
       </Flex>
@@ -204,7 +195,6 @@ export const CollectionHeader = (props: CollectionHeaderProps) => {
             isPlayable={isPlayable}
             isPlaying={playing}
             isPreviewing={previewing}
-            isPremium={isPremium}
             isOwner={isOwner}
             tracksLoading={tracksLoading}
             onPlay={onPlay}
@@ -246,12 +236,11 @@ export const CollectionHeader = (props: CollectionHeaderProps) => {
         <GatedContentSection
           isLoading={isLoading}
           contentId={collectionId}
-          contentType={PurchaseableContentType.ALBUM}
+          contentType='album'
           streamConditions={streamConditions}
           hasStreamAccess={hasStreamAccess}
           isOwner={ownerId === currentUserId}
           ownerId={ownerId}
-          source={ModalSource.CollectionDetails}
         />
       ) : null}
       {shouldShowStats ? (

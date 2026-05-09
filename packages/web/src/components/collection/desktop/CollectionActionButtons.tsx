@@ -16,7 +16,6 @@ import { ViewerActionButtons } from './ViewerActionButtons'
 const messages = {
   actionGroupLabel: 'collection actions',
   play: 'Play',
-  preview: 'Preview',
   pause: 'Pause'
 }
 
@@ -27,7 +26,6 @@ type CollectionActionButtonProps = {
   isPreviewing: boolean
   tracksLoading: boolean
   isPlayable: boolean
-  isPremium?: Nullable<boolean>
   onPlay: () => void
   onPreview: () => void
 }
@@ -37,11 +35,9 @@ export const CollectionActionButtons = (props: CollectionActionButtonProps) => {
     isOwner,
     collectionId,
     onPlay,
-    onPreview,
     isPlaying,
     isPlayable,
-    tracksLoading,
-    isPremium
+    tracksLoading
   } = props
 
   const { data: partialCollection } = useCollection(collectionId, {
@@ -60,11 +56,9 @@ export const CollectionActionButtons = (props: CollectionActionButtonProps) => {
     ({ hasStreamAccess }) => hasStreamAccess
   )
 
-  // Show play if user has access to the collection or any of its contents,
-  // otherwise show preview
+  // Show play if user has access to the collection or any of its contents.
   const shouldShowPlay =
     (isPlayable && hasStreamAccess) || doesUserHaveAccessToAnyTrack
-  const shouldShowPreview = isPremium && !hasStreamAccess && !shouldShowPlay
 
   let actionButtons: Nullable<JSX.Element> = null
 
@@ -89,21 +83,6 @@ export const CollectionActionButtons = (props: CollectionActionButtonProps) => {
     </Button>
   )
 
-  const previewButton = (
-    <Button
-      variant='secondary'
-      iconLeft={isPlaying ? IconPause : IconPlay}
-      onClick={onPreview}
-      size='large'
-      className={styles.playbackButton}
-      aria-label={isPlaying ? messages.pause : messages.preview}
-    >
-      <span className={styles.playbackButtonLabel}>
-        {isPlaying ? messages.pause : messages.preview}
-      </span>
-    </Button>
-  )
-
   return (
     <Flex
       className={cn({
@@ -117,7 +96,6 @@ export const CollectionActionButtons = (props: CollectionActionButtonProps) => {
       alignItems='center'
     >
       {shouldShowPlay ? playButton : null}
-      {shouldShowPreview ? previewButton : null}
       {actionButtons}
     </Flex>
   )

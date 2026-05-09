@@ -7,14 +7,9 @@ import {
 } from '@audius/harmony'
 import IconLock from '@audius/harmony/src/assets/icons/Lock.svg'
 
-const messages = {
-  premiumLocked: 'Available for purchase',
-  premiumUnlocked: 'Purchased'
-}
-
 export type LockedStatusBadgeProps = {
   locked: boolean
-  variant?: 'premium' | 'gated' | 'tokenGated'
+  variant?: 'gated'
   text?: string
   /** Whether the badge is colored when locked */
   coloredWhenLocked?: boolean
@@ -23,27 +18,14 @@ export type LockedStatusBadgeProps = {
 }
 
 export const LockedStatusBadge = (props: LockedStatusBadgeProps) => {
-  const {
-    locked,
-    variant = 'gated',
-    text,
-    coloredWhenLocked = false,
-    iconSize = 'xs',
-    id
-  } = props
+  const { locked, text, coloredWhenLocked = false, iconSize = 'xs', id } = props
 
   const LockComponent = locked ? IconLock : IconLockUnlocked
 
   const { color } = useTheme()
 
   const background =
-    !locked || coloredWhenLocked
-      ? variant === 'gated'
-        ? color.special.blue
-        : variant === 'tokenGated'
-          ? color.special.coinGradient
-          : color.special.lightGreen
-      : color.neutral.n400
+    !locked || coloredWhenLocked ? color.special.blue : color.neutral.n400
 
   return (
     <Flex
@@ -60,15 +42,7 @@ export const LockedStatusBadge = (props: LockedStatusBadgeProps) => {
         color='white'
         size={iconSize}
         id={text ? undefined : id}
-        title={
-          text
-            ? undefined
-            : variant === 'premium'
-              ? locked
-                ? messages.premiumLocked
-                : messages.premiumUnlocked
-              : undefined
-        }
+        title={undefined}
       />
       {text ? (
         <Text size='xs' variant='label' color='white' id={id}>

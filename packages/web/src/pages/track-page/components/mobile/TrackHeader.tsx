@@ -4,27 +4,23 @@ import { useRemixContest, useTrack, useTrackRank } from '@audius/common/api'
 import { useFeatureFlag } from '@audius/common/hooks'
 import {
   SquareSizes,
-  isContentUSDCPurchaseGated,
   ID,
   FieldVisibility,
   Remix,
-  AccessConditions,
-  isContentTokenGated
+  AccessConditions
 } from '@audius/common/models'
 import { FeatureFlags } from '@audius/common/services'
-import { OverflowAction, PurchaseableContentType } from '@audius/common/store'
+import { OverflowAction } from '@audius/common/store'
 import { Nullable, formatReleaseDate, dayjs } from '@audius/common/utils'
 import {
   Flex,
   IconPause,
   IconPlay,
   IconUserFollowing,
-  IconCart,
   Box,
   Button,
   MusicBadge,
-  Text,
-  IconFanClub
+  Text
 } from '@audius/harmony'
 import IconCalendarMonth from '@audius/harmony/src/assets/icons/CalendarMonth.svg'
 import IconTrending from '@audius/harmony/src/assets/icons/Trending.svg'
@@ -54,11 +50,8 @@ const messages = {
   track: 'TRACK',
   remix: 'REMIX',
   play: 'PLAY',
-  preview: 'PREVIEW',
   pause: 'PAUSE',
-  premiumTrack: 'PREMIUM TRACK',
   followersOnly: 'FOLLOWERS ONLY',
-  coinGated: 'COIN GATED',
   generatedWithAi: 'Generated With AI',
   artworkAltText: 'Track Artwork',
   hidden: 'Hidden',
@@ -83,19 +76,6 @@ const PlayButton = ({ disabled, playing, onPlay }: PlayButtonProps) => {
       fullWidth
     >
       {playing ? messages.pause : messages.play}
-    </Button>
-  )
-}
-
-const PreviewButton = ({ playing, onPlay }: PlayButtonProps) => {
-  return (
-    <Button
-      variant='secondary'
-      iconLeft={playing ? IconPause : IconPlay}
-      onClick={onPlay}
-      fullWidth
-    >
-      {playing ? messages.pause : messages.preview}
     </Button>
   )
 }
@@ -171,7 +151,6 @@ const TrackHeader = ({
   commentsDisabled,
   tags,
   onPlay,
-  onPreview,
   onShare,
   onSave,
   onRepost,
@@ -205,12 +184,7 @@ const TrackHeader = ({
   const hasDownloadableAssets = is_downloadable || (_stems?.length ?? 0) > 0
 
   const showSocials = !isUnlisted && hasStreamAccess
-  const isUSDCPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
-  // Preview button is shown for USDC-gated tracks if user does not have access
-  // or is the owner
-  const showPreview = isUSDCPurchaseGated && (isOwner || !hasStreamAccess)
-  // Play button is conditionally hidden for USDC-gated tracks when the user does not have access
-  const showPlay = isUSDCPurchaseGated ? hasStreamAccess : true
+  const showPlay = true
   const showListenCount = isOwner || (!isStreamGated && !isUnlisted)
   const albumInfo = album_backlink
   const shouldShowScheduledRelease =
@@ -306,20 +280,11 @@ const TrackHeader = ({
     }
 
     if (isStreamGated) {
-      let IconComponent = IconUserFollowing
-      let titleMessage = messages.followersOnly
-      if (isContentUSDCPurchaseGated(streamConditions)) {
-        IconComponent = IconCart
-        titleMessage = messages.premiumTrack
-      } else if (isContentTokenGated(streamConditions)) {
-        IconComponent = IconFanClub
-        titleMessage = messages.coinGated
-      }
       return (
         <Flex gap='xs' justifyContent='center' alignItems='center'>
-          <IconComponent color='subdued' size='s' />
+          <IconUserFollowing color='subdued' size='s' />
           <Text variant='label' color='subdued'>
-            {titleMessage}
+            {messages.followersOnly}
           </Text>
         </Flex>
       )
@@ -369,18 +334,12 @@ const TrackHeader = ({
             onPlay={onPlay}
           />
         ) : null}
-        {showPreview ? (
-          <PreviewButton
-            playing={isPlaying && isPreviewing}
-            onPlay={onPreview}
-          />
-        ) : null}
         {streamConditions && trackId ? (
           <Box w='100%'>
             <GatedContentSection
               isLoading={isLoading}
               contentId={trackId}
-              contentType={PurchaseableContentType.TRACK}
+              contentType='track'
               streamConditions={streamConditions}
               hasStreamAccess={hasStreamAccess}
               isOwner={isOwner}

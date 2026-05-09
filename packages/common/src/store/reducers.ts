@@ -4,7 +4,6 @@ import type { Storage } from 'redux-persist'
 
 import account from './account/slice'
 import averageColorReducer from './average-color/slice'
-import { buyUSDCReducer } from './buy-usdc'
 import cast from './cast/slice'
 import confirmer from './confirmer/reducer'
 import { ConfirmerState } from './confirmer/types'
@@ -14,7 +13,6 @@ import musicConfettiReducer, {
   MusicConfettiState
 } from './music-confetti/slice'
 import { HistoryPageState, LibraryPageState } from './pages'
-import audioRewardsSlice from './pages/audio-rewards/slice'
 import { chatReducer } from './pages/chat'
 import collection from './pages/collection/reducer'
 import { CollectionsPageState } from './pages/collection/types'
@@ -22,7 +20,6 @@ import {
   deactivateAccountReducer,
   DeactivateAccountState
 } from './pages/deactivate-account'
-import exclusiveTracks from './pages/exclusive-tracks/slice'
 import feedReducer from './pages/feed/reducer'
 import { FeedPageState } from './pages/feed/types'
 import historyPageReducer from './pages/history-page/reducer'
@@ -35,7 +32,6 @@ import searchResults from './pages/search-results/reducer'
 import { SearchPageState } from './pages/search-results/types'
 import settings from './pages/settings/reducer'
 import { SettingsPageState } from './pages/settings/types'
-import tokenDashboardSlice from './pages/token-dashboard/slice'
 import track from './pages/track/reducer'
 import { TrackPageState } from './pages/track/types'
 import trending from './pages/trending/reducer'
@@ -44,18 +40,16 @@ import playback from './playback/slice'
 import { PlaybackState } from './playback/types'
 import { PlaybackPositionState } from './playback-position'
 import playbackPosition from './playback-position/slice'
-import { purchaseContentReducer } from './purchase-content'
 import reachability from './reachability/reducer'
 import { ReachabilityState } from './reachability/types'
 import savedCollectionsReducer from './saved-collections/slice'
 import searchReducer from './search/slice'
 import { SearchState } from './search/types'
 import stemsUpload from './stems-upload/slice'
-import { ToastState, TransactionDetailsState, withdrawUSDCReducer } from './ui'
+import { ToastState } from './ui'
 import addToCollectionReducer, {
   AddToCollectionState
 } from './ui/add-to-collection/reducer'
-import coinflowModalReducer from './ui/coinflow-modal/slice'
 import deletePlaylistConfirmationReducer from './ui/delete-playlist-confirmation-modal/slice'
 import { DeletePlaylistConfirmationModalState } from './ui/delete-playlist-confirmation-modal/types'
 import duplicateAddConfirmationReducer from './ui/duplicate-add-confirmation-modal/slice'
@@ -66,21 +60,16 @@ import { modalsReducer, ModalsState } from './ui/modals'
 import nowPlayingReducer, { NowPlayingState } from './ui/now-playing/slice'
 import shareModalReducer from './ui/share-modal/slice'
 import { ShareModalState } from './ui/share-modal/types'
-import stripeModalReducer from './ui/stripe-modal/slice'
-import { StripeModalState } from './ui/stripe-modal/types'
 import theme, { ThemeState } from './ui/theme/slice'
 import toastReducer from './ui/toast/slice'
-import transactionDetailsReducer from './ui/transaction-details/slice'
 import { UploadConfirmationModalState } from './ui/upload-confirmation-modal/types'
 import upload from './upload/reducer'
 import { UploadState } from './upload/types'
-import coinLeaderboardUserListReducer from './user-list/coin-leaderboard/reducers'
 import favoritesUserListReducer from './user-list/favorites/reducers'
 import followersUserListReducer from './user-list/followers/reducers'
 import followingUserListReducer from './user-list/following/reducers'
 import mutualsUserListReducer from './user-list/mutuals/reducers'
 import notificationsUserListReducer from './user-list/notifications/reducers'
-import purchasersUserListReducer from './user-list/purchasers/reducers'
 import relatedArtistsListReducer from './user-list/related-artists/reducers'
 import remixersUserListReducer from './user-list/remixers/reducers'
 import repostsUserListReducer from './user-list/reposts/reducers'
@@ -125,12 +114,8 @@ export const reducers = (storage: Storage, history?: History) => ({
     musicConfetti: musicConfettiReducer,
     nowPlaying: nowPlayingReducer,
     shareModal: shareModalReducer,
-    stripeModal: stripeModalReducer,
-    coinflowModal: coinflowModalReducer,
     toast: toastReducer,
-    transactionDetails: transactionDetailsReducer,
     userList: combineReducers({
-      coinLeaderboard: coinLeaderboardUserListReducer,
       followers: followersUserListReducer,
       following: followingUserListReducer,
       reposts: repostsUserListReducer,
@@ -138,7 +123,6 @@ export const reducers = (storage: Storage, history?: History) => ({
       mutuals: mutualsUserListReducer,
       notifications: notificationsUserListReducer,
       relatedArtists: relatedArtistsListReducer,
-      purchasers: purchasersUserListReducer,
       remixers: remixersUserListReducer
     }),
     theme
@@ -146,7 +130,6 @@ export const reducers = (storage: Storage, history?: History) => ({
 
   // Pages
   pages: combineReducers({
-    audioRewards: audioRewardsSlice.reducer,
     chat: chatReducer,
     collection,
     deactivateAccount: deactivateAccountReducer,
@@ -157,21 +140,15 @@ export const reducers = (storage: Storage, history?: History) => ({
 
     libraryPage: persistedLibraryPageReducer(storage),
     searchResults,
-    tokenDashboard: tokenDashboardSlice.reducer,
     track,
     trending: trending(history),
     settings,
-    remixes,
-    exclusiveTracks
+    remixes
   }),
   search: searchReducer(storage),
   stemsUpload,
 
-  // Gated content
-  buyUSDC: buyUSDCReducer,
   gatedContent,
-  purchaseContent: purchaseContentReducer,
-  withdrawUSDC: withdrawUSDCReducer,
 
   upload,
   confirmer,
@@ -216,12 +193,9 @@ export type CommonState = {
     musicConfetti: MusicConfettiState
     nowPlaying: NowPlayingState
     shareModal: ShareModalState
-    stripeModal: StripeModalState
     toast: ToastState
-    transactionDetails: TransactionDetailsState
     uploadConfirmationModal: UploadConfirmationModalState
     userList: {
-      coinLeaderboard: ReturnType<typeof coinLeaderboardUserListReducer>
       mutuals: ReturnType<typeof mutualsUserListReducer>
       notifications: ReturnType<typeof notificationsUserListReducer>
       followers: ReturnType<typeof followersUserListReducer>
@@ -229,20 +203,17 @@ export type CommonState = {
       reposts: ReturnType<typeof repostsUserListReducer>
       favorites: ReturnType<typeof favoritesUserListReducer>
       relatedArtists: ReturnType<typeof relatedArtistsListReducer>
-      purchasers: ReturnType<typeof purchasersUserListReducer>
       remixers: ReturnType<typeof remixersUserListReducer>
     }
     theme: ThemeState
   }
 
   pages: {
-    audioRewards: ReturnType<typeof audioRewardsSlice.reducer>
     chat: ReturnType<typeof chatReducer>
     collection: CollectionsPageState
     deactivateAccount: DeactivateAccountState
     feed: FeedPageState
 
-    tokenDashboard: ReturnType<typeof tokenDashboardSlice.reducer>
     historyPage: HistoryPageState
     track: TrackPageState
     pickWinners: ReturnType<typeof pickWinners>
@@ -252,19 +223,13 @@ export type CommonState = {
     settings: SettingsPageState
     trending: TrendingPageState
     remixes: ReturnType<typeof remixes>
-    exclusiveTracks: ReturnType<typeof exclusiveTracks>
   }
   search: SearchState
 
   stemsUpload: ReturnType<typeof stemsUpload>
 
-  // USDC
-  buyUSDC: ReturnType<typeof buyUSDCReducer>
-
   // Gated content
-  purchaseContent: ReturnType<typeof purchaseContentReducer>
   gatedContent: ReturnType<typeof gatedContent>
-  withdrawUSDC: ReturnType<typeof withdrawUSDCReducer>
 
   upload: UploadState
   confirmer: ConfirmerState

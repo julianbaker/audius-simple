@@ -131,7 +131,7 @@ const LibraryPage = () => {
     } else if (selectedCategory === LibraryCategory.Repost) {
       return emptyStateMessages.emptyTrackRepostsHeader
     } else {
-      return emptyStateMessages.emptyTrackPurchasedHeader
+      return emptyStateMessages.emptyTrackAllHeader
     }
   })
 

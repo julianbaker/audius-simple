@@ -104,39 +104,7 @@ describe('CollectionCard', () => {
     ).toBeInTheDocument()
   })
 
-  it('premium locked collections are rendered correctly', async () => {
-    renderCollectionCard({
-      ...testCollection,
-      access: { stream: false },
-      stream_conditions: {
-        usdc_purchase: { price: 10, albumTrackPrice: 1, splits: [] }
-      }
-    })
-
-    expect(
-      await screen.findByRole('button', {
-        name: /test collection test user reposts 10 favorites 5 available for purchase/i
-      })
-    ).toBeInTheDocument()
-  })
-
-  it('premium unlocked collections are rendered correctly', async () => {
-    renderCollectionCard({
-      ...testCollection,
-      access: { stream: true, download: true },
-      stream_conditions: {
-        usdc_purchase: { price: 10, albumTrackPrice: 1, splits: [] }
-      }
-    })
-
-    expect(
-      await screen.findByRole('button', {
-        name: /test collection test user reposts 10 favorites 5 purchased/i
-      })
-    ).toBeInTheDocument()
-  })
-
-  it('premium collections owned by user are rendered correctly', async () => {
+  it('collections owned by user are rendered correctly', async () => {
     renderCollectionCard({
       ...testCollection,
       playlist_owner_id: 2 // Same as current user

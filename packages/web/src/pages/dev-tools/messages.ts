@@ -21,20 +21,6 @@ export const messages = {
   solanaToolsDescription:
     'A collection of tools for interacting with and debugging Solana programs.',
   solanaToolsButton: 'Open Solana Tools',
-  userBankDeriverTitle: 'User Bank Address Deriver',
-  userBankDeriverDescription:
-    'Derive the Program-Owned Associated Token Account (User Bank) address for a given Ethereum wallet address and token. This is where claimable tokens for that user would reside.',
-  userBankDeriverEthAddressLabel: 'Ethereum Wallet Address:',
-  userBankDeriverEthAddressPlaceholder:
-    'Enter Ethereum wallet address (e.g., 0x...)',
-  userBankDeriverTokenLabel: 'Token Symbol:',
-  userBankDeriverButton: 'Derive User Bank Address',
-  userBankDeriverOutputLabel: 'Derived User Bank Address:',
-  userBankDeriverErrorLabel: 'Error Deriving Address:',
-  aaoTitle: 'Anti-Abuse Oracle (AAO)',
-  aaoDescription:
-    'Access the Anti-Abuse Oracle attestation interface used to validate reward claims and verify legitimate user activity in the protocol.',
-  aaoButton: 'Open AAO UI',
   healthzTitle: 'Health Monitor (Healthz)',
   healthzDescription:
     'Access the health monitoring dashboard for Audius network services including discovery nodes, content nodes, and other protocol infrastructure.',
@@ -42,9 +28,5 @@ export const messages = {
   userIdParserTitle: 'User ID Parser',
   userIdParserDescription:
     'Parse hash IDs to decode them into numeric user IDs. Useful for debugging and development work with user identifiers.',
-  userIdParserButton: 'Open User ID Parser',
-  coinSuccessModalPreviewTitle: 'Coin success modal',
-  coinSuccessModalPreviewDescription:
-    'Open the post-launch fan club success dialog with sample coin data (UI preview only).',
-  coinSuccessModalPreviewButton: 'Open coin success modal'
+  userIdParserButton: 'Open User ID Parser'
 }

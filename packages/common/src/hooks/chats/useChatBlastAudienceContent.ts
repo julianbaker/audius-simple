@@ -5,11 +5,8 @@ import { ChatBlast, ChatBlastAudience, OptionalHashId } from '@audius/sdk'
 import {
   useCollection,
   useCurrentAccountUser,
-  usePurchasersCount,
   useRemixersCount,
-  useTrack,
-  useArtistCreatedFanClub,
-  useFanClubMembersCount
+  useTrack
 } from '~/api'
 import {
   getChatBlastAudienceDescription,
@@ -39,51 +36,21 @@ export const useChatBlastAudienceContent = ({ chat }: { chat: ChatBlast }) => {
     select: (collection) => collection.playlist_name
   })
 
-  const { data: purchasersCount } = usePurchasersCount(
-    {
-      contentId: decodedContentId,
-      contentType: audienceContentType
-    },
-    {
-      enabled: audience === ChatBlastAudience.CUSTOMERS
-    }
-  )
-
   const { data: remixersCount } = useRemixersCount(
     { trackId: decodedContentId },
     { enabled: audience === ChatBlastAudience.REMIXERS }
-  )
-
-  const { data: coin } = useArtistCreatedFanClub(user?.user_id)
-  const coinSymbol = coin?.ticker ?? ''
-  const mint = coin?.mint
-  const { data: coinMembersCount } = useFanClubMembersCount(
-    { mint },
-    {
-      enabled: audience === ChatBlastAudience.COIN_HOLDERS
-    }
   )
 
   const audienceCount = useMemo(() => {
     switch (audience) {
       case ChatBlastAudience.FOLLOWERS:
         return user?.follower_count
-      case ChatBlastAudience.CUSTOMERS:
-        return purchasersCount
       case ChatBlastAudience.REMIXERS:
         return remixersCount
-      case ChatBlastAudience.COIN_HOLDERS:
-        return coinMembersCount
       default:
         return 0
     }
-  }, [
-    audience,
-    user?.follower_count,
-    purchasersCount,
-    remixersCount,
-    coinMembersCount
-  ])
+  }, [audience, user?.follower_count, remixersCount])
 
   const contentTitle = audienceContentId
     ? audienceContentType === 'track'
@@ -91,20 +58,17 @@ export const useChatBlastAudienceContent = ({ chat }: { chat: ChatBlast }) => {
       : albumTitle
     : undefined
 
-  const chatBlastTitle = getChatBlastTitle({ audience, coinSymbol })
+  const chatBlastTitle = getChatBlastTitle({ audience })
   const chatBlastSecondaryTitle = getChatBlastSecondaryTitle({
     audience,
-    audienceContentId,
-    coinSymbol
+    audienceContentId
   })
   const chatBlastAudienceDescription = getChatBlastAudienceDescription({
-    audience,
-    coinSymbol
+    audience
   })
   const chatBlastCTA = getChatBlastCTA({
     audience,
-    audienceContentId,
-    coinSymbol
+    audienceContentId
   })
 
   return {

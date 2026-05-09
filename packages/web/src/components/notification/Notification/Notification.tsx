@@ -11,13 +11,10 @@ import { ApproveManagerNotification } from './ApproveManagerRequestNotification'
 import { ArtistRemixContestEndedNotification } from './ArtistRemixContestEndedNotification'
 import { ArtistRemixContestEndingSoonNotification } from './ArtistRemixContestEndingSoonNotification'
 import { ArtistRemixContestSubmissionsNotification } from './ArtistRemixContestSubmissionsNotification'
-import { ChallengeRewardNotification } from './ChallengeRewardNotification'
-import { ClaimableRewardNotification } from './ClaimableRewardNotification'
 import { CommentMentionNotification } from './CommentMentionNotification'
 import { CommentNotification } from './CommentNotification'
 import { CommentReactionNotification } from './CommentReactionNotification'
 import { CommentThreadNotification } from './CommentThreadNotification'
-import { FanClubTextPostNotification } from './FanClubTextPostNotification'
 import { FanRemixContestEndedNotification } from './FanRemixContestEndedNotification'
 import { FanRemixContestEndingSoonNotification } from './FanRemixContestEndingSoonNotification'
 import { FanRemixContestStartedNotification } from './FanRemixContestStartedNotification'
@@ -26,7 +23,6 @@ import { FanRemixContestWinnersSelectedNotification } from './FanRemixContestWin
 import { FavoriteNotification } from './FavoriteNotification'
 import { FavoriteOfRepostNotification } from './FavoriteOfRepostNotification'
 import { FollowNotification } from './FollowNotification'
-import { ListenStreakReminderNotification } from './ListenStreakReminderNotification'
 import { MilestoneNotification } from './MilestoneNotification'
 import { RemixContestUpdateNotification } from './RemixContestUpdateNotification'
 import { RemixCosignNotification } from './RemixCosignNotification'
@@ -35,12 +31,8 @@ import { RepostNotification } from './RepostNotification'
 import { RepostOfRepostNotification } from './RepostOfRepostNotification'
 import { RequestManagerNotification } from './RequestManagerNotification'
 import { TastemakerNotification } from './TastemakerNotification'
-import { TierChangeNotification } from './TierChangeNotification'
-import { TrackAddedToPurchasedAlbumNotification } from './TrackAddedToPurchasedAlbumNotification'
 import { TrendingTrackNotification } from './TrendingTrackNotification'
 import { TrendingUndergroundNotification } from './TrendingUndergroundNotification'
-import { USDCPurchaseBuyerNotification } from './USDCPurchaseBuyerNotification'
-import { USDCPurchaseSellerNotification } from './USDCPurchaseSellerNotification'
 import { UserSubscriptionNotification } from './UserSubscriptionNotification'
 
 type NotificationProps = {
@@ -54,12 +46,6 @@ export const Notification = (props: NotificationProps) => {
     switch (notification.type) {
       case NotificationType.Announcement: {
         return <AnnouncementNotification notification={notification} />
-      }
-      case NotificationType.ChallengeReward: {
-        return <ChallengeRewardNotification notification={notification} />
-      }
-      case NotificationType.ClaimableReward: {
-        return <ClaimableRewardNotification notification={notification} />
       }
       case NotificationType.Favorite: {
         return <FavoriteNotification notification={notification} />
@@ -88,9 +74,6 @@ export const Notification = (props: NotificationProps) => {
       case NotificationType.FavoriteOfRepost: {
         return <FavoriteOfRepostNotification notification={notification} />
       }
-      case NotificationType.TierChange: {
-        return <TierChangeNotification notification={notification} />
-      }
       case NotificationType.TrendingTrack: {
         return <TrendingTrackNotification notification={notification} />
       }
@@ -100,12 +83,6 @@ export const Notification = (props: NotificationProps) => {
       case NotificationType.UserSubscription: {
         return <UserSubscriptionNotification notification={notification} />
       }
-      case NotificationType.USDCPurchaseSeller: {
-        return <USDCPurchaseSellerNotification notification={notification} />
-      }
-      case NotificationType.USDCPurchaseBuyer: {
-        return <USDCPurchaseBuyerNotification notification={notification} />
-      }
       case NotificationType.RequestManager: {
         return <RequestManagerNotification notification={notification} />
       }
@@ -114,11 +91,6 @@ export const Notification = (props: NotificationProps) => {
       }
       case NotificationType.AddTrackToPlaylist: {
         return <AddTrackToPlaylistNotification notification={notification} />
-      }
-      case NotificationType.TrackAddedToPurchasedAlbum: {
-        return (
-          <TrackAddedToPurchasedAlbumNotification notification={notification} />
-        )
       }
       case NotificationType.Comment: {
         return <CommentNotification notification={notification} />
@@ -131,9 +103,6 @@ export const Notification = (props: NotificationProps) => {
       }
       case NotificationType.CommentReaction: {
         return <CommentReactionNotification notification={notification} />
-      }
-      case NotificationType.ListenStreakReminder: {
-        return <ListenStreakReminderNotification notification={notification} />
       }
       case NotificationType.FanRemixContestEndingSoon: {
         return (
@@ -181,9 +150,6 @@ export const Notification = (props: NotificationProps) => {
         return (
           <FanRemixContestSubmissionNotification notification={notification} />
         )
-      }
-      case NotificationType.FanClubTextPost: {
-        return <FanClubTextPostNotification notification={notification} />
       }
       default: {
         return null

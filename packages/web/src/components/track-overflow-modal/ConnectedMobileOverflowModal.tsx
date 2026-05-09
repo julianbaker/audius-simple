@@ -9,8 +9,7 @@ import {
   ID,
   RepostSource,
   ShareSource,
-  FollowSource,
-  ModalSource
+  FollowSource
 } from '@audius/common/models'
 import {
   cacheCollectionsActions,
@@ -23,16 +22,13 @@ import {
   shareModalUIActions,
   modalsSelectors,
   modalsActions,
-  usePremiumContentPurchaseModal,
-  OverflowSource,
-  PurchaseableContentType
+  OverflowSource
 } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Dispatch } from 'redux'
 
-import { useRequiresAccountCallback } from 'hooks/useRequiresAccount'
 import { AppState } from 'store/types'
 import { push } from 'utils/navigation'
 
@@ -90,12 +86,6 @@ const ConnectedMobileOverflowModal = ({
   unfollow,
   shareUser
 }: ConnectedMobileOverflowModalProps) => {
-  const { onOpen: openPremiumContentModal } = usePremiumContentPurchaseModal()
-  const openPurchaseModal = useRequiresAccountCallback(
-    (...args: Parameters<typeof openPremiumContentModal>) =>
-      openPremiumContentModal(...args),
-    [openPremiumContentModal]
-  )
   const navigate = useNavigate()
 
   // Fetch data based on source
@@ -134,8 +124,7 @@ const ConnectedMobileOverflowModal = ({
     onVisitArtistPage,
     onVisitCollectionPage,
     onFollow,
-    onUnfollow,
-    onPurchase
+    onUnfollow
   } = ((): {
     onRepost?: () => void
     onUnrepost?: () => void
@@ -152,7 +141,6 @@ const ConnectedMobileOverflowModal = ({
     onVisitCollectionPage?: () => void
     onFollow?: () => void
     onUnfollow?: () => void
-    onPurchase?: () => void
   } => {
     if (!id || !user) return {}
 
@@ -173,15 +161,7 @@ const ConnectedMobileOverflowModal = ({
               : console.error(`Permalink missing for track ${id}`),
           onVisitArtistPage: () => visitArtistPage(user.handle),
           onFollow: () => follow(track.owner_id),
-          onUnfollow: () => unfollow(track.owner_id),
-          onPurchase: () =>
-            openPurchaseModal(
-              {
-                contentId: id as ID,
-                contentType: PurchaseableContentType.TRACK
-              },
-              { source: ModalSource.OverflowMenu }
-            )
+          onUnfollow: () => unfollow(track.owner_id)
         }
       }
       case OverflowSource.COLLECTIONS: {
@@ -242,7 +222,6 @@ const ConnectedMobileOverflowModal = ({
       onVisitCollectionPage={onVisitCollectionPage}
       onFollow={onFollow}
       onUnfollow={onUnfollow}
-      onPurchase={onPurchase}
     />
   )
 }

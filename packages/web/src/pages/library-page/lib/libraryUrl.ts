@@ -29,28 +29,21 @@ const TAB_TO_PATH: Record<LibraryPageTabs, string> = {
   [LibraryPageTabs.PLAYLISTS]: LIBRARY_PLAYLISTS_PAGE
 }
 
-/** URL filter values: all, favorites, reposts, premium (premium = purchase) */
-export const FILTER_URL_VALUES = [
-  'all',
-  'favorites',
-  'reposts',
-  'premium'
-] as const
+/** URL filter values: all, favorites, reposts */
+export const FILTER_URL_VALUES = ['all', 'favorites', 'reposts'] as const
 export type LibraryFilterParam = (typeof FILTER_URL_VALUES)[number]
 
 const URL_FILTER_TO_CATEGORY: Record<string, LibraryCategoryType> = {
   all: LibraryCategory.All,
   favorites: LibraryCategory.Favorite,
-  reposts: LibraryCategory.Repost,
-  premium: LibraryCategory.Purchase
+  reposts: LibraryCategory.Repost
 }
 
 const CATEGORY_TO_URL_FILTER: Record<LibraryCategoryType, LibraryFilterParam> =
   {
     [LibraryCategory.All]: 'all',
     [LibraryCategory.Favorite]: 'favorites',
-    [LibraryCategory.Repost]: 'reposts',
-    [LibraryCategory.Purchase]: 'premium'
+    [LibraryCategory.Repost]: 'reposts'
   }
 
 export function getTabFromPathname(pathname: string): LibraryPageTabs {

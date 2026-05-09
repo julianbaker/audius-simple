@@ -1,10 +1,6 @@
 import { MouseEvent, ReactElement, memo } from 'react'
 
-import {
-  isContentUSDCPurchaseGated,
-  AccessConditions,
-  GatedContentStatus
-} from '@audius/common/models'
+import { AccessConditions, GatedContentStatus } from '@audius/common/models'
 import { Nullable } from '@audius/common/utils'
 import {
   Flex,
@@ -20,7 +16,6 @@ import AnimatedIconButton, {
   AnimatedIconType
 } from 'components/animated-button/AnimatedIconButton'
 import { useIsMobile } from 'hooks/useIsMobile'
-import { useIsUSDCEnabled } from 'hooks/useIsUSDCEnabled'
 
 import { GatedConditionsPill } from '../GatedConditionsPill'
 
@@ -60,9 +55,6 @@ type BottomButtonsProps = {
 
 const BottomButtons = (props: BottomButtonsProps) => {
   const isMobile = useIsMobile()
-  const isUSDCEnabled = useIsUSDCEnabled()
-  const isUSDCPurchase =
-    isUSDCEnabled && isContentUSDCPurchaseGated(props.streamConditions)
 
   // Wrap with a Harmony Tooltip on desktop web; skip on native mobile (no hover)
   const withTooltip = (
@@ -78,8 +70,7 @@ const BottomButtons = (props: BottomButtonsProps) => {
       </Tooltip>
     )
 
-  // Readonly variant only renders content for locked USDC tracks
-  if (!!props.readonly && (!isUSDCPurchase || props.hasStreamAccess)) {
+  if (!!props.readonly && props.hasStreamAccess) {
     return null
   }
 

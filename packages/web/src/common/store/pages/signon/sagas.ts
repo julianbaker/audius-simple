@@ -10,7 +10,6 @@ import {
   queryUserByHandle,
   queryUsers
 } from '@audius/common/api'
-import { GUEST_EMAIL } from '@audius/common/hooks'
 import {
   Name,
   FavoriteSource,
@@ -39,8 +38,7 @@ import {
   getContext,
   confirmerActions,
   getSDK,
-  fetchAccountAsync,
-  getOrCreateUSDCUserBank
+  fetchAccountAsync
 } from '@audius/common/store'
 import {
   parseHandleReservedStatusFromSocial,
@@ -427,13 +425,7 @@ function* createGuestAccount(
         ])
         yield* call(fetchAccountAsync, { shouldMarkAccountAsLoading: true })
 
-        const userBank = yield* call(getOrCreateUSDCUserBank)
-        if (!userBank) {
-          throw new Error('Failed to create user bank')
-        }
-
-        // associates user record with blockchain user ID and creates notification settings
-        // necessary for sending purchase emails
+        // Associates user record with blockchain user ID and creates notification settings.
         yield* call(audiusBackendInstance.updateUserLocationTimezone, { sdk })
 
         yield* put(
@@ -464,7 +456,6 @@ function* signUp() {
     const signOn = yield* select(getSignOn)
     const email = signOn.email.value
     const password = signOn.password.value
-    const { usingExternalWallet } = signOn
 
     const isGuest = yield* select(getIsGuest)
 
@@ -502,7 +493,6 @@ function* signUp() {
                   guestEmail: null
                 })
               )
-              yield* call([localStorage, localStorage.removeItem], GUEST_EMAIL)
 
               const [wallet] = yield* call([
                 sdk.services.audiusWalletClient,
@@ -596,25 +586,11 @@ function* signUp() {
               const authService = yield* getContext('authService')
               const hedgehog = authService.hedgehogInstance
               if (!alreadyExisted) {
-                if (!usingExternalWallet) {
-                  // Sign up via Hedgehog
-                  yield* call([hedgehog, hedgehog.signUp], {
-                    username: email,
-                    password
-                  })
-                  yield* fork(sendPostSignInRecoveryEmail, { handle, email })
-                } else {
-                  // Still save user data to Identity if using 3p wallet
-                  // so that users can manage their notifications settings etc.
-                  const [wallet] = yield* call([
-                    sdk.services.audiusWalletClient,
-                    sdk.services.audiusWalletClient.getAddresses
-                  ])
-                  yield* call([hedgehog, hedgehog.setUserFn], {
-                    walletAddress: wallet,
-                    username: email
-                  })
-                }
+                yield* call([hedgehog, hedgehog.signUp], {
+                  username: email,
+                  password
+                })
+                yield* fork(sendPostSignInRecoveryEmail, { handle, email })
               }
 
               const [wallet] = yield* call([

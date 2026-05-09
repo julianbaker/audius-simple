@@ -4,18 +4,11 @@ import { useFavoriteTrack, useUnfavoriteTrack } from '@audius/common/api'
 import {
   Variant,
   Status,
-  isContentUSDCPurchaseGated,
-  ModalSource,
   Track,
   FavoriteSource,
   PlayableType
 } from '@audius/common/models'
-import {
-  CollectionTrack,
-  CollectionsPageType,
-  usePremiumContentPurchaseModal,
-  PurchaseableContentType
-} from '@audius/common/store'
+import { CollectionTrack, CollectionsPageType } from '@audius/common/store'
 import { removeNullable } from '@audius/common/utils'
 import { Divider, Flex, Paper, Text } from '@audius/harmony'
 import { Id } from '@audius/sdk'
@@ -27,7 +20,6 @@ import Page from 'components/page/Page'
 import { SuggestedTracks } from 'components/suggested-tracks'
 import { RESPONSIVE_TABLE_POLICIES } from 'components/table/responsivePolicies'
 import { TracksTable } from 'components/tracks-table'
-import { useRequiresAccountCallback } from 'hooks/useRequiresAccount'
 import { useMainContentRef } from 'pages/MainContentContext'
 import { computeCollectionMetadataProps } from 'pages/collection-page/store/utils'
 import { useCollectionPage } from 'pages/collection-page/useCollectionPage'
@@ -121,17 +113,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
     structuredData
   } = useCollectionPage(type, false)
 
-  const { onOpen: openPremiumContentModal } = usePremiumContentPurchaseModal()
-  const openPurchaseModal = useRequiresAccountCallback(
-    ({ track_id }: Track) => {
-      openPremiumContentModal(
-        { contentId: track_id, contentType: PurchaseableContentType.TRACK },
-        { source: ModalSource.TrackListItem }
-      )
-    },
-    [openPremiumContentModal]
-  )
-
   const { mutate: favoriteTrack } = useFavoriteTrack()
   const { mutate: unfavoriteTrack } = useUnfavoriteTrack()
   const toggleSaveTrack = useCallback(
@@ -154,15 +135,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
   // Compute values needed for useMemo (handle undefined collection case)
   // These need to be computed before the conditional return to ensure hooks are always called
   const isAlbum = collection?.is_album ?? false
-  const areAllTracksPremium =
-    collection && tracks.entries.length > 0
-      ? tracks.entries.every(
-          (track) =>
-            track.is_stream_gated &&
-            isContentUSDCPurchaseGated(track.stream_conditions)
-        )
-      : false
-
   // useMemo must be called before any conditional returns
   const tracksTableColumns = useMemo(() => {
     const columns = [
@@ -170,12 +142,12 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
       'trackName',
       isAlbum ? 'date' : 'addedDate',
       'length',
-      areAllTracksPremium ? undefined : 'plays',
+      'plays',
       'reposts',
       'overflowActions'
     ]
     return columns.filter(removeNullable)
-  }, [areAllTracksPremium, isAlbum])
+  }, [isAlbum])
 
   // Now we can do conditional returns after all hooks
   if (!collection) return null
@@ -223,7 +195,7 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
   } = computeCollectionMetadataProps(metadata, tracks)
   const numTracks = tracks.entries.length
   const areAllTracksDeleted = tracks.entries.every((track) => track.is_delete)
-  // areAllTracksPremium and isAlbum are already computed above for useMemo
+  // isAlbum is already computed above for useMemo
 
   const isPlayable = !areAllTracksDeleted && numTracks > 0
 
@@ -341,7 +313,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
               onClickFavorite={toggleSaveTrack}
               onClickRemove={isOwner ? onClickRemove : undefined}
               onClickRepost={onClickRepostTrack}
-              onClickPurchase={openPurchaseModal}
               onReorder={onReorderTracks}
               onSort={onSortTracks}
               trackActionsHeader={trackTableHeaderFilter}
@@ -362,11 +333,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
                   : collectionMessages.type.playlist
               }`}
               isAlbumPage={isAlbum}
-              isAlbumPremium={
-                !!metadata && 'is_stream_gated' in metadata
-                  ? metadata?.is_stream_gated
-                  : false
-              }
             />
           </div>
         )}

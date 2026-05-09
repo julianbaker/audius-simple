@@ -62,6 +62,11 @@ export const TrackTableLineup = ({
 
   const { data: tracks } = useTracks(trackIds)
   const { byId: usersMap } = useUsers(tracks?.map((entry) => entry.owner_id))
+  const visibleTrackIds = useMemo(() => {
+    if (!tracks) return []
+    const visibleTrackIdSet = new Set(tracks.map((track) => track.track_id))
+    return trackIds.filter((trackId) => visibleTrackIdSet.has(trackId))
+  }, [tracks, trackIds])
 
   const isPlaying = useSelector(getPlaying)
   const isBuffering = useSelector(getBuffering)
@@ -72,12 +77,12 @@ export const TrackTableLineup = ({
   // Build playback queue entries keyed to this lineup's source.
   const playbackQueue: PlaybackTrack[] = useMemo(
     () =>
-      trackIds.map((id) => ({
+      visibleTrackIds.map((id) => ({
         trackId: id,
         source,
         uid: makeStableUid(Kind.TRACKS, id, source)
       })),
-    [trackIds, source]
+    [visibleTrackIds, source]
   )
 
   // Build rows: track metadata + user + stable UID.
@@ -88,7 +93,7 @@ export const TrackTableLineup = ({
         : []
     }
     const byId = new Map(tracks.map((t) => [t.track_id, t]))
-    const rows = trackIds
+    const rows = visibleTrackIds
       .map((id) => {
         const track = byId.get(id)
         if (!track) return null
@@ -104,7 +109,7 @@ export const TrackTableLineup = ({
     return hasNextPage
       ? rows.concat(new Array(pageSize ?? 0).fill({ kind: Kind.EMPTY }))
       : rows
-  }, [tracks, trackIds, source, usersMap, hasNextPage, pageSize])
+  }, [tracks, visibleTrackIds, source, usersMap, hasNextPage, pageSize])
 
   const activeIndex = useMemo(() => {
     if (currentPlaybackTrackId === null) return -1

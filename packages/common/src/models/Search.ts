@@ -134,5 +134,4 @@ export type SearchFilters = {
   key?: string
   isVerified?: boolean
   hasDownloads?: boolean
-  isPremium?: boolean
 }

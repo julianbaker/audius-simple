@@ -68,7 +68,6 @@ const statePruner = (state: AppState) => {
       email: state.signOn.email,
       handle: state.signOn.handle,
       status: state.signOn.status,
-      useExternalWallet: state.signOn.usingExternalWallet,
       verified: state.signOn.verified
     },
     upload: {

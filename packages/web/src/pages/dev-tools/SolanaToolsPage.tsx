@@ -4,7 +4,6 @@ import { Header } from 'components/header/desktop/Header'
 import { Page } from 'components/page/Page'
 
 import { SignatureDecoder } from './components/SignatureDecoder'
-import { UserBankAddressDeriver } from './components/UserBankAddressDeriver'
 import { messages } from './messages'
 
 export const SolanaToolsPage = () => {
@@ -25,7 +24,6 @@ export const SolanaToolsPage = () => {
           }}
         >
           <SignatureDecoder />
-          <UserBankAddressDeriver />
         </Flex>
       </Box>
     </Page>

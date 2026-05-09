@@ -35,15 +35,10 @@ export const audiusBackendInstance = audiusBackend({
   solanaConfig: {
     claimableTokenPda: env.CLAIMABLE_TOKEN_PDA,
     claimableTokenProgramAddress: env.CLAIMABLE_TOKEN_PROGRAM_ADDRESS,
-    rewardsManagerProgramId: env.REWARDS_MANAGER_PROGRAM_ID,
-    rewardsManagerProgramPda: env.REWARDS_MANAGER_PROGRAM_PDA,
-    rewardsManagerTokenPda: env.REWARDS_MANAGER_TOKEN_PDA,
-    paymentRouterProgramId: env.PAYMENT_ROUTER_PROGRAM_ID,
     solanaClusterEndpoint: env.SOLANA_CLUSTER_ENDPOINT,
     solanaFeePayerAddress: env.SOLANA_FEE_PAYER_ADDRESS,
     solanaTokenAddress: env.SOLANA_TOKEN_PROGRAM_ADDRESS,
     waudioMintAddress: env.WAUDIO_MINT_ADDRESS,
-    usdcMintAddress: env.USDC_MINT_ADDRESS,
     wormholeAddress: env.WORMHOLE_ADDRESS ?? undefined
   }
 })

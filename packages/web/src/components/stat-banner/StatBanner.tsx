@@ -3,7 +3,7 @@ import { useRef } from 'react'
 import { useCurrentUserId, useUser } from '@audius/common/api'
 import { useIsManagedAccount } from '@audius/common/hooks'
 import { ID, statusIsNotFinalized } from '@audius/common/models'
-import { chatSelectors, useSendTokensModal } from '@audius/common/store'
+import { chatSelectors } from '@audius/common/store'
 import {
   IconMessageBlock,
   IconMessageUnblock,
@@ -12,7 +12,6 @@ import {
   IconPencil,
   IconKebabHorizontal,
   IconMessage,
-  IconMoneySend,
   PopupMenu,
   Button,
   FollowButton,
@@ -25,7 +24,6 @@ import { useSelector } from 'react-redux'
 import { ArtistRecommendationsPopup } from 'components/artist-recommendations/ArtistRecommendationsPopup'
 import Stats, { StatProps } from 'components/stats/Stats'
 import SubscribeButton from 'components/subscribe-button/SubscribeButton'
-import { env } from 'services/env'
 import { zIndex } from 'utils/zIndex'
 const { getChatPermissionsStatus } = chatSelectors
 
@@ -42,8 +40,6 @@ const messages = {
   cancel: 'Cancel',
   save: 'Save Changes',
   message: 'Send Message',
-  sendTokens: 'Send Tokens',
-  sendFanClubs: 'Send Coins',
   unblockMessages: 'Unblock Messages',
   blockMessages: 'Block Messages',
   unmuteComments: 'Unmute Comments',
@@ -187,8 +183,6 @@ export const StatBanner = (props: StatsBannerProps) => {
   const { data: isFollowing } = useUser(profileId, {
     select: (user) => user.does_current_user_follow
   })
-  const { data: profileUser } = useUser(profileId)
-  const { onOpen: openSendTokensModal } = useSendTokensModal()
 
   const shareButton = (
     <Button
@@ -264,21 +258,6 @@ export const StatBanner = (props: StatsBannerProps) => {
           )}
 
           <>
-            {mode === 'visitor' ? (
-              <Button
-                variant='secondary'
-                size='small'
-                iconLeft={IconMoneySend}
-                aria-label={messages.sendFanClubs}
-                onClick={() => {
-                  openSendTokensModal({
-                    mint: env.WAUDIO_MINT_ADDRESS,
-                    isOpen: true,
-                    user: profileUser ?? undefined
-                  })
-                }}
-              />
-            ) : null}
             {isFollowing && profileId ? (
               <SubscribeButton userId={profileId} />
             ) : null}

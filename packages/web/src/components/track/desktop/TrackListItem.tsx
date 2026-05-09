@@ -2,7 +2,7 @@ import { memo, MouseEvent, useRef } from 'react'
 
 import { CollectionTrack, useCurrentUserId, useUser } from '@audius/common/api'
 import { useGatedContentAccess } from '@audius/common/hooks'
-import { ID, isContentUSDCPurchaseGated, Track } from '@audius/common/models'
+import { ID, Track } from '@audius/common/models'
 import { Genre, formatSeconds, route } from '@audius/common/utils'
 import { IconKebabHorizontal } from '@audius/harmony'
 import cn from 'classnames'
@@ -60,7 +60,6 @@ const TrackListItem = (props: TrackListItemProps) => {
   const { data: currentUserId } = useCurrentUserId()
   const isOwner = track?.owner_id === currentUserId
   const isPrivate = track?.is_unlisted
-  const isPremium = isContentUSDCPurchaseGated(track?.stream_conditions)
   const { hasStreamAccess } = useGatedContentAccess(track as Track)
   const { data: partialUser } = useUser(track?.owner_id, {
     select: (user) => ({
@@ -191,7 +190,6 @@ const TrackListItem = (props: TrackListItemProps) => {
               playing={active}
               paused={!playing}
               hideDefault={false}
-              isTrackPremium={isPremium}
               isLocked={!hasStreamAccess}
             />
           </div>

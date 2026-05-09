@@ -1,23 +1,14 @@
 import { useCurrentCommentSection } from '@audius/common/context'
-import { useIsCoinMember } from '@audius/common/hooks'
 import { ID } from '@audius/common/models'
-import {
-  Flex,
-  IconFanClub,
-  IconComponent,
-  IconStar,
-  Text
-} from '@audius/harmony'
+import { Flex, IconComponent, IconStar, Text } from '@audius/harmony'
 
-type BadgeType = 'artist' | 'coinMember'
+type BadgeType = 'artist'
 
 const iconMap: Record<BadgeType, IconComponent> = {
-  artist: IconStar,
-  coinMember: IconFanClub
+  artist: IconStar
 }
 const messages: Record<BadgeType, string> = {
-  artist: 'Artist',
-  coinMember: 'Coin Member'
+  artist: 'Artist'
 }
 
 type CommentBadgeProps = {
@@ -30,9 +21,8 @@ export const CommentBadge = ({
   isArtist
 }: CommentBadgeProps) => {
   const { artistId } = useCurrentCommentSection()
-  const { isCoinHolder } = useIsCoinMember(commentUserId, artistId)
 
-  const badgeType = isArtist ? 'artist' : isCoinHolder ? 'coinMember' : null
+  const badgeType = isArtist && commentUserId === artistId ? 'artist' : null
 
   if (badgeType === null) return null
 

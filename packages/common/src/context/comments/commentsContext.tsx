@@ -22,11 +22,9 @@ import {
   useCurrentUserId
 } from '~/api'
 import { useGatedContentAccess } from '~/hooks'
-import { ModalSource, ID, Comment, ReplyComment, Name, Track } from '~/models'
+import { ID, Comment, ReplyComment, Name, Track } from '~/models'
 import { playbackActions } from '~/store'
 import { seekTo } from '~/store/playback/slice'
-import { PurchaseableContentType } from '~/store/purchase-content/types'
-import { usePremiumContentPurchaseModal } from '~/store/ui/modals/premium-content-purchase-modal'
 import { Nullable } from '~/utils'
 
 import { useAppContext } from '../appContext'
@@ -153,9 +151,6 @@ export function CommentSectionProvider<NavigationProp>(
 
   const { hasStreamAccess } = useGatedContentAccess(track!)
 
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
-
   const handleLoadMorePages = useCallback(() => {
     loadMorePages()
     trackEvent(
@@ -202,13 +197,7 @@ export function CommentSectionProvider<NavigationProp>(
       if (timestampSeconds !== undefined) {
         // But only if the user has access to the stream
         if (!hasStreamAccess) {
-          const { track_id: trackId } = track
-          openPremiumContentPurchaseModal(
-            { contentId: trackId, contentType: PurchaseableContentType.TRACK },
-            {
-              source: ModalSource.Comment
-            }
-          )
+          return
         } else {
           dispatchPlay()
           setTimeout(() => dispatch(seekTo({ seconds: timestampSeconds })), 100)
@@ -221,7 +210,6 @@ export function CommentSectionProvider<NavigationProp>(
       dispatch,
       hasStreamAccess,
       playbackSource,
-      openPremiumContentPurchaseModal,
       track
     ]
   )

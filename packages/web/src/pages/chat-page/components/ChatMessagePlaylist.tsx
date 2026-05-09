@@ -7,7 +7,7 @@ import {
   useTracks
 } from '@audius/common/api'
 import { usePlayTrack, usePauseTrack } from '@audius/common/hooks'
-import { Name, ModalSource } from '@audius/common/models'
+import { Name } from '@audius/common/models'
 import { QueueSource, ChatMessageTileProps } from '@audius/common/store'
 import { getPathFromPlaylistUrl } from '@audius/common/utils'
 import { useQuery } from '@tanstack/react-query'
@@ -108,7 +108,6 @@ export const ChatMessagePlaylist = ({
         isLoading={false}
         isTrending={false}
         variant='readonly'
-        source={ModalSource.DirectMessageCollectionTile}
       />
     )
   }

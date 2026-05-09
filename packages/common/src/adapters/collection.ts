@@ -1,5 +1,4 @@
 import {
-  type AccessGate,
   type AccountCollection as SdkAccountCollection,
   type CreateAlbumRequestBody,
   type CreatePlaylistRequestBody,
@@ -24,12 +23,11 @@ import {
   UserCollectionMetadata,
   Variant
 } from '~/models/Collection'
-import { Copyright, isContentUSDCPurchaseGated } from '~/models/Track'
+import { Copyright } from '~/models/Track'
 import type { AlbumValues, PlaylistValues } from '~/schemas'
 import dayjs from '~/utils/dayjs'
 
 import { accessConditionsFromSDK } from './accessConditionsFromSDK'
-import { usdcPurchaseConditionsToSDK } from './accessConditionsToSDK'
 import { resourceContributorFromSDK } from './attribution'
 import { favoriteFromSDK } from './favorite'
 import { coverArtSizesCIDsFromSDK } from './imageSize'
@@ -220,13 +218,7 @@ export const albumMetadataForCreateWithSDK = (
   input: Collection | AlbumValues
 ): CreateAlbumRequestBody => {
   return {
-    streamConditions:
-      input.stream_conditions != null &&
-      isContentUSDCPurchaseGated(input.stream_conditions)
-        ? (usdcPurchaseConditionsToSDK(
-            input.stream_conditions
-          ) as unknown as AccessGate)
-        : null,
+    streamConditions: null,
     isStreamGated: input.is_stream_gated ?? false,
     isScheduledRelease: input.is_scheduled_release ?? false,
     albumName: input.playlist_name ?? '',

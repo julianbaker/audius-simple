@@ -25,7 +25,6 @@ import {
   SIGN_IN_FAILED,
   SIGN_IN_SUCCEEDED,
   COMPLETE_FOLLOW_ARTISTS,
-  USING_EXTERNAL_WALLET,
   UPDATE_ROUTE_ON_COMPLETION,
   UPDATE_ROUTE_ON_EXIT,
   ADD_FOLLOW_ARTISTS,
@@ -60,7 +59,6 @@ const initialState = {
   linkedSocialOnFirstPage: false,
   accountAlreadyExisted: false,
   verified: false,
-  usingExternalWallet: false,
   accountReady: false,
   profileImage: null, // Object with file blob & url
   coverPhoto: null, // Object with file blob & url
@@ -212,12 +210,6 @@ const actionsMap = {
         ...state.email,
         status: 'loading'
       }
-    }
-  },
-  [USING_EXTERNAL_WALLET](state, action) {
-    return {
-      ...state,
-      usingExternalWallet: true
     }
   },
   [VALIDATE_EMAIL_SUCCEEDED](state, action) {

@@ -14,14 +14,6 @@
 /* .iconTip, */
 /* .iconAddTrackToPlaylist {} */
 
-.iconRewards {
-  margin-right: var(--harmony-unit-2);
-}
-
-.iconRewards i {
-  margin-bottom: 0 !important;
-}
-
 .iconTier {
   margin-right: var(--harmony-unit-2);
 }

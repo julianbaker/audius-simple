@@ -10,7 +10,7 @@ export const useCreateUserbankIfNeeded = ({
   mint
 }: {
   recordAnalytics: (event: AnalyticsEvent) => void
-  mint: 'USDC' | 'wAUDIO'
+  mint: 'wAUDIO'
 }) => {
   const { data: walletAddresses } = useWalletAddresses()
   const { currentUser } = walletAddresses ?? {}

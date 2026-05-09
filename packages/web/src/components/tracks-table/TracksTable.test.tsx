@@ -14,10 +14,6 @@ vi.mock('@audius/common/store', async () => {
   const actual = await vi.importActual<any>('@audius/common/store')
   return {
     ...actual,
-    PurchaseableContentType: {
-      ...actual.PurchaseableContentType,
-      TRACK: 'track'
-    },
     gatedContentActions: {
       ...actual.gatedContentActions,
       setLockedContentId: vi.fn()
@@ -25,8 +21,7 @@ vi.mock('@audius/common/store', async () => {
     gatedContentSelectors: {
       ...actual.gatedContentSelectors,
       getGatedContentStatusMap: () => ({})
-    },
-    usePremiumContentPurchaseModal: () => ({ onOpen: vi.fn() })
+    }
   }
 })
 

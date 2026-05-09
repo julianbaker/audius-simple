@@ -9,7 +9,8 @@ import {
   UserTrackMetadata,
   ResourceContributor,
   Copyright,
-  AccessPermissions
+  AccessPermissions,
+  isContentUnsupportedCryptoGated
 } from './Track'
 import { User, UserMetadata } from './User'
 
@@ -97,6 +98,19 @@ export type ComputedCollectionProperties = {
 }
 
 export type Collection = CollectionMetadata & ComputedCollectionProperties
+
+export const shouldHideCollectionForUnsupportedCrypto = (
+  collection?: Nullable<Pick<CollectionMetadata, 'stream_conditions'>>
+) => isContentUnsupportedCryptoGated(collection?.stream_conditions)
+
+export const filterUnsupportedCryptoGatedCollections = <
+  T extends Pick<CollectionMetadata, 'stream_conditions'>
+>(
+  collections: T[]
+) =>
+  collections.filter(
+    (collection) => !shouldHideCollectionForUnsupportedCrypto(collection)
+  )
 
 export type UserCollectionMetadata = CollectionMetadata & { user: UserMetadata }
 

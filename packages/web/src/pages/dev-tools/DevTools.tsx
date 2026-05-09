@@ -1,4 +1,4 @@
-import { modalsActions, useCoinSuccessModal } from '@audius/common/store'
+import { modalsActions } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import {
   Box,
@@ -6,9 +6,7 @@ import {
   Flex,
   IconSettings,
   IconSolana,
-  IconShieldCheck,
   IconDashboard,
-  IconFanClub,
   IconUser,
   Paper,
   Text,
@@ -89,19 +87,9 @@ const DevToolCard = (props: DevToolCardProps) => {
   )
 }
 
-const COIN_SUCCESS_MODAL_PREVIEW_DATA = {
-  mint: 'DLJDqsFSgA94QUuFjTbQtEu3oP3mLS1AAAAAAAAAAAAAAAA',
-  name: 'Breadcrumb The Golden',
-  ticker: 'BRED',
-  logoUri: 'https://picsum.photos/seed/audiuscoin/200/200',
-  amountUi: '2,612.2151391',
-  amountUsd: '2,134.67'
-} as const
-
 export const DevTools = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { onOpen: openCoinSuccessModal } = useCoinSuccessModal()
 
   const handleOpenFeatureFlags = () => {
     dispatch(
@@ -130,20 +118,12 @@ export const DevTools = () => {
     navigate('/dev-tools/solana')
   }
 
-  const handleOpenAAOUI = () => {
-    window.open('https://discoveryprovider.audius.co/attestation/ui', '_blank')
-  }
-
   const handleOpenHealthzDashboard = () => {
     window.open('https://healthz.audius.co/', '_blank')
   }
 
   const handleOpenUserIdParser = () => {
     navigate(USER_ID_PARSER_PAGE)
-  }
-
-  const handleOpenCoinSuccessModalPreview = () => {
-    openCoinSuccessModal({ ...COIN_SUCCESS_MODAL_PREVIEW_DATA })
   }
 
   return (
@@ -187,14 +167,6 @@ export const DevTools = () => {
           />
 
           <DevToolCard
-            icon={IconShieldCheck}
-            title={messages.aaoTitle}
-            description={messages.aaoDescription}
-            buttonText={messages.aaoButton}
-            onButtonClick={handleOpenAAOUI}
-          />
-
-          <DevToolCard
             icon={IconDashboard}
             title={messages.healthzTitle}
             description={messages.healthzDescription}
@@ -208,14 +180,6 @@ export const DevTools = () => {
             description={messages.userIdParserDescription}
             buttonText={messages.userIdParserButton}
             onButtonClick={handleOpenUserIdParser}
-          />
-
-          <DevToolCard
-            icon={IconFanClub}
-            title={messages.coinSuccessModalPreviewTitle}
-            description={messages.coinSuccessModalPreviewDescription}
-            buttonText={messages.coinSuccessModalPreviewButton}
-            onButtonClick={handleOpenCoinSuccessModalPreview}
           />
         </Flex>
       </Box>

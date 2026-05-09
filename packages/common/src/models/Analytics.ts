@@ -1,16 +1,11 @@
 import { ChatPermission, Genre } from '@audius/sdk'
 
 import { FeedFilter } from '~/models/FeedFilter'
-import { FeedTab } from '~/models/FeedTab'
 import { ID, PlayableType } from '~/models/Identifiers'
 import { TimeRange } from '~/models/TimeRange'
-import { WalletAddress } from '~/models/Wallet'
 import { Nullable } from '~/utils/typeUtils'
 
-import { Chain } from './Chain'
-import { LaunchCoinResponse, LaunchpadFormValues } from './Launchpad'
 import { PlaylistLibraryKind } from './PlaylistLibrary'
-import { PurchaseMethod } from './PurchaseContent'
 import { AccessConditions, TrackAccessType } from './Track'
 
 const ANALYTICS_TRACK_EVENT = 'ANALYTICS/TRACK_EVENT'
@@ -212,14 +207,8 @@ export enum Name {
 
   // Gated Track Uploads
   TRACK_UPLOAD_FOLLOW_GATED = 'Track Upload: Follow Gated',
-  TRACK_UPLOAD_USDC_GATED = 'Track Upload: USDC Gated',
-  TRACK_UPLOAD_TOKEN_GATED = 'Track Upload: Token Gated',
-  TRACK_UPLOAD_CLICK_USDC_WAITLIST_LINK = 'Track Upload: Clicked USDC Waitlist Link',
   // Download-Only Gated Track Uploads
   TRACK_UPLOAD_FOLLOW_GATED_DOWNLOAD = 'Track Upload: Follow Gated Download',
-  TRACK_UPLOAD_USDC_GATED_DOWNLOAD = 'Track Upload: USDC Gated Download',
-  TRACK_UPLOAD_TOKEN_GATED_DOWNLOAD = 'Track Upload: Token Gated Download',
-  TRACK_UPLOAD_CLICK_USDC_DOWNLOAD_WAITLIST_LINK = 'Track Upload: Clicked USDC Download Waitlist Link',
 
   // Track Downloads
   TRACK_DOWNLOAD_CLICKED_DOWNLOAD_ALL = 'Track Download: Clicked Download All',
@@ -242,14 +231,9 @@ export enum Name {
   LISTEN_GATED = 'Listen: Gated',
 
   // Unlocked Gated Tracks
-  USDC_PURCHASE_GATED_TRACK_UNLOCKED = 'USDC Gated: Track Unlocked',
-  USDC_PURCHASE_GATED_COLLECTION_UNLOCKED = 'USDC Gated: Collection Unlocked',
   FOLLOW_GATED_TRACK_UNLOCKED = 'Follow Gated: Track Unlocked',
-  TOKEN_GATED_TRACK_UNLOCKED = 'Token Gated: Track Unlocked',
   // Unlocked Download-Only Gated Tracks
-  USDC_PURCHASE_GATED_DOWNLOAD_TRACK_UNLOCKED = 'USDC Gated: Download Track Unlocked',
   FOLLOW_GATED_DOWNLOAD_TRACK_UNLOCKED = 'Follow Gated: Download Track Unlocked',
-  TOKEN_GATED_DOWNLOAD_TRACK_UNLOCKED = 'Token Gated: Download Track Unlocked',
 
   // Trending
   TRENDING_CHANGE_VIEW = 'Trending: Change view',
@@ -270,7 +254,6 @@ export enum Name {
   NOTIFICATIONS_CLICK_TRENDING_UNDERGROUND_TWITTER_SHARE = 'Notifications: Clicked Trending Underground Twitter Share',
   NOTIFICATIONS_CLICK_TASTEMAKER_TWITTER_SHARE = 'Notifications: Clicked Tastemaker Twitter Share',
   NOTIFICATIONS_CLICK_ADD_TRACK_TO_PLAYLIST_TWITTER_SHARE = 'Notifications: Clicked Add Track to Playlist Twitter Share',
-  NOTIFICATIONS_CLICK_USDC_PURCHASE_TWITTER_SHARE = 'Notifications: Clicked USDC Purchase Twitter Share',
   NOTIFICATIONS_TOGGLE_SETTINGS = 'Notifications: Toggle Setting',
   BROWSER_NOTIFICATION_SETTINGS = 'Browser Push Notification',
 
@@ -342,16 +325,6 @@ export enum Name {
   REMIX_COSIGN_INDICATOR = 'Remix: CoSign Indicator',
   REMIX_HIDE = 'Remix: Hide',
 
-  // $AUDIO
-  SEND_AUDIO_REQUEST = 'Send $AUDIO: Request',
-  SEND_AUDIO_SUCCESS = 'Send $AUDIO: Success',
-  SEND_AUDIO_FAILURE = 'Send $AUDIO: Failure',
-
-  // AUDIO Manager
-  TRANSFER_AUDIO_TO_WAUDIO_REQUEST = 'TRANSFER_AUDIO_TO_WAUDIO_REQUEST',
-  TRANSFER_AUDIO_TO_WAUDIO_SUCCESS = 'TRANSFER_AUDIO_TO_WAUDIO_SUCCESS',
-  TRANSFER_AUDIO_TO_WAUDIO_FAILURE = 'TRANSFER_AUDIO_TO_WAUDIO_FAILURE',
-
   // Service monitoring
   SERVICE_MONITOR_REQUEST = 'Service Monitor: Request',
   SERVICE_MONITOR_HEALTH_CHECK = 'Service Monitor: Status',
@@ -377,103 +350,15 @@ export enum Name {
   CREATE_USER_BANK_SUCCESS = 'Create User Bank: Success',
   CREATE_USER_BANK_FAILURE = 'Create User Bank: Failure',
 
-  // Rewards
-  REWARDS_CLAIM_DETAILS_OPENED = 'Rewards Claim: Opened',
-  REWARDS_CLAIM_ALL_REQUEST = 'Rewards Claim All: Request',
-  REWARDS_CLAIM_ALL_SUCCESS = 'Rewards Claim All: Success',
-  REWARDS_CLAIM_ALL_FAILURE = 'Rewards Claim All: Failure',
-  REWARDS_CLAIM_ALL_BLOCKED = 'Rewards Claim All: Blocked',
-  REWARDS_CLAIM_REQUEST = 'Rewards Claim: Request',
-  REWARDS_CLAIM_SUCCESS = 'Rewards Claim: Success',
-  REWARDS_CLAIM_BLOCKED = 'Rewards Claim: Blocked',
-
   // Social Proof
   SOCIAL_PROOF_OPEN = 'Social Proof: Open',
   SOCIAL_PROOF_SUCCESS = 'Social Proof: Success',
   SOCIAL_PROOF_ERROR = 'Social Proof: Error',
 
-  // Buy Audio
-  BUY_AUDIO_ON_RAMP_OPENED = 'Buy Audio: On Ramp Opened',
-  BUY_AUDIO_ON_RAMP_CANCELED = 'Buy Audio: On Ramp Canceled',
-  BUY_AUDIO_ON_RAMP_SUCCESS = 'Buy Audio: On Ramp Success',
-  BUY_AUDIO_SUCCESS = 'Buy Audio: Success',
-  BUY_AUDIO_FAILURE = 'Buy Audio: Failure',
-
-  // Buy Audio Recovery
-  BUY_AUDIO_RECOVERY_OPENED = 'Buy Audio Recovery: Opened',
-  BUY_AUDIO_RECOVERY_SUCCESS = 'Buy Audio Recovery: Success',
-  BUY_AUDIO_RECOVERY_FAILURE = 'Buy Audio Recovery: Failure',
-
-  // Buy USDC
-  BUY_USDC_ON_RAMP_OPENED = 'Buy USDC: On Ramp Opened',
-  BUY_USDC_ON_RAMP_CANCELED = 'Buy USDC: On Ramp Canceled',
-  BUY_USDC_ON_RAMP_FAILURE = 'Buy USDC: On Ramp Failed',
-  BUY_USDC_ON_RAMP_SUCCESS = 'Buy USDC: On Ramp Success',
-  BUY_USDC_SUCCESS = 'Buy USDC: Success',
-  BUY_USDC_FAILURE = 'Buy USDC: Failure',
-  BUY_USDC_RECOVERY_IN_PROGRESS = 'Buy USDC: Recovery In Progress',
-  BUY_USDC_RECOVERY_SUCCESS = 'Buy USDC: Recovery Success',
-  BUY_USDC_RECOVERY_FAILURE = 'Buy USDC: Recovery Failure',
-  BUY_USDC_ADD_FUNDS_MANUALLY = 'Buy USDC: Add Funds Manually',
-
-  BUY_SELL_SWAP_REQUESTED = 'Buy Sell Modal: Swap Requested',
-  BUY_SELL_SWAP_CONFIRMED = 'Buy Sell Modal: Swap Confirmed',
-  BUY_SELL_SWAP_SUCCESS = 'Buy Sell Modal: Swap Success',
-  BUY_SELL_SWAP_FAILURE = 'Buy Sell Modal: Swap Failure',
-  BUY_SELL_ADD_FUNDS_CLICKED = 'Buy Sell Modal: Add Funds Clicked',
-
-  // Withdraw USDC
-
-  WITHDRAW_USDC_MODAL_OPENED = 'Withdraw USDC: Modal Opened',
-  WITHDRAW_USDC_ADDRESS_PASTED = 'Withdraw USDC: Address Pasted',
-  WITHDRAW_USDC_REQUESTED = 'Withdraw USDC: Requested',
-  WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_START = 'Withdraw USDC: Create Destination Token Account Started',
-  WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_SUCCESS = 'Withdraw USDC: Create Destination Token Account Success',
-  WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_FAILED = 'Withdraw USDC: Create Destination Token Account Failed',
-  WITHDRAW_USDC_TRANSFER_TO_ROOT_WALLET = 'Withdraw USDC: Transfer to Root Wallet',
-  WITHDRAW_USDC_COINFLOW_WITHDRAWAL_READY = 'Withdraw USDC: Coinflow Withdrawal Ready',
-  WITHDRAW_USDC_COINFLOW_SEND_TRANSACTION = 'Withdraw USDC: Coinflow Send Transaction',
-  WITHDRAW_USDC_COINFLOW_SEND_TRANSACTION_FAILED = 'Withdraw USDC: Coinflow Send Transaction Failed',
-  WITHDRAW_USDC_CANCELLED = 'Withdraw USDC: Cancelled',
-  WITHDRAW_USDC_FORM_ERROR = 'Withdraw USDC: Form Error',
-  WITHDRAW_USDC_SUCCESS = 'Withdraw USDC: Success',
-  WITHDRAW_USDC_FAILURE = 'Withdraw USDC: Failure',
-  WITHDRAW_USDC_HELP_LINK_CLICKED = 'Withdraw USDC: Help Link Clicked',
-  WITHDRAW_USDC_TRANSACTION_LINK_CLICKED = 'Withdraw USDC: Transaction Link Clicked',
-
-  // Stripe Tracking
-  STRIPE_SESSION_CREATION_ERROR = 'Stripe: Session Creation Error',
-  STRIPE_SESSION_CREATED = 'Stripe Session: Created',
-  STRIPE_MODAL_INITIALIZED = 'Stripe Modal: Initialized',
-  STRIPE_REQUIRES_PAYMENT = 'Stripe Modal: Requires Payment',
-  STRIPE_FULLFILMENT_PROCESSING = 'Stripe Modal: Fulfillment Processing',
-  STRIPE_FULLFILMENT_COMPLETE = 'Stripe Modal: Fulfillment Complete',
-  STRIPE_ERROR = 'Stripe Modal: Error',
-  STRIPE_REJECTED = 'Stripe Modal: Rejected',
-
-  // Purchase Content
-
-  PURCHASE_CONTENT_BUY_CLICKED = 'Purchase Content: Buy Clicked',
-  PURCHASE_CONTENT_STARTED = 'Purchase Content: Started',
-  PURCHASE_CONTENT_SUCCESS = 'Purchase Content: Success',
-  PURCHASE_CONTENT_FAILURE = 'Purchase Content: Failure',
-  PURCHASE_CONTENT_TWITTER_SHARE = 'Purchase Content: Twitter Share',
-  PURCHASE_CONTENT_TOS_CLICKED = 'Purchase Content: Terms of Service Link Clicked',
-  PURCHASE_CONTENT_USDC_USER_BANK_COPIED = 'Purchase Content: USDC User Bank Copied',
-
   // Rate & Review CTA
   RATE_CTA_DISPLAYED = 'Rate CTA: Displayed',
   RATE_CTA_RESPONSE_YES = 'Rate CTA: User Responded Yes',
   RATE_CTA_RESPONSE_NO = 'Rate CTA: User Responded No',
-
-  // Connect Wallet
-  CONNECT_WALLET_NEW_WALLET_START = 'Connect Wallet: New Wallet Start',
-  CONNECT_WALLET_NEW_WALLET_CONNECTING = 'Connect Wallet: New Wallet Connecting',
-  CONNECT_WALLET_NEW_WALLET_CONNECTED = 'Connect Wallet: New Wallet Connected',
-  CONNECT_WALLET_DISCONNECTED = 'Connect Wallet: Disconnected',
-  CONNECT_WALLET_ALREADY_ASSOCIATED = 'Connect Wallet: Already Associated',
-  CONNECT_WALLET_ASSOCIATION_ERROR = 'Connect Wallet: Association Error',
-  CONNECT_WALLET_ERROR = 'Connect Wallet: Error',
 
   // Chat
   CREATE_CHAT_SUCCESS = 'Create Chat: Success',
@@ -498,21 +383,10 @@ export enum Name {
   CHAT_ENTRY_POINT = 'Chat Entry Point',
   CHAT_WEBSOCKET_ERROR = 'Chat Websocket Error',
 
-  // Jupiter
-  JUPITER_QUOTE_REQUEST = 'Jupiter: Quote Request',
-  JUPITER_QUOTE_RESPONSE = 'Jupiter: Quote Response',
-
   // Repair Signups
   SIGN_UP_REPAIR_START = 'Sign Up Repair: Start',
   SIGN_UP_REPAIR_SUCCESS = 'Sign Up Repair: Success',
   SIGN_UP_REPAIR_FAILURE = 'Sign Up Repair: Failure',
-
-  // Export Private Key
-  EXPORT_PRIVATE_KEY_LINK_CLICKED = 'Export Private Key: Settings Link Clicked',
-  EXPORT_PRIVATE_KEY_PAGE_VIEWED = 'Export Private Key: Page Viewed',
-  EXPORT_PRIVATE_KEY_MODAL_OPENED = 'Export Private Key: Modal Opened',
-  EXPORT_PRIVATE_KEY_PUBLIC_ADDRESS_COPIED = 'Export Private Key: Public Address Copied',
-  EXPORT_PRIVATE_KEY_PRIVATE_KEY_COPIED = 'Export Private Key: Private Key Copied',
 
   // Manager Mode
   MANAGER_MODE_SWITCH_ACCOUNT = 'Manager Mode: Switch Account',
@@ -582,55 +456,7 @@ export enum Name {
   // Android App Lifecycle
   ANDROID_APP_RESTART_HEARTBEAT = 'Android App: Restart Due to Heartbeat',
   ANDROID_APP_RESTART_STALE = 'Android App: Restart Due to Stale Time',
-  ANDROID_APP_RESTART_FORCE_QUIT = 'Android App: Restart Due to Force Quit',
-
-  // Fan Clubs
-  BANNER_FAN_CLUBS_LAUNCH_CLICKED = 'Banner Artist Coins Launch Clicked',
-  BANNER_TRADING_VOLUME_LAUNCH_CLICKED = 'Banner Trading Volume Launch Clicked',
-  BANNER_YAK_COIN_LAUNCH_CLICKED = 'Banner Yak Coin Launch Clicked',
-
-  // Fan Club Launchpad
-  LAUNCHPAD_SPLASH_GET_STARTED = 'Launchpad: Get Started Clicked',
-  LAUNCHPAD_HAS_EXISTING_FAN_CLUB = 'Launchpad: Has Existing Artist Coin',
-  LAUNCHPAD_SPLASH_LEARN_MORE_CLICKED = 'Launchpad: Learn More Clicked',
-  LAUNCHPAD_WALLET_CONNECT_SUCCESS = 'Launchpad: Wallet Connect Success',
-  LAUNCHPAD_WALLET_CONNECT_ERROR = 'Launchpad: Wallet Connect Error',
-  LAUNCHPAD_WALLET_INSUFFICIENT_BALANCE = 'Launchpad: Wallet Insufficient Balance',
-  LAUNCHPAD_SETUP_CONTINUE = 'Launchpad: Setup Continue',
-  LAUNCHPAD_FORM_BACK = 'Launchpad: Back To Previous Step',
-  LAUNCHPAD_FORM_INPUT_CHANGE = 'Launchpad: Form Input Change',
-  LAUNCHPAD_REVIEW_CONTINUE = 'Launchpad: Review Continue',
-  LAUNCHPAD_COIN_CREATION_STARTED = 'Launchpad: Coin Creation Started',
-  LAUNCHPAD_COIN_CREATION_SUCCESS = 'Launchpad: Coin Creation Success',
-  LAUNCHPAD_COIN_CREATION_FAILURE = 'Launchpad: Coin Creation Failure',
-  LAUNCHPAD_FIRST_BUY_STARTED = 'Launchpad: First Buy Started',
-  LAUNCHPAD_FIRST_BUY_SUCCESS = 'Launchpad: First Buy Success',
-  LAUNCHPAD_FIRST_BUY_FAILURE = 'Launchpad: First Buy Failure',
-  LAUNCHPAD_FIRST_BUY_RETRY = 'Launchpad: First Buy Retry',
-  LAUNCHPAD_FIRST_BUY_MAX_BUTTON = 'Launchpad: First Buy Max Button Clicked',
-  LAUNCHPAD_FIRST_BUY_QUOTE_RECEIVED = 'Launchpad: First Buy Quote Received',
-  LAUNCHPAD_BUY_MODAL_OPEN = 'Launchpad: Buy Audio Modal Open',
-  LAUNCHPAD_BUY_MODAL_CLOSE = 'Launchpad: Buy Audio Modal Close',
-  LAUNCHPAD_BUY_MODAL_SUBMIT = 'Launchpad: Buy Audio Modal Submit',
-  LAUNCHPAD_BUY_MODAL_SUCCESS = 'Launchpad: Buy Audio Modal Success',
-  LAUNCHPAD_BUY_MODAL_FAILURE = 'Launchpad: Buy Audio Modal Failure',
-  LAUNCHPAD_BUY_MODAL_CHANGE_CURRENCY = 'Launchpad: Buy Audio Modal Change Currency',
-  LAUNCHPAD_BUY_MODAL_FORM_CHANGE = 'Launchpad: Buy Audio Modal Form Change',
-  LAUNCHPAD_BUY_MODAL_MAX_BUTTON = 'Launchpad: Buy Audio Modal Max Button Clicked',
-  LAUNCHPAD_BUY_MODAL_CONTINUE = 'Launchpad: Buy Audio Modal Continue Clicked',
-  LAUNCHPAD_BUY_MODAL_BACK = 'Launchpad: Buy Audio Modal Back Clicked',
-  LAUNCHPAD_CLAIM_FEES_CLICKED = 'Launchpad: Claim Fees Clicked',
-  LAUNCHPAD_CLAIM_FEES_SUCCESS = 'Launchpad: Claim Fees Success',
-  LAUNCHPAD_CLAIM_FEES_FAILURE = 'Launchpad: Claim Fees Failure',
-  LAUNCHPAD_CLAIM_FEES_CONNECT_WALLET = 'Launchpad: Claim Fees Connect Wallet',
-  LAUNCHPAD_CLAIM_FEES_SWITCH_WALLET = 'Launchpad: Claim Fees Switch Wallet',
-  LAUNCHPAD_CLAIM_VESTED_COINS_SWITCH_WALLET = 'Launchpad: Claim Vested Coins Switch Wallet',
-  LAUNCHPAD_CLAIM_VESTED_COINS_CLICKED = 'Launchpad: Claim Vested Coins Clicked',
-  LAUNCHPAD_CLAIM_VESTED_COINS_CONNECT_WALLET = 'Launchpad: Claim Vested Coins Connect Wallet',
-  LAUNCHPAD_CLAIM_FEES_WALLET_CONNECTED = 'Launchpad: Claim Fees Wallet Connected',
-  LAUNCHPAD_CLAIM_VESTED_COINS_WALLET_CONNECTED = 'Launchpad: Claim Vested Coins Wallet Connected',
-  LAUNCHPAD_CLAIM_VESTED_COINS_SUCCESS = 'Launchpad: Claim Vested Coins Success',
-  LAUNCHPAD_CLAIM_VESTED_COINS_FAILURE = 'Launchpad: Claim Vested Coins Failure'
+  ANDROID_APP_RESTART_FORCE_QUIT = 'Android App: Restart Due to Force Quit'
 }
 
 type PageView = {
@@ -947,8 +773,7 @@ export enum RepostSource {
   HISTORY_PAGE = 'history page',
   LIBRARY_PAGE = 'library page',
   OVERFLOW = 'overflow',
-  TRACK_LIST = 'track list',
-  PURCHASE = 'purchase'
+  TRACK_LIST = 'track list'
 }
 export enum FavoriteSource {
   TILE = 'tile',
@@ -980,8 +805,7 @@ export enum FollowSource {
   EMPTY_FEED = 'empty feed',
   HOW_TO_UNLOCK_TRACK_PAGE = 'how to unlock track page',
   HOW_TO_UNLOCK_MODAL = 'how to unlock modal',
-  SIGN_UP = 'sign up',
-  ARTIST_COIN_PURCHASE = 'artist coin purchase'
+  SIGN_UP = 'sign up'
 }
 
 type Share = {
@@ -1195,49 +1019,11 @@ type TrackUploadFollowGated = {
   lossless: boolean
 }
 
-type TrackUploadUSDCGated = {
-  eventName: Name.TRACK_UPLOAD_USDC_GATED
-  price: number
-  kind: 'tracks'
-  downloadable: boolean
-  lossless: boolean
-}
-
-type TrackUploadTokenGated = {
-  eventName: Name.TRACK_UPLOAD_TOKEN_GATED
-  kind: 'tracks'
-  downloadable: boolean
-  lossless: boolean
-}
-
-type TrackUploadClickUSDCWaitListLink = {
-  eventName: Name.TRACK_UPLOAD_CLICK_USDC_WAITLIST_LINK
-}
-
 type TrackUploadFollowGatedDownload = {
   eventName: Name.TRACK_UPLOAD_FOLLOW_GATED_DOWNLOAD
   kind: 'tracks'
   downloadable: boolean
   lossless: boolean
-}
-
-type TrackUploadTokenGatedDownload = {
-  eventName: Name.TRACK_UPLOAD_TOKEN_GATED_DOWNLOAD
-  kind: 'tracks'
-  downloadable: boolean
-  lossless: boolean
-}
-
-type TrackUploadUSDCGatedDownload = {
-  eventName: Name.TRACK_UPLOAD_USDC_GATED_DOWNLOAD
-  price: number
-  kind: 'tracks'
-  downloadable: boolean
-  lossless: boolean
-}
-
-type TrackUploadClickUSDCDownloadWaitListLink = {
-  eventName: Name.TRACK_UPLOAD_CLICK_USDC_DOWNLOAD_WAITLIST_LINK
 }
 
 // Track Downloads
@@ -1311,34 +1097,13 @@ type CollectionEdit = {
   to: TrackAccessType
 }
 
-// Unlocked Gated Tracks
-type USDCGatedTrackUnlocked = {
-  eventName: Name.USDC_PURCHASE_GATED_TRACK_UNLOCKED
-  count: number
-}
-
 type FollowGatedTrackUnlocked = {
   eventName: Name.FOLLOW_GATED_TRACK_UNLOCKED
   trackId: number
 }
 
-type TokenGatedTrackUnlocked = {
-  eventName: Name.TOKEN_GATED_TRACK_UNLOCKED
-  trackId: number
-}
-
-type USDCGatedDownloadTrackUnlocked = {
-  eventName: Name.USDC_PURCHASE_GATED_DOWNLOAD_TRACK_UNLOCKED
-  count: number
-}
-
 type FollowGatedDownloadTrackUnlocked = {
   eventName: Name.FOLLOW_GATED_DOWNLOAD_TRACK_UNLOCKED
-  trackId: number
-}
-
-type TokenGatedDownloadTrackUnlocked = {
-  eventName: Name.TOKEN_GATED_DOWNLOAD_TRACK_UNLOCKED
   trackId: number
 }
 
@@ -1352,7 +1117,7 @@ type TrendingChangeView = {
 // Feed
 type FeedChangeView = {
   eventName: Name.FEED_CHANGE_VIEW
-  view: FeedFilter | FeedTab
+  view: FeedFilter
 }
 
 // Notifications
@@ -1391,10 +1156,6 @@ type NotificationsClickDethroned = {
 }
 type NotificationsClickAddTrackToPlaylist = {
   eventName: Name.NOTIFICATIONS_CLICK_ADD_TRACK_TO_PLAYLIST_TWITTER_SHARE
-  text: string
-}
-type NotificationsClickUSDCPurchaseBuyer = {
-  eventName: Name.NOTIFICATIONS_CLICK_USDC_PURCHASE_TWITTER_SHARE
   text: string
 }
 type NotificationsClickTrendingTrack = {
@@ -1628,11 +1389,9 @@ type SearchResultSelect = {
 // Explore
 export type ExploreSectionName =
   | 'Recommended Tracks'
-  | 'Artist Coin Tracks'
   | 'Recently Played'
   | 'Quick Search'
   | 'Featured Playlists'
-  | 'Fan Clubs'
   | 'Featured Remix Contests'
   | 'Underground Trending Tracks'
   | 'Artist Spotlight'
@@ -1641,11 +1400,8 @@ export type ExploreSectionName =
   | 'Downloads Available'
   | 'Mood Grid'
   | 'Most Shared'
-  | 'Best Selling'
-  | 'Best Selling Albums'
   | 'Top Albums This Month'
   | 'New Album Releases'
-  | 'Recent Premium Tracks'
   | 'Feeling Lucky'
   | 'Recent Searches'
 
@@ -1742,66 +1498,6 @@ type RemixHide = {
   handle: string
 }
 
-/** Where in the app the send was initiated (for analytics parity with legacy Tip Audio) */
-export type SendAudioSource =
-  | 'send_tokens_modal'
-  | 'oauth_pay_page'
-  | 'send_tokens_drawer'
-
-type SendAudioRequest = {
-  eventName: Name.SEND_AUDIO_REQUEST
-  from: WalletAddress
-  recipient: WalletAddress
-  amount?: string
-  source?: SendAudioSource | string
-  senderHandle?: string
-  senderWallet?: WalletAddress
-  recipientHandle?: string
-  recipientWallet?: WalletAddress
-}
-
-type SendAudioSuccess = {
-  eventName: Name.SEND_AUDIO_SUCCESS
-  from: WalletAddress
-  recipient: WalletAddress
-  amount?: string
-  source?: SendAudioSource | string
-  senderHandle?: string
-  senderWallet?: WalletAddress
-  recipientHandle?: string
-  recipientWallet?: WalletAddress
-}
-
-type SendAudioFailure = {
-  eventName: Name.SEND_AUDIO_FAILURE
-  from: WalletAddress
-  recipient: WalletAddress
-  error: string
-  amount?: string
-  source?: SendAudioSource | string
-  senderHandle?: string
-  senderWallet?: WalletAddress
-  recipientHandle?: string
-  recipientWallet?: WalletAddress
-}
-
-type TransferAudioToWAudioRequest = {
-  eventName: Name.TRANSFER_AUDIO_TO_WAUDIO_REQUEST
-  from: WalletAddress
-}
-
-type TransferAudioToWAudioSuccess = {
-  eventName: Name.TRANSFER_AUDIO_TO_WAUDIO_SUCCESS
-  from: WalletAddress
-  txSignature: string
-  logs: string
-}
-
-type TransferAudioToWAudioFailure = {
-  eventName: Name.TRANSFER_AUDIO_TO_WAUDIO_FAILURE
-  from: WalletAddress
-}
-
 type PlaylistLibraryReorder = {
   eventName: Name.PLAYLIST_LIBRARY_REORDER
   // Whether or not the reorder contains newly created temp playlists
@@ -1865,51 +1561,6 @@ type CreateUserBankFailure = {
   recipientEthAddress: string
   errorCode: string
   errorMessage: string
-}
-
-type RewardsClaimDetailsOpened = {
-  eventName: Name.REWARDS_CLAIM_DETAILS_OPENED
-  challengeId: string
-}
-
-type RewardsClaimRequest = {
-  eventName: Name.REWARDS_CLAIM_REQUEST
-  challengeId: string
-  specifier: string
-  amount: number
-}
-
-type RewardsClaimSuccess = {
-  eventName: Name.REWARDS_CLAIM_SUCCESS
-  challengeId: string
-  specifier: string
-  amount: number
-}
-
-type RewardsClaimBlocked = {
-  eventName: Name.REWARDS_CLAIM_BLOCKED
-  challengeId: string
-  specifier: string
-  amount: number
-  code: number
-}
-
-type RewardsClaimAllRequest = {
-  eventName: Name.REWARDS_CLAIM_ALL_REQUEST
-  count: number
-}
-type RewardsClaimAllSuccess = {
-  eventName: Name.REWARDS_CLAIM_ALL_SUCCESS
-  count: number
-}
-type RewardsClaimAllFailure = {
-  eventName: Name.REWARDS_CLAIM_ALL_FAILURE
-  count: number
-}
-type RewardsClaimAllBlocked = {
-  eventName: Name.REWARDS_CLAIM_ALL_BLOCKED
-  count: number
-  code: number
 }
 
 type SocialProofOpen = {
@@ -2023,345 +1674,8 @@ type AuthorizedAppRemoveError = {
   error?: string
 }
 
-type BuyAudioOnRampOpened = {
-  eventName: Name.BUY_AUDIO_ON_RAMP_OPENED
-  provider: string
-}
-
-type BuyAudioOnRampCanceled = {
-  eventName: Name.BUY_AUDIO_ON_RAMP_CANCELED
-  provider: string
-}
-
-type BuyAudioOnRampSuccess = {
-  eventName: Name.BUY_AUDIO_ON_RAMP_SUCCESS
-  provider: string
-}
-
-type BuyAudioSuccess = {
-  eventName: Name.BUY_AUDIO_SUCCESS
-  provider: string
-  requestedAudio: number
-  actualAudio: number
-  surplusAudio: number
-}
-
-type BuyAudioFailure = {
-  eventName: Name.BUY_AUDIO_FAILURE
-  provider: string
-  requestedAudio: number
-  stage: string
-  error: string
-}
-
-type BuyAudioRecoveryOpened = {
-  eventName: Name.BUY_AUDIO_RECOVERY_OPENED
-  provider: string
-  trigger: string
-  balance: string
-}
-
-type BuyAudioRecoverySuccess = {
-  eventName: Name.BUY_AUDIO_RECOVERY_SUCCESS
-  provider: string
-  audioRecovered: number
-}
-
-type BuyAudioRecoveryFailure = {
-  eventName: Name.BUY_AUDIO_RECOVERY_FAILURE
-  provider: string
-  stage: string
-  error: string
-}
-
-// Buy USDC
-type BuyUSDCOnRampOpened = {
-  eventName: Name.BUY_USDC_ON_RAMP_OPENED
-  vendor: string
-}
-
-type BuyUSDCOnRampCanceled = {
-  eventName: Name.BUY_USDC_ON_RAMP_CANCELED
-  vendor: string
-}
-
-type BuyUSDCOnRampFailed = {
-  eventName: Name.BUY_USDC_ON_RAMP_FAILURE
-  error: string
-  vendor: string
-}
-
-type BuyUSDCOnRampSuccess = {
-  eventName: Name.BUY_USDC_ON_RAMP_SUCCESS
-  vendor: string
-}
-
-type BuyUSDCSuccess = {
-  eventName: Name.BUY_USDC_SUCCESS
-  vendor: string
-  requestedAmount: number
-}
-
-type BuyUSDCFailure = {
-  eventName: Name.BUY_USDC_FAILURE
-  vendor: string
-  requestedAmount: number
-  error: string
-}
-
-type BuyUSDCRecoveryInProgress = {
-  eventName: Name.BUY_USDC_RECOVERY_IN_PROGRESS
-  userBank: string
-}
-
-type BuyUSDCRecoverySuccess = {
-  eventName: Name.BUY_USDC_RECOVERY_SUCCESS
-  userBank: string
-}
-
-type BuyUSDCRecoveryFailure = {
-  eventName: Name.BUY_USDC_RECOVERY_FAILURE
-  error: string
-}
-
-type BuyUSDCAddFundsManually = {
-  eventName: Name.BUY_USDC_ADD_FUNDS_MANUALLY
-}
-
-export type BuySellSwapEventFields = {
-  activeTab: 'buy' | 'sell' | 'convert'
-  inputToken: string
-  outputToken: string
-  inputAmount?: number
-  outputAmount?: number
-  exchangeRate?: number | null
-}
-
-type BuySellSwapRequested = BuySellSwapEventFields & {
-  eventName: Name.BUY_SELL_SWAP_REQUESTED
-}
-
-type BuySellSwapConfirmed = BuySellSwapEventFields & {
-  eventName: Name.BUY_SELL_SWAP_CONFIRMED
-  slippageBps: number
-}
-
-type BuySellSwapSuccess = BuySellSwapEventFields & {
-  eventName: Name.BUY_SELL_SWAP_SUCCESS
-  signature: string
-}
-
-type BuySellSwapFailure = BuySellSwapEventFields & {
-  eventName: Name.BUY_SELL_SWAP_FAILURE
-  errorType: string
-  errorStage: string
-  errorMessage?: string
-}
-
-type BuySellAddFundsClicked = {
-  eventName: Name.BUY_SELL_ADD_FUNDS_CLICKED
-  source: 'insufficient_balance_hint' | 'input_screen'
-}
-
-// Withdraw USDC
-
-export type WithdrawUSDCEventFields = {
-  /** Balance in dollars */
-  currentBalance: number
-}
-
-export type WithdrawUSDCTransferEventFields = WithdrawUSDCEventFields & {
-  amount: number
-  destinationAddress: string
-}
-
-export type WithdrawUSDCModalOpened = WithdrawUSDCEventFields & {
-  eventName: Name.WITHDRAW_USDC_MODAL_OPENED
-}
-
-export type WithdrawUSDCAddressPasted = WithdrawUSDCEventFields & {
-  eventName: Name.WITHDRAW_USDC_ADDRESS_PASTED
-  destinationAddress: string
-}
-
-export type WithdrawUSDCFormError = WithdrawUSDCEventFields & {
-  eventName: Name.WITHDRAW_USDC_FORM_ERROR
-  error: string
-  value?: string
-}
-
-export type WithdrawUSDCRequested = WithdrawUSDCTransferEventFields & {
-  eventName: Name.WITHDRAW_USDC_REQUESTED
-}
-
-export type WithdrawUSDCSuccess = WithdrawUSDCTransferEventFields & {
-  eventName: Name.WITHDRAW_USDC_SUCCESS
-}
-
-export type WithdrawUSDCFailure = WithdrawUSDCTransferEventFields & {
-  eventName: Name.WITHDRAW_USDC_FAILURE
-  error?: unknown
-  errorName?: string
-  /** HTTP status code, when the failure was a non-2xx SDK response. */
-  httpStatus?: number
-  httpStatusText?: string
-  /** Truncated response body, when the failure was a non-2xx SDK response. */
-  responseBody?: string
-}
-export type WithdrawUSDCCancelled = WithdrawUSDCTransferEventFields & {
-  eventName: Name.WITHDRAW_USDC_CANCELLED
-}
-
-export type WithdrawUSDCCreateDestAccountStarted =
-  WithdrawUSDCTransferEventFields & {
-    eventName: Name.WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_START
-  }
-
-export type WithdrawUSDCCreateDestAccountSuccess =
-  WithdrawUSDCTransferEventFields & {
-    eventName: Name.WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_SUCCESS
-  }
-
-export type WithdrawUSDCCreateDestAccountFailure =
-  WithdrawUSDCTransferEventFields & {
-    eventName: Name.WITHDRAW_USDC_CREATE_DEST_TOKEN_ACCOUNT_FAILED
-    error?: unknown
-    errorName?: string
-    /** HTTP status code, when the failure was a non-2xx SDK response. */
-    httpStatus?: number
-    httpStatusText?: string
-    /** Truncated response body, when the failure was a non-2xx SDK response. */
-    responseBody?: string
-  }
-
-export type WithdrawUSDCTransferToRootWallet =
-  WithdrawUSDCTransferEventFields & {
-    eventName: Name.WITHDRAW_USDC_TRANSFER_TO_ROOT_WALLET
-  }
-
-export type WithdrawUSDCCoinflowWithdrawalReady =
-  WithdrawUSDCTransferEventFields & {
-    eventName: Name.WITHDRAW_USDC_COINFLOW_WITHDRAWAL_READY
-  }
-
-export type WithdrawUSDCCoinflowSendTransaction = {
-  eventName: Name.WITHDRAW_USDC_COINFLOW_SEND_TRANSACTION
-  signature: string
-}
-
-export type WithdrawUSDCCoinflowSendTransactionFailed = {
-  eventName: Name.WITHDRAW_USDC_COINFLOW_SEND_TRANSACTION_FAILED
-  error?: string
-  errorCode?: string | number
-}
-
-export type WithdrawUSDCHelpLinkClicked = WithdrawUSDCEventFields & {
-  eventName: Name.WITHDRAW_USDC_HELP_LINK_CLICKED
-}
-
-export type WithdrawUSDCTxLinkClicked = WithdrawUSDCTransferEventFields & {
-  eventName: Name.WITHDRAW_USDC_TRANSACTION_LINK_CLICKED
-  signature: string
-}
-
-// Stripe Tracking
-export type StripeEventFields = {
-  amount: string
-  destinationCurrency: string
-}
-
-type StripeSessionCreationError = StripeEventFields & {
-  eventName: Name.STRIPE_SESSION_CREATION_ERROR
-  code: string
-  stripeErrorMessage: string
-  kind: string
-}
-
-type StripeSessionCreated = StripeEventFields & {
-  eventName: Name.STRIPE_SESSION_CREATED
-}
-
-type StripeModalInitialized = StripeEventFields & {
-  eventName: Name.STRIPE_MODAL_INITIALIZED
-}
-
-type StripeRequiresPayment = StripeEventFields & {
-  eventName: Name.STRIPE_REQUIRES_PAYMENT
-}
-
-type StripeFulfillmentProcessing = StripeEventFields & {
-  eventName: Name.STRIPE_FULLFILMENT_PROCESSING
-}
-
-type StripeFulfillmentComplete = StripeEventFields & {
-  eventName: Name.STRIPE_FULLFILMENT_COMPLETE
-}
-
-type StripeError = StripeEventFields & {
-  eventName: Name.STRIPE_ERROR
-}
-
-type StripeRejected = StripeEventFields & {
-  eventName: Name.STRIPE_REJECTED
-}
-
-// Content Purchase
-
-type ContentPurchaseMetadata = {
-  price: number
-  contentId: number
-  contentName: string
-  contentType: string
-  payExtraAmount: number
-  payExtraPreset?: string
-  purchaseMethod: PurchaseMethod
-  totalAmount: number
-  artistHandle: string
-  isVerifiedArtist: boolean
-}
-
-type PurchaseContentBuyClicked = {
-  eventName: Name.PURCHASE_CONTENT_BUY_CLICKED
-  contentId: number
-  contentType: string
-}
-
-type PurchaseContentStarted = ContentPurchaseMetadata & {
-  eventName: Name.PURCHASE_CONTENT_STARTED
-}
-type PurchaseContentSuccess = ContentPurchaseMetadata & {
-  eventName: Name.PURCHASE_CONTENT_SUCCESS
-}
-
-type PurchaseContentFailure = ContentPurchaseMetadata & {
-  eventName: Name.PURCHASE_CONTENT_FAILURE
-  error: string
-}
-
-type PurchaseContentTwitterShare = {
-  eventName: Name.PURCHASE_CONTENT_TWITTER_SHARE
-  text: string
-}
-
-type PurchaseContentTOSClicked = {
-  eventName: Name.PURCHASE_CONTENT_TOS_CLICKED
-}
-
-type PurchaseContentUSDCUserBankCopied = {
-  eventName: Name.PURCHASE_CONTENT_USDC_USER_BANK_COPIED
-  address: string
-}
-
 type BannerTOSClicked = {
   eventName: Name.BANNER_TOS_CLICKED
-}
-
-type BannerFanClubsLaunchClicked = {
-  eventName: Name.BANNER_FAN_CLUBS_LAUNCH_CLICKED
-}
-
-type BannerTradingVolumeLaunchClicked = {
-  eventName: Name.BANNER_TRADING_VOLUME_LAUNCH_CLICKED
 }
 
 type RateCtaDisplayed = {
@@ -2374,43 +1688,6 @@ type RateCtaResponseNo = {
 
 type RateCtaResponseYes = {
   eventName: Name.RATE_CTA_RESPONSE_YES
-}
-
-type ConnectWalletNewWalletStart = {
-  eventName: Name.CONNECT_WALLET_NEW_WALLET_START
-}
-
-type ConnectWalletNewWalletConnecting = {
-  eventName: Name.CONNECT_WALLET_NEW_WALLET_CONNECTING
-  chain: Chain
-  walletAddress: WalletAddress
-}
-
-type ConnectWalletNewWalletConnected = {
-  eventName: Name.CONNECT_WALLET_NEW_WALLET_CONNECTED
-  chain: Chain
-  walletAddress: WalletAddress
-}
-
-type ConnectWalletDisconnected = {
-  eventName: Name.CONNECT_WALLET_DISCONNECTED
-}
-
-type ConnectWalletAlreadyAssociated = {
-  eventName: Name.CONNECT_WALLET_ALREADY_ASSOCIATED
-  chain: Chain
-  walletAddress: WalletAddress
-}
-
-type ConnectWalletAssociationError = {
-  eventName: Name.CONNECT_WALLET_ASSOCIATION_ERROR
-  chain: Chain
-  walletAddress: WalletAddress
-}
-
-type ConnectWalletError = {
-  eventName: Name.CONNECT_WALLET_ERROR
-  error: string
 }
 
 type ChatBlastCTAClicked = {
@@ -2517,58 +1794,6 @@ type ChatEntryPoint = {
 type ChatWebsocketError = {
   eventName: Name.CHAT_WEBSOCKET_ERROR
   code?: string
-}
-
-// Jupiter
-type JupiterQuoteRequest = {
-  eventName: Name.JUPITER_QUOTE_REQUEST
-  inputMint: string
-  outputMint: string
-  swapMode?: string
-  slippageBps?: number
-  amount: number
-}
-
-type JupiterQuoteResponse = {
-  eventName: Name.JUPITER_QUOTE_RESPONSE
-  inputMint: string
-  outputMint: string
-  swapMode: string
-  slippageBps: number
-  otherAmountThreshold: number
-  inAmount: number
-  outAmount: number
-}
-
-// Export Private Key
-type ExportPrivateKeyLinkClicked = {
-  eventName: Name.EXPORT_PRIVATE_KEY_LINK_CLICKED
-  handle?: string
-  userId?: ID
-}
-
-type ExportPrivateKeyPageOpened = {
-  eventName: Name.EXPORT_PRIVATE_KEY_PAGE_VIEWED
-  handle: string
-  userId: ID
-}
-
-type ExportPrivateKeyModalOpened = {
-  eventName: Name.EXPORT_PRIVATE_KEY_MODAL_OPENED
-  handle: string
-  userId: ID
-}
-
-type ExportPrivateKeyPublicAddressCopied = {
-  eventName: Name.EXPORT_PRIVATE_KEY_PUBLIC_ADDRESS_COPIED
-  handle: string
-  userId: ID
-}
-
-type ExportPrivateKeyPrivateKeyCopied = {
-  eventName: Name.EXPORT_PRIVATE_KEY_PRIVATE_KEY_COPIED
-  handle: string
-  userId: ID
 }
 
 // Manager Mode
@@ -2882,257 +2107,6 @@ export type AndroidAppRestartForceQuit = {
   eventName: Name.ANDROID_APP_RESTART_FORCE_QUIT
 }
 
-// Fan Club Launchpad
-export type LaunchpadSplashGetStarted = {
-  eventName: Name.LAUNCHPAD_SPLASH_GET_STARTED
-}
-
-export type LaunchpadHasExistingFanClub = {
-  eventName: Name.LAUNCHPAD_HAS_EXISTING_FAN_CLUB
-}
-
-export type LaunchpadSplashLearnMoreClicked = {
-  eventName: Name.LAUNCHPAD_SPLASH_LEARN_MORE_CLICKED
-}
-
-export type LaunchpadFormBack = {
-  eventName: Name.LAUNCHPAD_FORM_BACK
-}
-
-export type LaunchpadFormInputChange = {
-  eventName: Name.LAUNCHPAD_FORM_INPUT_CHANGE
-  input: string
-  newValue: string
-}
-
-export type LaunchpadWalletConnectSuccess = {
-  eventName: Name.LAUNCHPAD_WALLET_CONNECT_SUCCESS
-  walletAddress: string
-  walletSolBalance: number
-}
-
-export type LaunchpadWalletConnectError = {
-  eventName: Name.LAUNCHPAD_WALLET_CONNECT_ERROR
-  error: string
-}
-
-export type LaunchpadWalletInsufficientBalance = {
-  eventName: Name.LAUNCHPAD_WALLET_INSUFFICIENT_BALANCE
-  walletAddress: string
-  walletSolBalance: number
-}
-
-export type LaunchpadSetupContinue = {
-  eventName: Name.LAUNCHPAD_SETUP_CONTINUE
-} & Partial<LaunchpadFormValues>
-
-export type LaunchpadReviewContinue = {
-  eventName: Name.LAUNCHPAD_REVIEW_CONTINUE
-} & Partial<LaunchpadFormValues>
-
-export type LaunchpadCoinCreationStarted = {
-  eventName: Name.LAUNCHPAD_COIN_CREATION_STARTED
-  coinName: string
-  coinSymbol: string
-  walletAddress: string
-  initialBuyAmount?: string
-}
-
-export type LaunchpadCoinCreationSuccess = {
-  eventName: Name.LAUNCHPAD_COIN_CREATION_SUCCESS
-  launchCoinResponse: LaunchCoinResponse
-}
-
-export type LaunchpadCoinCreationFailure = {
-  eventName: Name.LAUNCHPAD_COIN_CREATION_FAILURE
-  errorState:
-    | 'poolCreateFailed'
-    | 'sdkCoinFailed'
-    | 'firstBuyFailed'
-    | 'unknownError'
-  launchCoinResponse: LaunchCoinResponse
-}
-
-export type LaunchpadFirstBuyStarted = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_STARTED
-  coinSymbol: string
-  mintAddress: string
-  payAmount: string
-  receiveAmount: string
-}
-
-export type LaunchpadFirstBuySuccess = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_SUCCESS
-  coinSymbol: string
-  mintAddress: string
-  payAmount: string
-  receiveAmount: string
-}
-
-export type LaunchpadFirstBuyFailure = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_FAILURE
-  coinSymbol: string
-  mintAddress: string
-  payAmount: string
-  error: string
-}
-
-export type LaunchpadFirstBuyRetry = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_RETRY
-  launchCoinResponse: LaunchCoinResponse
-}
-
-export type LaunchpadFirstBuyMaxButton = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_MAX_BUTTON
-  maxValue?: string
-} & Partial<LaunchpadFormValues>
-
-export type LaunchpadFirstBuyQuoteReceived = {
-  eventName: Name.LAUNCHPAD_FIRST_BUY_QUOTE_RECEIVED
-  payAmount: string
-  receiveAmount: string
-  usdcValue: string
-}
-
-export type LaunchpadBuyModalOpen = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_OPEN
-}
-
-export type LaunchpadBuyModalClose = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_CLOSE
-}
-
-export type LaunchpadBuyModalContinue = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_CONTINUE
-}
-
-export type LaunchpadBuyModalBack = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_BACK
-}
-
-export type LaunchpadBuyModalSubmit = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_SUBMIT
-  inputAmount: string
-  outputAmount: string
-  inputTokenSymbol: string
-  outputTokenSymbol: string
-  walletAddress: string
-}
-
-export type LaunchpadBuyModalSuccess = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_SUCCESS
-}
-
-export type LaunchpadBuyModalFailure = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_FAILURE
-  error: any
-}
-
-export type LaunchpadBuyModalChangeCurrency = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_CHANGE_CURRENCY
-  newCurrencySymbol: string
-}
-
-export type LaunchpadBuyModalFormChange = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_FORM_CHANGE
-  inputChanged: string
-  newValue: string
-}
-
-export type LaunchpadBuyModalMaxButton = {
-  eventName: Name.LAUNCHPAD_BUY_MODAL_MAX_BUTTON
-}
-
-export type LaunchpadClaimFeesClicked = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_CLICKED
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimFeesSuccess = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_SUCCESS
-  signatures: string[]
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-  claimedAmount: string
-}
-
-export type LaunchpadClaimFeesFailure = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_FAILURE
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-  error: string
-}
-
-export type LaunchpadClaimFeesConnectWallet = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_CONNECT_WALLET
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimFeesSwitchWallet = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_SWITCH_WALLET
-  currentWalletAddress: string
-  expectedWalletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimFeesWalletConnected = {
-  eventName: Name.LAUNCHPAD_CLAIM_FEES_WALLET_CONNECTED
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimVestedCoinsClicked = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_CLICKED
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimVestedCoinsConnectWallet = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_CONNECT_WALLET
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimVestedCoinsSuccess = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_SUCCESS
-  signature: string
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-  claimedAmount: string
-}
-
-export type LaunchpadClaimVestedCoinsFailure = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_FAILURE
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-  error: string
-}
-
-export type LaunchpadClaimVestedCoinsSwitchWallet = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_SWITCH_WALLET
-  currentWalletAddress: string
-  expectedWalletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
-export type LaunchpadClaimVestedCoinsWalletConnected = {
-  eventName: Name.LAUNCHPAD_CLAIM_VESTED_COINS_WALLET_CONNECTED
-  walletAddress: string
-  coinSymbol?: string
-  mintAddress?: string
-}
-
 export type BaseAnalyticsEvent = { type: typeof ANALYTICS_TRACK_EVENT }
 
 export type AllTrackingEvents =
@@ -3210,13 +2184,7 @@ export type AllTrackingEvents =
   | TrackUploadTrackUploading
   | TrackUploadCompleteUpload
   | TrackUploadFollowGated
-  | TrackUploadUSDCGated
-  | TrackUploadTokenGated
-  | TrackUploadClickUSDCWaitListLink
   | TrackUploadFollowGatedDownload
-  | TrackUploadUSDCGatedDownload
-  | TrackUploadTokenGatedDownload
-  | TrackUploadClickUSDCDownloadWaitListLink
   | TrackDownloadClickedDownloadAll
   | TrackDownloadSuccessfulDownloadAll
   | TrackDownloadFailedDownloadAll
@@ -3234,12 +2202,8 @@ export type AllTrackingEvents =
   | TrackUploadCopyLink
   | TrackUploadShareWithFans
   | TrackUploadViewTrackPage
-  | USDCGatedTrackUnlocked
   | FollowGatedTrackUnlocked
-  | TokenGatedTrackUnlocked
-  | USDCGatedDownloadTrackUnlocked
   | FollowGatedDownloadTrackUnlocked
-  | TokenGatedDownloadTrackUnlocked
   | TrendingChangeView
   | FeedChangeView
   | NotificationsOpen
@@ -3252,7 +2216,6 @@ export type AllTrackingEvents =
   | NotificationsClickAddTrackToPlaylist
   | NotificationsClickTrendingTrack
   | NotificationsClickTrendingUnderground
-  | NotificationsClickUSDCPurchaseBuyer
   | NotificationsClickTastemaker
   | NotificationsToggleSettings
   | ProfilePageTabClick
@@ -3303,9 +2266,6 @@ export type AllTrackingEvents =
   | RemixCosign
   | RemixCosignIndicator
   | RemixHide
-  | SendAudioRequest
-  | SendAudioSuccess
-  | SendAudioFailure
   | PlaylistLibraryReorder
   | PlaylistLibraryClicked
   | PlaylistLibraryMovePlaylistIntoFolder
@@ -3313,9 +2273,6 @@ export type AllTrackingEvents =
   | PlaylistLibraryMovePlaylistOutOfFolder
   | PlaylistLibraryExpandFolder
   | PlaylistLibraryCollapseFolder
-  | TransferAudioToWAudioRequest
-  | TransferAudioToWAudioSuccess
-  | TransferAudioToWAudioFailure
   | DeactivateAccountPageView
   | DeactivateAccountRequest
   | DeactivateAccountSuccess
@@ -3323,14 +2280,6 @@ export type AllTrackingEvents =
   | CreateUserBankRequest
   | CreateUserBankSuccess
   | CreateUserBankFailure
-  | RewardsClaimDetailsOpened
-  | RewardsClaimRequest
-  | RewardsClaimSuccess
-  | RewardsClaimBlocked
-  | RewardsClaimAllRequest
-  | RewardsClaimAllSuccess
-  | RewardsClaimAllFailure
-  | RewardsClaimAllBlocked
   | SocialProofOpen
   | SocialProofSuccess
   | SocialProofError
@@ -3345,73 +2294,10 @@ export type AllTrackingEvents =
   | AudiusOauthComplete
   | AudiusOauthSubmit
   | AudiusOauthError
-  | BuyAudioOnRampOpened
-  | BuyAudioOnRampSuccess
-  | BuyAudioOnRampCanceled
-  | BuyAudioSuccess
-  | BuyAudioFailure
-  | BuyAudioRecoveryOpened
-  | BuyAudioRecoverySuccess
-  | BuyAudioRecoveryFailure
-  | BuyUSDCOnRampOpened
-  | BuyUSDCOnRampSuccess
-  | BuyUSDCOnRampCanceled
-  | BuyUSDCOnRampFailed
-  | BuyUSDCSuccess
-  | BuyUSDCFailure
-  | BuyUSDCRecoveryInProgress
-  | BuyUSDCRecoverySuccess
-  | BuyUSDCRecoveryFailure
-  | BuyUSDCAddFundsManually
-  | BuySellSwapRequested
-  | BuySellSwapConfirmed
-  | BuySellSwapSuccess
-  | BuySellSwapFailure
-  | BuySellAddFundsClicked
-  | WithdrawUSDCModalOpened
-  | WithdrawUSDCAddressPasted
-  | WithdrawUSDCFormError
-  | WithdrawUSDCRequested
-  | WithdrawUSDCSuccess
-  | WithdrawUSDCFailure
-  | WithdrawUSDCCancelled
-  | WithdrawUSDCCreateDestAccountStarted
-  | WithdrawUSDCCreateDestAccountSuccess
-  | WithdrawUSDCCreateDestAccountFailure
-  | WithdrawUSDCTransferToRootWallet
-  | WithdrawUSDCCoinflowWithdrawalReady
-  | WithdrawUSDCCoinflowSendTransaction
-  | WithdrawUSDCCoinflowSendTransactionFailed
-  | WithdrawUSDCHelpLinkClicked
-  | WithdrawUSDCTxLinkClicked
-  | StripeSessionCreationError
-  | StripeSessionCreated
-  | StripeModalInitialized
-  | StripeRequiresPayment
-  | StripeFulfillmentProcessing
-  | StripeFulfillmentComplete
-  | StripeError
-  | StripeRejected
-  | PurchaseContentBuyClicked
-  | PurchaseContentStarted
-  | PurchaseContentSuccess
-  | PurchaseContentFailure
-  | PurchaseContentTwitterShare
-  | PurchaseContentTOSClicked
-  | PurchaseContentUSDCUserBankCopied
   | BannerTOSClicked
-  | BannerFanClubsLaunchClicked
-  | BannerTradingVolumeLaunchClicked
   | RateCtaDisplayed
   | RateCtaResponseNo
   | RateCtaResponseYes
-  | ConnectWalletNewWalletStart
-  | ConnectWalletNewWalletConnecting
-  | ConnectWalletNewWalletConnected
-  | ConnectWalletDisconnected
-  | ConnectWalletAlreadyAssociated
-  | ConnectWalletAssociationError
-  | ConnectWalletError
   | ChatBlastCTAClicked
   | ChatBlastMessageSent
   | CreateChatSuccess
@@ -3443,13 +2329,6 @@ export type AllTrackingEvents =
   | AuthorizedAppRemoveError
   | ChatEntryPoint
   | ChatWebsocketError
-  | JupiterQuoteResponse
-  | JupiterQuoteRequest
-  | ExportPrivateKeyLinkClicked
-  | ExportPrivateKeyPageOpened
-  | ExportPrivateKeyModalOpened
-  | ExportPrivateKeyPublicAddressCopied
-  | ExportPrivateKeyPrivateKeyCopied
   | ManagerModeSwitchAccount
   | ManagerModeInviteManager
   | ManagerModeAcceptInvite
@@ -3507,44 +2386,3 @@ export type AllTrackingEvents =
   | AndroidAppRestartHeartbeat
   | AndroidAppRestartStale
   | AndroidAppRestartForceQuit
-  | LaunchpadSplashGetStarted
-  | LaunchpadHasExistingFanClub
-  | LaunchpadSplashLearnMoreClicked
-  | LaunchpadWalletConnectSuccess
-  | LaunchpadWalletInsufficientBalance
-  | LaunchpadSetupContinue
-  | LaunchpadReviewContinue
-  | LaunchpadCoinCreationStarted
-  | LaunchpadCoinCreationSuccess
-  | LaunchpadCoinCreationFailure
-  | LaunchpadFirstBuyStarted
-  | LaunchpadFirstBuySuccess
-  | LaunchpadFirstBuyFailure
-  | LaunchpadFirstBuyRetry
-  | LaunchpadFormInputChange
-  | LaunchpadFormBack
-  | LaunchpadWalletConnectError
-  | LaunchpadFirstBuyMaxButton
-  | LaunchpadFirstBuyQuoteReceived
-  | LaunchpadBuyModalOpen
-  | LaunchpadBuyModalClose
-  | LaunchpadBuyModalSubmit
-  | LaunchpadBuyModalSuccess
-  | LaunchpadBuyModalFailure
-  | LaunchpadBuyModalChangeCurrency
-  | LaunchpadBuyModalFormChange
-  | LaunchpadBuyModalMaxButton
-  | LaunchpadBuyModalContinue
-  | LaunchpadBuyModalBack
-  | LaunchpadClaimFeesClicked
-  | LaunchpadClaimFeesSuccess
-  | LaunchpadClaimFeesFailure
-  | LaunchpadClaimFeesConnectWallet
-  | LaunchpadClaimFeesSwitchWallet
-  | LaunchpadClaimFeesWalletConnected
-  | LaunchpadClaimVestedCoinsClicked
-  | LaunchpadClaimVestedCoinsSuccess
-  | LaunchpadClaimVestedCoinsFailure
-  | LaunchpadClaimVestedCoinsConnectWallet
-  | LaunchpadClaimVestedCoinsSwitchWallet
-  | LaunchpadClaimVestedCoinsWalletConnected

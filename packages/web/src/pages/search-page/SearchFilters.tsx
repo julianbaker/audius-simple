@@ -27,7 +27,6 @@ const messages = {
   mood: 'Mood',
   moodFilterLabel: 'Search Mood',
   key: 'Key',
-  isPremium: 'Premium',
   isVerified: 'Verified',
   hasDownloads: 'Downloads Available'
 }
@@ -180,20 +179,6 @@ const KeyFilter = () => {
   )
 }
 
-const IsPremiumFilter = () => {
-  const [urlSearchParams] = useSearchParams()
-  const isPremium = urlSearchParams.get('isPremium') === 'true'
-  const updateSearchParams = useUpdateSearchParams('isPremium')
-
-  return (
-    <FilterButton
-      label={messages.isPremium}
-      value={isPremium ? 'true' : null}
-      onClick={() => updateSearchParams(isPremium ? '' : 'true')}
-    />
-  )
-}
-
 const HasDownloadsFilter = () => {
   const [urlSearchParams] = useSearchParams()
   const hasDownloads = urlSearchParams.get('hasDownloads') === 'true'
@@ -231,7 +216,6 @@ export const filters: Record<Filter, () => ReactElement> = {
   mood: MoodFilter,
   key: KeyFilter,
   bpm: BpmFilter,
-  isPremium: IsPremiumFilter,
   hasDownloads: HasDownloadsFilter,
   isVerified: IsVerifiedFilter
 }

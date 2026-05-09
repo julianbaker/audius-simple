@@ -1,10 +1,6 @@
 import { useCallback, useEffect } from 'react'
 
-import {
-  notificationsUserListSelectors,
-  coinLeaderboardUserListSelectors,
-  TOKEN_LISTING_MAP
-} from '@audius/common/store'
+import { notificationsUserListSelectors } from '@audius/common/store'
 import {
   Modal,
   Scrollbar,
@@ -12,7 +8,6 @@ import {
   IconUserGroup,
   IconTrophy,
   IconUserFollowing as IconFollowing,
-  IconCart,
   IconRemix,
   ModalHeader,
   ModalTitle
@@ -21,12 +16,10 @@ import { ChatBlastAudience } from '@audius/sdk'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMatch, useLocation } from 'react-router'
 
-import { CoinLeaderboardUserList } from 'components/user-list/lists/CoinLeaderboardUserList'
 import { FavoritesUserList } from 'components/user-list/lists/FavoritesUserList'
 import { FollowingUserList } from 'components/user-list/lists/FollowingUserList'
 import { MutualsUserList } from 'components/user-list/lists/MutualsUserList'
 import { NotificationsUserList } from 'components/user-list/lists/NotificationsUserList'
-import { PurchasersUserList } from 'components/user-list/lists/PurchasersUserList'
 import { RelatedArtistsUserList } from 'components/user-list/lists/RelatedArtistsUserList'
 import { RemixersUserList } from 'components/user-list/lists/RemixersUserList'
 import { RepostsUserList } from 'components/user-list/lists/RepostsUserList'
@@ -48,9 +41,7 @@ const messages = {
   following: 'Following',
   relatedArtists: 'Related Artists',
   mutuals: 'Mutuals',
-  purchasers: 'Purchasers',
-  remixers: 'Remixers',
-  coinLeaderboard: 'Members'
+  remixers: 'Remixers'
 }
 
 export const UserListModal = () => {
@@ -59,7 +50,6 @@ export const UserListModal = () => {
   const isOpen = useSelector(getIsOpen)
   const location = useLocation()
   const notificationTitle = useSelector(getPageTitle)
-  const mint = useSelector(coinLeaderboardUserListSelectors.getMint)
 
   const onClose = useCallback(() => dispatch(setVisibility(false)), [dispatch])
 
@@ -121,30 +111,12 @@ export const UserListModal = () => {
           Icon: IconUserGroup,
           title: messages.relatedArtists
         }
-      case UserListType.PURCHASER:
-        return {
-          component: <PurchasersUserList />,
-          Icon: IconCart,
-          title: messages.purchasers
-        }
       case UserListType.REMIXER:
         return {
           component: <RemixersUserList />,
           Icon: IconRemix,
           title: messages.remixers
         }
-      case UserListType.COIN_LEADERBOARD: {
-        const ticker =
-          TOKEN_LISTING_MAP[
-            mint?.toUpperCase() as keyof typeof TOKEN_LISTING_MAP
-          ]?.symbol
-        return {
-          component: <CoinLeaderboardUserList />,
-          title: ticker
-            ? `$${ticker} ${messages.coinLeaderboard}`
-            : messages.coinLeaderboard
-        }
-      }
       default:
         return {}
     }

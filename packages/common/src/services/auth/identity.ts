@@ -13,33 +13,6 @@ export type RecoveryInfoParams = {
 
 export type IdentityRequestError = AxiosError
 
-type CreateStripeSessionRequest = {
-  destinationWallet: string
-  amount: string
-  destinationCurrency: 'sol' | 'usdc'
-}
-
-type CreateStripeSessionResponse = {
-  id: string
-  client_secret: string
-  status: string
-}
-
-enum TransactionMetadataType {
-  PURCHASE_SOL_AUDIO_SWAP = 'PURCHASE_SOL_AUDIO_SWAP'
-}
-
-type InAppAudioPurchaseMetadata = {
-  discriminator: TransactionMetadataType.PURCHASE_SOL_AUDIO_SWAP
-  usd: string
-  sol: string
-  audio: string
-  purchaseTransactionId: string
-  setupTransactionId?: string
-  swapTransactionId: string
-  cleanupTransactionId?: string
-}
-
 export type IdentityServiceConfig = {
   identityServiceEndpoint: string
   getAudiusWalletClient: () => Promise<AudiusWalletClient>
@@ -246,52 +219,12 @@ export class IdentityService {
     })
   }
 
-  async createStripeSession(
-    data: CreateStripeSessionRequest
-  ): Promise<CreateStripeSessionResponse> {
-    const headers = await this.getAuthHeaders()
-
-    return await this._makeRequest({
-      url: '/stripe/session',
-      method: 'post',
-      data,
-      headers
-    })
-  }
-
   async recordIP() {
     const headers = await this.getAuthHeaders()
 
     return await this._makeRequest({
       url: '/record_ip',
       method: 'post',
-      headers
-    })
-  }
-
-  async getUserBankTransactionMetadata(transactionId: string) {
-    const headers = await this.getAuthHeaders()
-
-    const metadatas = await this._makeRequest<
-      Array<{ metadata: InAppAudioPurchaseMetadata }>
-    >({
-      url: `/transaction_metadata?id=${transactionId}`,
-      method: 'get',
-      headers
-    })
-    return metadatas[0]?.metadata ?? null
-  }
-
-  async saveUserBankTransactionMetadata(data: {
-    transactionSignature: string
-    metadata: InAppAudioPurchaseMetadata
-  }) {
-    const headers = await this.getAuthHeaders()
-
-    return await this._makeRequest({
-      url: '/transaction_metadata',
-      method: 'post',
-      data,
       headers
     })
   }

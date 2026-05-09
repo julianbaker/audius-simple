@@ -46,7 +46,8 @@ export const userMetadataFromSDK = (input: User): UserMetadata | undefined => {
       'id',
       'cover_photo_legacy',
       'profile_picture_legacy',
-      'artist_coin_badge'
+      'artist_coin_badge',
+      'spl_usdc_payout_wallet'
     ]),
 
     // Conversions
@@ -68,7 +69,6 @@ export const userMetadataFromSDK = (input: User): UserMetadata | undefined => {
     total_balance: input.totalBalance as StringWei,
     user_id: decodedUserId,
     spl_wallet: input.splWallet as SolanaWalletAddress,
-    spl_usdc_payout_wallet: input.splUsdcPayoutWallet as SolanaWalletAddress,
     cover_photo: input.coverPhoto
       ? {
           '640x': input.coverPhoto._640x,
@@ -101,16 +101,7 @@ export const userMetadataFromSDK = (input: User): UserMetadata | undefined => {
     cover_photo_sizes: input.coverPhotoSizes ?? null,
     creator_node_endpoint: input.creatorNodeEndpoint ?? null,
     location: input.location ?? null,
-    profile_picture_sizes: input.profilePictureSizes ?? null,
-
-    // Explicit handling for fan_club_badge to convert nested logoUri to logo_uri
-    fan_club_badge: input.artistCoinBadge
-      ? {
-          mint: input.artistCoinBadge.mint ?? '',
-          logo_uri: input.artistCoinBadge.logoUri ?? '',
-          ticker: input.artistCoinBadge.ticker ?? ''
-        }
-      : null
+    profile_picture_sizes: input.profilePictureSizes ?? null
   }
 
   return newUser
@@ -207,14 +198,9 @@ export const userMetadataToSdk = (
   name: input.name ?? undefined,
   handle: input.handle ?? undefined,
   isDeactivated: input.is_deactivated ?? undefined,
-  // The SDK schema *does* allow null for profile_type, spl_usdc_payout_wallet,
-  // and coin_flair_mint (null is meaningful — e.g. coinFlairMint:null = use
-  // default badge). The OpenAPI-generated `UpdateUserRequestBody` type is
-  // incorrectly non-nullable for these, so spread via pick to bypass TS while
-  // preserving null at runtime.
-  ...camelcaseKeys(
-    pick(input, ['profile_type', 'spl_usdc_payout_wallet', 'coin_flair_mint'])
-  ),
+  // The OpenAPI-generated `UpdateUserRequestBody` type is incorrectly
+  // non-nullable for profile_type, so spread via pick to preserve null at runtime.
+  ...camelcaseKeys(pick(input, ['profile_type'])),
   bio: input.bio ?? undefined,
   website: input.website ?? undefined,
   artistPickTrackId: input.artist_pick_track_id

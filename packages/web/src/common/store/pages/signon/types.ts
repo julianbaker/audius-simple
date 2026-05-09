@@ -24,7 +24,6 @@ export default interface SignOnPageState {
   genres: string[]
   isGuest: boolean
   verified: boolean
-  usingExternalWallet: boolean
   accountReady: boolean
   accountAlreadyExisted: boolean
   linkedSocialOnFirstPage: boolean

@@ -16,18 +16,6 @@ import {
 } from '@audius/common/api'
 import { Client, FrostedSurfaceIntensity, Status } from '@audius/common/models'
 import { StringKeys } from '@audius/common/services'
-import {
-  COIN_DETAIL_BUY_PAGE,
-  CLUB_DETAIL_PAGE,
-  CLUB_DETAIL_BUY_PAGE,
-  CLUB_REDEEM_PAGE,
-  CLUB_EXCLUSIVE_TRACKS_PAGE,
-  CLUB_EXCLUSIVE_TRACKS_MOBILE_ROUTE,
-  CLUB_DETAIL_MOBILE_WEB_ROUTE,
-  EDIT_CLUB_DETAILS_PAGE,
-  CLUBS_CREATE_PAGE,
-  guestRoutes
-} from '@audius/common/src/utils/route'
 import { themeSelectors } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import cn from 'classnames'
@@ -54,7 +42,6 @@ import AppRedirectListener from 'components/app-redirect-popover/AppRedirectList
 import { AppBannerWrapper } from 'components/banner/AppBannerWrapper'
 import { DownloadAppBanner } from 'components/banner/DownloadAppBanner'
 import { UpdateAppBanner } from 'components/banner/UpdateAppBanner'
-import { Web3ErrorBanner } from 'components/banner/Web3ErrorBanner'
 import { ChatListener } from 'components/chat-listener/ChatListener'
 import CookieBanner from 'components/cookie-banner/CookieBanner'
 import { DevModeMananger } from 'components/dev-mode-manager/DevModeManager'
@@ -64,11 +51,8 @@ import TopLevelPage from 'components/nav/mobile/TopLevelPage'
 import Notice from 'components/notice/Notice'
 import { NotificationPage } from 'components/notification'
 import PlayBarProvider from 'components/play-bar/PlayBarProvider'
-import { RewardClaimedToast } from 'components/reward-claimed-toast/RewardClaimedToast'
-import { USDCBalanceFetcher } from 'components/usdc-balance-fetcher/USDCBalanceFetcher'
 import { useEnvironment } from 'hooks/useEnvironment'
 import { MAIN_CONTENT_ID, MainContentContext } from 'pages/MainContentContext'
-import { TableType } from 'pages/pay-and-earn-page/types'
 import { SubPage } from 'pages/settings-page/components/mobile/SettingsPage'
 import { remoteConfigInstance } from 'services/remote-config/remote-config-instance'
 import { SsrContext } from 'ssr/SsrContext'
@@ -82,41 +66,7 @@ const { getFrostedSurfaceIntensity } = themeSelectors
 const TrendingGenreSelectionPage = lazy(
   () => import('components/trending-genre-selection/TrendingGenreSelectionPage')
 )
-// Lazy load heavy page components for code-splitting
-const FanClubsExplorePage = lazy(() =>
-  import('pages/fan-clubs-explore-page/FanClubsExplorePage').then((m) => ({
-    default: m.FanClubsExplorePage
-  }))
-)
-const LaunchpadPage = lazy(() =>
-  import('pages/fan-clubs-launchpad-page').then((m) => ({
-    default: m.LaunchpadPage
-  }))
-)
-const MobileFanClubsSortPage = lazy(() =>
-  import('pages/fan-clubs-sort-page/MobileFanClubsSortPage').then((m) => ({
-    default: m.MobileFanClubsSortPage
-  }))
-)
-const CashPage = lazy(() =>
-  import('pages/cash-page').then((m) => ({ default: m.CashPage }))
-)
 const ChatPage = lazy(() => import('pages/chat-page'))
-const FanClubDetailPage = lazy(() =>
-  import('pages/fan-club-detail-page/FanClubDetailPage').then((m) => ({
-    default: m.FanClubDetailPage
-  }))
-)
-const ArtistFanClubDetailsPage = lazy(() =>
-  import(
-    'pages/fan-club-detail-page/components/mobile/ArtistFanClubDetailsPage'
-  ).then((m) => ({ default: m.ArtistFanClubDetailsPage }))
-)
-const CoinRedeemPage = lazy(() =>
-  import('pages/coin-redeem-page/CoinRedeemPage').then((m) => ({
-    default: m.CoinRedeemPage
-  }))
-)
 const CollectionPage = lazy(
   () => import('pages/collection-page/CollectionPage')
 )
@@ -136,11 +86,6 @@ const DeactivateAccountPage = lazy(() =>
 const DevTools = lazy(() => import('pages/dev-tools/DevTools'))
 const SolanaToolsPage = lazy(() => import('pages/dev-tools/SolanaToolsPage'))
 const UserIdParserPage = lazy(() => import('pages/dev-tools/UserIdParserPage'))
-const EditCoinDetailsPage = lazy(() =>
-  import('pages/edit-coin-details-page/EditCoinDetailsPage').then((m) => ({
-    default: m.EditCoinDetailsPage
-  }))
-)
 const EditCollectionPage = lazy(() =>
   import('pages/edit-collection-page').then((m) => ({
     default: m.EditCollectionPage
@@ -154,14 +99,10 @@ const FbSharePage = lazy(() =>
   }))
 )
 const FeedPage = lazy(() => import('pages/feed-page/FeedPage'))
+const HomePage = lazy(() => import('pages/home-page/HomePage'))
 const FollowersPage = lazy(() => import('pages/followers-page/FollowersPage'))
 const FollowingPage = lazy(() => import('pages/following-page/FollowingPage'))
 const HistoryPage = lazy(() => import('pages/history-page/HistoryPage'))
-const LeaderboardPage = lazy(() =>
-  import('pages/leaderboard-page/LeaderboardPage').then((m) => ({
-    default: m.LeaderboardPage
-  }))
-)
 const LibraryPage = lazy(() => import('pages/library-page/LibraryPage'))
 const NotFoundPage = lazy(() =>
   import('pages/not-found-page/NotFoundPage').then((m) => ({
@@ -171,11 +112,6 @@ const NotFoundPage = lazy(() =>
 const NotificationUsersPage = lazy(() =>
   import('pages/notification-users-page/NotificationUsersPage').then((m) => ({
     default: m.NotificationUsersPage
-  }))
-)
-const PayAndEarnPage = lazy(() =>
-  import('pages/pay-and-earn-page/PayAndEarnPage').then((m) => ({
-    default: m.PayAndEarnPage
   }))
 )
 const PickWinnersPage = lazy(() =>
@@ -193,11 +129,6 @@ const RepostsPage = lazy(() => import('pages/reposts-page/RepostsPage'))
 const RequiresUpdate = lazy(() =>
   import('pages/requires-update/RequiresUpdate').then((m) => ({
     default: m.RequiresUpdate
-  }))
-)
-const RewardsPage = lazy(() =>
-  import('pages/rewards-page/RewardsPage').then((m) => ({
-    default: m.RewardsPage
   }))
 )
 const ExplorePage = lazy(() =>
@@ -219,9 +150,6 @@ const TrackCommentsPage = lazy(() =>
 const TrackPage = lazy(() => import('pages/track-page/TrackPage'))
 const TrendingPage = lazy(() => import('pages/trending-page/TrendingPage'))
 const Visualizer = lazy(() => import('pages/visualizer/Visualizer'))
-const WalletPage = lazy(() =>
-  import('pages/wallet-page').then((m) => ({ default: m.WalletPage }))
-)
 
 const {
   FEED_PAGE,
@@ -237,14 +165,12 @@ const {
   LIBRARY_PLAYLISTS_PAGE,
   HISTORY_PAGE,
   DASHBOARD_PAGE,
-  COIN_DETAIL_PAGE,
-  COIN_REDEEM_PAGE,
-  REWARDS_PAGE,
   UPLOAD_PAGE,
   UPLOAD_ALBUM_PAGE,
   UPLOAD_PLAYLIST_PAGE,
   SETTINGS_PAGE,
   HOME_PAGE,
+  HOMEPAGE_PAGE,
   NOT_FOUND_PAGE,
   SEARCH_PAGE,
   PLAYLIST_PAGE,
@@ -259,6 +185,7 @@ const {
   HOST_REMIX_CONTEST_ROOT_PAGE,
   PROFILE_PAGE,
   authenticatedRoutes,
+  guestRoutes,
   EMPTY_PAGE,
   REPOSTING_USERS_ROUTE,
   FAVORITING_USERS_ROUTE,
@@ -270,8 +197,6 @@ const {
   ABOUT_SETTINGS_PAGE,
   FOLLOWING_USERS_ROUTE,
   FOLLOWERS_USERS_ROUTE,
-  LEADERBOARD_USERS_ROUTE,
-  COIN_DETAIL_MOBILE_WEB_ROUTE,
   TRENDING_GENRES,
   APP_REDIRECT,
   TRACK_ID_PAGE,
@@ -283,8 +208,6 @@ const {
   PROFILE_PAGE_REPOSTS,
   PROFILE_PAGE_CONTESTS,
   TRENDING_UNDERGROUND_PAGE,
-  COIN_EXCLUSIVE_TRACKS_PAGE,
-  COIN_EXCLUSIVE_TRACKS_MOBILE_ROUTE,
   CHECK_PAGE,
   TRENDING_PLAYLISTS_PAGE,
   TRENDING_PLAYLISTS_PAGE_LEGACY,
@@ -292,10 +215,6 @@ const {
   publicSiteRoutes,
   CHAT_PAGE,
   PROFILE_PAGE_COMMENTS,
-  PAYMENTS_PAGE,
-  WITHDRAWALS_PAGE,
-  PURCHASES_PAGE,
-  SALES_PAGE,
   AUTHORIZED_APPS_SETTINGS_PAGE,
   ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE,
   ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE,
@@ -304,17 +223,44 @@ const {
   SEARCH_BASE_ROUTE,
   EDIT_PLAYLIST_PAGE,
   EDIT_ALBUM_PAGE,
-  AIRDROP_PAGE,
-  WALLET_PAGE,
-  CASH_PAGE,
-  COINS_CREATE_PAGE,
-  COINS_EXPLORE_PAGE,
-  CLUBS_EXPLORE_PAGE,
-  EDIT_COIN_DETAILS_PAGE,
   DEV_TOOLS_PAGE,
   SOLANA_TOOLS_PAGE,
   USER_ID_PARSER_PAGE
 } = route
+
+const REMOVED_CRYPTO_ROUTES = [
+  '/audio',
+  '/payments',
+  '/payments/withdrawals',
+  '/payments/purchases',
+  '/payments/sales',
+  '/wallet',
+  '/wallet/audio',
+  '/wallet/guide',
+  '/cash',
+  '/rewards',
+  '/rewards/airdrop',
+  '/coins',
+  '/clubs',
+  '/coins/sort',
+  '/clubs/sort',
+  '/coins/create',
+  '/clubs/create',
+  '/coins/:ticker',
+  '/clubs/:ticker',
+  '/coins/:ticker/buy',
+  '/clubs/:ticker/buy',
+  '/coins/:ticker/redeem/:code?',
+  '/clubs/:ticker/redeem/:code?',
+  '/coins/:ticker/exclusive-tracks',
+  '/clubs/:ticker/exclusive-tracks',
+  '/coins/:ticker/exclusive-tracks/mobile',
+  '/clubs/:ticker/exclusive-tracks/mobile',
+  '/coins/:ticker/details',
+  '/clubs/:ticker/details',
+  '/coins/:ticker/edit',
+  '/clubs/:ticker/edit'
+] as const
 
 // TODO: do we need to lazy load edit?
 const EditTrackPage = lazy(() => import('pages/edit-page'))
@@ -387,49 +333,15 @@ const SearchPageRoute = ({ validSearchCategories }: SearchPageRouteProps) => {
   return <ExplorePage />
 }
 
-type FanClubDetailPageRouteProps = {
-  mainContentRef: React.RefObject<HTMLDivElement>
-}
-
-const FanClubDetailPageRoute = ({
-  mainContentRef
-}: FanClubDetailPageRouteProps) => {
-  const params = useParams<{ ticker?: string }>()
-  const location = useLocation()
-  const { ticker } = params
-
-  if (ticker && ticker !== ticker.toUpperCase()) {
-    // Preserve the current path prefix (/clubs or /coins)
-    const isClubsRoute = location.pathname.startsWith('/clubs')
-    const detailPage = isClubsRoute ? CLUB_DETAIL_PAGE : COIN_DETAIL_PAGE
-    return (
-      <Navigate
-        to={{
-          pathname: detailPage.replace(':ticker', ticker.toUpperCase()),
-          search: location.search,
-          hash: location.hash
-        }}
-        replace
-      />
-    )
-  }
-  return <FanClubDetailPage />
-}
-
-const CoinExclusiveTracksLegacyRedirect = () => {
-  const params = useParams<{ ticker?: string }>()
-  const location = useLocation()
-  const ticker = (params.ticker ?? '').toUpperCase()
-  const isClubsRoute = location.pathname.startsWith('/clubs')
-  const detailPage = isClubsRoute ? CLUB_DETAIL_PAGE : COIN_DETAIL_PAGE
-  return <Navigate to={generatePath(detailPage, { ticker })} replace />
-}
-
 type HomePageRedirectProps = {
   isGuestAccount: boolean
+  target?: string
 }
 
-const HomePageRedirect = ({ isGuestAccount }: HomePageRedirectProps) => {
+const HomePageRedirect = ({
+  isGuestAccount,
+  target = FEED_PAGE
+}: HomePageRedirectProps) => {
   const location = useLocation()
   const currentPath = getPathname(location)
   const to = {
@@ -437,7 +349,7 @@ const HomePageRedirect = ({ isGuestAccount }: HomePageRedirectProps) => {
       currentPath === HOME_PAGE
         ? isGuestAccount
           ? LIBRARY_PAGE
-          : FEED_PAGE
+          : target
         : currentPath,
     search: includeSearch(location.search) ? location.search : ''
   }
@@ -751,7 +663,6 @@ const WebPlayer = (props: WebPlayerProps) => {
         <DownloadAppBanner />
         {/* Re-enable for ToS updates */}
         {/* <TermsOfServiceUpdateBanner /> */}
-        <Web3ErrorBanner />
         {showWebUpdateBanner ? (
           <UpdateAppBanner
             onAccept={acceptWebUpdate}
@@ -760,7 +671,6 @@ const WebPlayer = (props: WebPlayerProps) => {
         ) : null}
       </AppBannerWrapper>
       <ChatListener />
-      <USDCBalanceFetcher />
       <div
         id='webPlayer'
         className={cn(styles.app, { [styles.mobileApp]: isMobile })}
@@ -924,91 +834,9 @@ const WebPlayer = (props: WebPlayerProps) => {
                     element={<Navigate to={TRENDING_PAGE} replace />}
                   />
                 )}
-                <Route
-                  path={WITHDRAWALS_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.WITHDRAWALS} />}
-                />
-                <Route
-                  path={PURCHASES_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.PURCHASES} />}
-                />
-                <Route
-                  path={SALES_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.SALES} />}
-                />
-                <Route
-                  path={COINS_EXPLORE_PAGE}
-                  element={<Navigate to={CLUBS_EXPLORE_PAGE} replace />}
-                />
-                <Route
-                  path={CLUBS_EXPLORE_PAGE}
-                  element={<FanClubsExplorePage />}
-                />
-                <Route
-                  path='/coins/sort'
-                  element={<MobileFanClubsSortPage />}
-                />
-                <Route
-                  path='/clubs/sort'
-                  element={<MobileFanClubsSortPage />}
-                />
-                <Route path={COINS_CREATE_PAGE} element={<LaunchpadPage />} />
-                <Route path={CLUBS_CREATE_PAGE} element={<LaunchpadPage />} />
-                <Route
-                  path={COIN_DETAIL_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={CLUB_DETAIL_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={COIN_DETAIL_BUY_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={CLUB_DETAIL_BUY_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route path={COIN_REDEEM_PAGE} element={<CoinRedeemPage />} />
-                <Route path={CLUB_REDEEM_PAGE} element={<CoinRedeemPage />} />
-                <Route
-                  path={COIN_EXCLUSIVE_TRACKS_PAGE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={CLUB_EXCLUSIVE_TRACKS_PAGE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={COIN_EXCLUSIVE_TRACKS_MOBILE_ROUTE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={CLUB_EXCLUSIVE_TRACKS_MOBILE_ROUTE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={EDIT_COIN_DETAILS_PAGE}
-                  element={<EditCoinDetailsPage />}
-                />
-                <Route
-                  path={EDIT_CLUB_DETAILS_PAGE}
-                  element={<EditCoinDetailsPage />}
-                />
-                <Route path={PAYMENTS_PAGE} element={<WalletPage />} />
-                <Route path={WALLET_PAGE} element={<WalletPage />} />
-                <Route path={CASH_PAGE} element={<CashPage />} />
-                <Route path={REWARDS_PAGE} element={<RewardsPage />} />
-                <Route path={AIRDROP_PAGE} element={<RewardsPage />} />
+                {REMOVED_CRYPTO_ROUTES.map((path) => (
+                  <Route key={path} path={path} element={<NotFoundPage />} />
+                ))}
 
                 <Route path={CHAT_PAGE} element={<ChatPage />} />
                 <Route
@@ -1228,18 +1056,7 @@ const WebPlayer = (props: WebPlayerProps) => {
                       path={FOLLOWERS_USERS_ROUTE}
                       element={<FollowersPage />}
                     />
-                    <Route
-                      path={LEADERBOARD_USERS_ROUTE}
-                      element={<LeaderboardPage />}
-                    />
-                    <Route
-                      path={COIN_DETAIL_MOBILE_WEB_ROUTE}
-                      element={<ArtistFanClubDetailsPage />}
-                    />
-                    <Route
-                      path={CLUB_DETAIL_MOBILE_WEB_ROUTE}
-                      element={<ArtistFanClubDetailsPage />}
-                    />
+                    <Route path='/leaderboard' element={<NotFoundPage />} />
                     <Route path={EMPTY_PAGE} element={<EmptyPage />} />
                   </>
                 ) : (
@@ -1260,18 +1077,7 @@ const WebPlayer = (props: WebPlayerProps) => {
                       path={FOLLOWERS_USERS_ROUTE}
                       element={<Navigate to={TRENDING_PAGE} replace />}
                     />
-                    <Route
-                      path={LEADERBOARD_USERS_ROUTE}
-                      element={<Navigate to={TRENDING_PAGE} replace />}
-                    />
-                    <Route
-                      path={COIN_DETAIL_MOBILE_WEB_ROUTE}
-                      element={<Navigate to={TRENDING_PAGE} replace />}
-                    />
-                    <Route
-                      path={CLUB_DETAIL_MOBILE_WEB_ROUTE}
-                      element={<Navigate to={TRENDING_PAGE} replace />}
-                    />
+                    <Route path='/leaderboard' element={<NotFoundPage />} />
                     <Route
                       path={EMPTY_PAGE}
                       element={<Navigate to={TRENDING_PAGE} replace />}
@@ -1282,9 +1088,15 @@ const WebPlayer = (props: WebPlayerProps) => {
                   path={PROFILE_PAGE}
                   element={<ProfilePageRoute mainContentRef={mainContentRef} />}
                 />
+                <Route path={HOMEPAGE_PAGE} element={<HomePage />} />
                 <Route
                   path={HOME_PAGE}
-                  element={<HomePageRedirect isGuestAccount={isGuestAccount} />}
+                  element={
+                    <HomePageRedirect
+                      isGuestAccount={isGuestAccount}
+                      target={HOMEPAGE_PAGE}
+                    />
+                  }
                 />
               </AnimatedSwitch>
             ) : (
@@ -1386,83 +1198,9 @@ const WebPlayer = (props: WebPlayerProps) => {
                   />
                 ) : null}
                 <Route path={DASHBOARD_PAGE} element={<DashboardPage />} />
-                <Route
-                  path={WITHDRAWALS_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.WITHDRAWALS} />}
-                />
-                <Route
-                  path={PURCHASES_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.PURCHASES} />}
-                />
-                <Route
-                  path={SALES_PAGE}
-                  element={<PayAndEarnPage tableView={TableType.SALES} />}
-                />
-                <Route
-                  path={COINS_EXPLORE_PAGE}
-                  element={<Navigate to={CLUBS_EXPLORE_PAGE} replace />}
-                />
-                <Route
-                  path={CLUBS_EXPLORE_PAGE}
-                  element={<FanClubsExplorePage />}
-                />
-                <Route path={COINS_CREATE_PAGE} element={<LaunchpadPage />} />
-                <Route path={CLUBS_CREATE_PAGE} element={<LaunchpadPage />} />
-                <Route
-                  path={COIN_DETAIL_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={CLUB_DETAIL_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={COIN_DETAIL_BUY_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route
-                  path={CLUB_DETAIL_BUY_PAGE}
-                  element={
-                    <FanClubDetailPageRoute mainContentRef={mainContentRef} />
-                  }
-                />
-                <Route path={COIN_REDEEM_PAGE} element={<CoinRedeemPage />} />
-                <Route path={CLUB_REDEEM_PAGE} element={<CoinRedeemPage />} />
-                <Route
-                  path={COIN_EXCLUSIVE_TRACKS_PAGE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={CLUB_EXCLUSIVE_TRACKS_PAGE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={COIN_EXCLUSIVE_TRACKS_MOBILE_ROUTE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={CLUB_EXCLUSIVE_TRACKS_MOBILE_ROUTE}
-                  element={<CoinExclusiveTracksLegacyRedirect />}
-                />
-                <Route
-                  path={EDIT_COIN_DETAILS_PAGE}
-                  element={<EditCoinDetailsPage />}
-                />
-                <Route
-                  path={EDIT_CLUB_DETAILS_PAGE}
-                  element={<EditCoinDetailsPage />}
-                />
-                <Route path={PAYMENTS_PAGE} element={<WalletPage />} />
-                <Route path={WALLET_PAGE} element={<WalletPage />} />
-                <Route path={CASH_PAGE} element={<CashPage />} />
-                <Route path={REWARDS_PAGE} element={<RewardsPage />} />
-                <Route path={AIRDROP_PAGE} element={<RewardsPage />} />
+                {REMOVED_CRYPTO_ROUTES.map((path) => (
+                  <Route key={path} path={path} element={<NotFoundPage />} />
+                ))}
                 <Route path={CHAT_PAGE} element={<ChatPage />} />
                 <Route
                   path={DEACTIVATE_PAGE}
@@ -1612,18 +1350,7 @@ const WebPlayer = (props: WebPlayerProps) => {
                   path={FOLLOWERS_USERS_ROUTE}
                   element={<Navigate to={TRENDING_PAGE} replace />}
                 />
-                <Route
-                  path={LEADERBOARD_USERS_ROUTE}
-                  element={<Navigate to={TRENDING_PAGE} replace />}
-                />
-                <Route
-                  path={COIN_DETAIL_MOBILE_WEB_ROUTE}
-                  element={<Navigate to={TRENDING_PAGE} replace />}
-                />
-                <Route
-                  path={CLUB_DETAIL_MOBILE_WEB_ROUTE}
-                  element={<Navigate to={TRENDING_PAGE} replace />}
-                />
+                <Route path='/leaderboard' element={<NotFoundPage />} />
                 <Route
                   path={EMPTY_PAGE}
                   element={<Navigate to={TRENDING_PAGE} replace />}
@@ -1632,9 +1359,15 @@ const WebPlayer = (props: WebPlayerProps) => {
                   path={PROFILE_PAGE}
                   element={<ProfilePageRoute mainContentRef={mainContentRef} />}
                 />
+                <Route path={HOMEPAGE_PAGE} element={<HomePage />} />
                 <Route
                   path={HOME_PAGE}
-                  element={<HomePageRedirect isGuestAccount={isGuestAccount} />}
+                  element={
+                    <HomePageRedirect
+                      isGuestAccount={isGuestAccount}
+                      target={HOMEPAGE_PAGE}
+                    />
+                  }
                 />
               </Routes>
             )}
@@ -1646,8 +1379,6 @@ const WebPlayer = (props: WebPlayerProps) => {
           <Modals />
         </Suspense>
         <ConnectedMusicConfetti />
-
-        <RewardClaimedToast />
         {!isMobile ? <Visualizer /> : null}
         {!isMobile ? <DevModeMananger /> : null}
       </div>

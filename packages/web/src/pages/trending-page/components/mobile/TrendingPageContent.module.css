@@ -76,7 +76,3 @@
   /* Clear the fixed filter row (header 92px + filter row ~56px) */
   margin-top: 56px;
 }
-
-.rewardsContainer {
-  margin: 12px 0px 8px;
-}

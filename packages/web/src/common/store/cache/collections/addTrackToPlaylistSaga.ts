@@ -8,18 +8,11 @@ import {
   queryTracks,
   updateCollectionData
 } from '@audius/common/api'
-import {
-  Name,
-  Kind,
-  Collection,
-  ID,
-  ChallengeName
-} from '@audius/common/models'
+import { Name, Kind, Collection, ID } from '@audius/common/models'
 import {
   cacheCollectionsActions,
   cacheActions,
   PlaylistOperations,
-  audioRewardsPageActions,
   toastActions,
   getContext,
   confirmerActions,
@@ -43,8 +36,6 @@ import {
   isPlaylistConfirmerDone
 } from './utils/hasPendingPlaylistUpdates'
 import { optimisticUpdateCollection } from './utils/optimisticUpdateCollection'
-
-const { setOptimisticChallengeCompleted } = audioRewardsPageActions
 
 const { toast } = toastActions
 
@@ -142,20 +133,6 @@ function* addTrackToPlaylistAsync(action: AddTrackToPlaylistAction) {
     action.trackId,
     count,
     updatedPlaylist
-  )
-
-  yield* put(
-    setOptimisticChallengeCompleted({
-      challengeId: 'first-playlist',
-      specifier: userId.toString()
-    })
-  )
-
-  yield* put(
-    setOptimisticChallengeCompleted({
-      challengeId: ChallengeName.FirstPlaylist,
-      specifier: Id.parse(userId)
-    })
   )
 
   const event = make(Name.PLAYLIST_ADD, {

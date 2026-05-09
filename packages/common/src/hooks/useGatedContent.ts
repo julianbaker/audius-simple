@@ -3,7 +3,6 @@ import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  useFanClub,
   useCollection,
   useCurrentAccount,
   useTrack,
@@ -15,16 +14,11 @@ import { ID } from '~/models/Identifiers'
 import {
   AccessConditions,
   Track,
-  isContentFollowGated,
-  isContentTokenGated,
-  isContentUSDCPurchaseGated
+  isContentFollowGated
 } from '~/models/Track'
-import { FeatureFlags } from '~/services/remote-config'
 import { gatedContentSelectors } from '~/store/gated-content'
 import { isContentPartialTrack } from '~/utils/contentTypeUtils'
 import { Nullable, removeNullable } from '~/utils/typeUtils'
-
-import { useFeatureFlag } from './useFeatureFlag'
 
 const { getLockedContentId } = gatedContentSelectors
 
@@ -90,16 +84,11 @@ export const useGatedContentAccess = (
 
     const { stream, download } = content.access ?? {}
 
-    const isPreviewable =
-      isContentUSDCPurchaseGated(content.stream_conditions) &&
-      isTrack &&
-      !!content?.preview_cid
-
     return {
       isFetchingNFTAccess: false,
       hasStreamAccess: !isStreamGated || !!stream,
       hasDownloadAccess: !isDownloadGated || !!download,
-      isPreviewable
+      isPreviewable: false
     }
   }, [content])
 }
@@ -135,17 +124,13 @@ export const useStreamConditionsEntity = (
   const followUserId = isContentFollowGated(streamConditions)
     ? streamConditions?.follow_user_id
     : null
-  const tokenMint = isContentTokenGated(streamConditions)
-    ? streamConditions?.token_gate.token_mint
-    : null
 
   const { byId: usersById } = useUsers([followUserId].filter(removeNullable))
   const followee = followUserId ? usersById[followUserId] : null
-  const { data: token } = useFanClub(tokenMint)
 
   return {
     followee,
-    token
+    token: null
   }
 }
 
@@ -158,9 +143,6 @@ export const useLockedContent = () => {
 }
 
 export const useDownloadableContentAccess = ({ trackId }: { trackId: ID }) => {
-  const { isEnabled: isUsdcPurchasesEnabled } = useFeatureFlag(
-    FeatureFlags.USDC_PURCHASES
-  )
   const { data: track } = useTrack(trackId, {
     select: (track) => ({
       owner_id: track?.owner_id,
@@ -173,16 +155,8 @@ export const useDownloadableContentAccess = ({ trackId }: { trackId: ID }) => {
   const { data: currentAccount, isPending } = useCurrentAccount()
   const isOwner = track?.owner_id === currentAccount?.userId
 
-  const price = isContentUSDCPurchaseGated(track?.download_conditions)
-    ? track?.download_conditions.usdc_purchase.price
-    : undefined
-
   if (isPending) {
     return {
-      price,
-      shouldDisplayPremiumDownloadLocked: false,
-      shouldDisplayPremiumDownloadUnlocked: false,
-      shouldDisplayOwnerPremiumDownloads: false,
       shouldDisplayDownloadFollowGated: false
     }
   }
@@ -196,27 +170,8 @@ export const useDownloadableContentAccess = ({ trackId }: { trackId: ID }) => {
     isContentFollowGated(track?.download_conditions) &&
     track?.access?.download === false &&
     !isOwner
-  const isOnlyDownloadableContentPurchaseGated =
-    isDownloadGatedOnly &&
-    isContentUSDCPurchaseGated(track?.download_conditions)
 
   return {
-    price,
-    shouldDisplayPremiumDownloadLocked:
-      isOnlyDownloadableContentPurchaseGated &&
-      track?.access?.download === false &&
-      !isOwner &&
-      isUsdcPurchasesEnabled,
-    shouldDisplayPremiumDownloadUnlocked:
-      isOnlyDownloadableContentPurchaseGated &&
-      track?.access?.download === true &&
-      !isOwner &&
-      isUsdcPurchasesEnabled,
-    shouldDisplayOwnerPremiumDownloads:
-      isOnlyDownloadableContentPurchaseGated &&
-      track?.access?.download === true &&
-      isOwner &&
-      isUsdcPurchasesEnabled,
     shouldDisplayDownloadFollowGated
   }
 }

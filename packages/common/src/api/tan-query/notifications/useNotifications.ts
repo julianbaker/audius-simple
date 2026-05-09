@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
 import { Id, type NotificationsResponse } from '@audius/sdk'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
@@ -6,10 +6,7 @@ import { usePrevious } from 'react-use'
 
 import { notificationFromSDK, transformAndCleanList } from '~/adapters'
 import { useQueryContext } from '~/api/tan-query/utils/QueryContext'
-import { useRemoteVar } from '~/hooks'
-import { ChallengeRewardID } from '~/models'
 import { ID } from '~/models/Identifiers'
-import { StringKeys } from '~/services'
 import {
   Entity,
   NotificationType,
@@ -103,10 +100,7 @@ const collectEntityIds = (notifications: Notification[]): EntityIds => {
     ) {
       trackIds.add(notification.entityId)
     }
-    if (
-      type === NotificationType.AddTrackToPlaylist ||
-      type === NotificationType.TrackAddedToPurchasedAlbum
-    ) {
+    if (type === NotificationType.AddTrackToPlaylist) {
       trackIds.add(notification.trackId)
       userIds.add(notification.playlistOwnerId)
       collectionIds.add(notification.playlistId)
@@ -114,17 +108,6 @@ const collectEntityIds = (notifications: Notification[]): EntityIds => {
     if (type === NotificationType.Tastemaker) {
       userIds.add(notification.userId)
       trackIds.add(notification.entityId)
-    }
-    if (
-      type === NotificationType.USDCPurchaseBuyer ||
-      type === NotificationType.USDCPurchaseSeller
-    ) {
-      notification.userIds.forEach((id) => userIds.add(id))
-      if (notification.entityType === Entity.Track) {
-        trackIds.add(notification.entityId)
-      } else if (notification.entityType === Entity.Album) {
-        collectionIds.add(notification.entityId)
-      }
     }
     if (
       type === NotificationType.RequestManager ||
@@ -148,9 +131,6 @@ const collectEntityIds = (notifications: Notification[]): EntityIds => {
     if (type === NotificationType.RemixCreate) {
       trackIds.add(notification.parentTrackId)
       trackIds.add(notification.childTrackId)
-    }
-    if (type === NotificationType.FanClubTextPost) {
-      userIds.add(notification.entityUserId)
     }
   })
 
@@ -186,17 +166,6 @@ export const useNotifications = (options?: QueryOptions) => {
   const { data: unreadCount } = useNotificationUnreadCount()
   const prevUnreadCount = usePrevious(unreadCount)
 
-  // Get whitelisted challenge reward IDs from remote config
-  const challengeRewardIdsString = useRemoteVar(StringKeys.CHALLENGE_REWARD_IDS)
-  const whitelistedChallengeIds = useMemo(() => {
-    if (!challengeRewardIdsString) return new Set<ChallengeRewardID>()
-    return new Set(
-      challengeRewardIdsString
-        .split(',')
-        .map((id) => id.trim()) as ChallengeRewardID[]
-    )
-  }, [challengeRewardIdsString])
-
   const query = useInfiniteQuery({
     queryKey: getNotificationsQueryKey({
       currentUserId,
@@ -227,13 +196,7 @@ export const useNotifications = (options?: QueryOptions) => {
         notificationFromSDK
       ) as Notification[]
 
-      // Filter out challenge reward notifications that aren't whitelisted
-      return notifications.filter((notification) => {
-        if (notification.type === NotificationType.ChallengeReward) {
-          return whitelistedChallengeIds.has(notification.challengeId)
-        }
-        return true
-      })
+      return notifications
     },
     getNextPageParam: (lastPage: Notification[]) => {
       const lastNotification = lastPage[lastPage.length - 1]

@@ -7,8 +7,6 @@ import { fullCollectionPage, fullProfilePage, fullTrackPage } from 'utils/route'
 
 // Image URLs - default OG uses the Audius logo on black from og.audius.co
 export const DEFAULT_IMAGE_URL = 'https://og.audius.co/default'
-export const AUDIO_REWARDS_IMAGE_URL =
-  'https://download.audius.co/static-resources/audio-rewards.png'
 export const SIGNUP_REF_IMAGE_URL =
   'https://download.audius.co/static-resources/signup_referral.png'
 
@@ -175,26 +173,6 @@ export const getUploadContext = () => ({
 })
 
 /**
- * $AUDIO token page meta tag context
- */
-export const getAudioContext = () => ({
-  title: '$AUDIO & Rewards',
-  description: 'Earn $AUDIO tokens while using the app!',
-  image: AUDIO_REWARDS_IMAGE_URL,
-  thumbnail: false
-})
-
-/**
- * Rewards page meta tag context
- */
-export const getRewardsContext = () => ({
-  title: '$AUDIO & Rewards',
-  description: 'Earn $AUDIO tokens while using the app!',
-  image: AUDIO_REWARDS_IMAGE_URL,
-  thumbnail: false
-})
-
-/**
  * Signup page meta tag context
  */
 export const getSignupContext = () => ({
@@ -211,7 +189,7 @@ export const getSignupRefContext = (handle?: string) => ({
   title: handle
     ? `Invite to join Audius from @${handle}!`
     : 'Invite to join Audius',
-  description: 'Sign up for Audius to earn $AUDIO tokens while using the app!',
+  description: 'Sign up for Audius to listen, upload, and follow artists.',
   image: SIGNUP_REF_IMAGE_URL,
   thumbnail: false
 })
@@ -519,62 +497,5 @@ export const getCollectionPageContext = ({
     entityType: 'collection' as const,
     hashId,
     thumbnail: false
-  }
-}
-
-/**
- * Coins page meta tag context
- */
-export const getCoinsPageContext = () => {
-  const pageTitle = 'Discover Fan Clubs • Audius'
-  const pageDescription =
-    'Explore Artist Fan Clubs on Audius. Support your favorite artists, unlock exclusive perks, and become part of their community.'
-  const canonicalUrl = 'https://audius.co/coins'
-
-  return {
-    title: pageTitle,
-    description: pageDescription,
-    ogDescription: pageDescription,
-    canonicalUrl,
-    image: DEFAULT_IMAGE_URL,
-    thumbnail: true
-  }
-}
-
-/**
- * Wallet page meta tag context
- */
-export const getWalletPageContext = () => {
-  const pageTitle = 'Wallet'
-  const pageDescription =
-    'Manage your Audius wallet. View your cash balance, fan clubs, and linked wallets all in one place.'
-  const canonicalUrl = 'https://audius.co/wallet'
-
-  return {
-    title: pageTitle,
-    description: pageDescription,
-    ogDescription: pageDescription,
-    canonicalUrl,
-    image: DEFAULT_IMAGE_URL,
-    thumbnail: true
-  }
-}
-
-/**
- * Cash page meta tag context
- */
-export const getCashPageContext = () => {
-  const pageTitle = 'Cash'
-  const pageDescription =
-    'Manage your Audius Cash. View your balance, transaction history, and cash-enabled features.'
-  const canonicalUrl = 'https://audius.co/cash'
-
-  return {
-    title: pageTitle,
-    description: pageDescription,
-    ogDescription: pageDescription,
-    canonicalUrl,
-    image: DEFAULT_IMAGE_URL,
-    thumbnail: true
   }
 }

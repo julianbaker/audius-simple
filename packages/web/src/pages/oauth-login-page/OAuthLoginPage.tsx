@@ -37,13 +37,11 @@ import { fingerprintClient } from 'services/fingerprint'
 import { reportToSentry } from 'store/errors/reportToSentry'
 
 import styles from './OAuthLoginPage.module.css'
-import { ApproveTransactionScreen } from './components/ApproveTransactionScreen'
 import { CTAButton } from './components/CTAButton'
 import { ContentWrapper } from './components/ContentWrapper'
 import { PermissionsSection } from './components/PermissionsSection'
 import { useOAuthSetup } from './hooks'
 import { messages } from './messages'
-import { DashboardWalletTx } from './utils'
 
 const { signOut } = signOutActions
 
@@ -66,10 +64,6 @@ export const OAuthLoginPage = () => {
   const [generalSubmitError, setGeneralSubmitError] = useState<string | null>(
     null
   )
-  const [metaMaskTransactionStatus, setMetaMaskTransactionStatus] = useState<
-    null | 'pending' | 'approved'
-  >(null) // Only applicable when tx = connect_dashboard_wallet
-
   const clearErrors = () => {
     setGeneralSubmitError(null)
     setSignInError(null)
@@ -87,11 +81,6 @@ export const OAuthLoginPage = () => {
   }
 
   const handleEmailInputChange = (input: string) => {
-    if (
-      generalSubmitError === messages.disconnectDashboardWalletWrongUserError
-    ) {
-      setGeneralSubmitError(null)
-    }
     if (otpEmail !== input) {
       toggleOtpUI(false)
     } else if (otpEmail === input && !showOtpInput) {
@@ -141,21 +130,11 @@ export const OAuthLoginPage = () => {
     error?: Error
   }) => {
     setIsSubmitting(false)
-    setMetaMaskTransactionStatus(null)
     setAndLogGeneralSubmitError(isUserError, errorMessage, error)
-  }
-
-  const handlePendingTransactionApproval = () => {
-    setMetaMaskTransactionStatus('pending')
-  }
-
-  const handleReceiveTransactionApproval = () => {
-    setMetaMaskTransactionStatus('approved')
   }
 
   const {
     scope,
-    tx,
     queryParamsError,
     loading,
     userAlreadyWriteAuthorized,
@@ -164,12 +143,9 @@ export const OAuthLoginPage = () => {
     appImage,
     userEmail,
     authorize,
-    txParams,
     display
   } = useOAuthSetup({
-    onError: handleAuthError,
-    onPendingTransactionApproval: handlePendingTransactionApproval,
-    onReceiveTransactionApproval: handleReceiveTransactionApproval
+    onError: handleAuthError
   })
 
   const handleSignInFormSubmit = async (e: FormEvent) => {
@@ -293,9 +269,6 @@ export const OAuthLoginPage = () => {
     setAccountSwitcherOpen(false)
   }, [setAccountSwitcherOpen])
 
-  const isSubmitDisabled =
-    generalSubmitError === messages.disconnectDashboardWalletWrongUserError
-
   if (queryParamsError) {
     return (
       <ContentWrapper display={display}>
@@ -313,10 +286,6 @@ export const OAuthLoginPage = () => {
         </Flex>
       </ContentWrapper>
     )
-  }
-
-  if (metaMaskTransactionStatus != null) {
-    return <ApproveTransactionScreen status={metaMaskTransactionStatus} />
   }
 
   return (
@@ -391,11 +360,9 @@ export const OAuthLoginPage = () => {
           {userAlreadyWriteAuthorized ? null : (
             <PermissionsSection
               scope={scope}
-              tx={tx as DashboardWalletTx}
               userEmail={isInManagerMode ? userEmail : null}
               isLoggedIn={isLoggedIn}
               isLoading={userEmail === null}
-              txParams={txParams ?? undefined}
             />
           )}
 
@@ -434,7 +401,7 @@ export const OAuthLoginPage = () => {
               </Flex>
               <CTAButton
                 isLoading={isSubmitting}
-                disabled={isSubmitDisabled}
+                disabled={false}
                 onClick={handleAlreadySignedInAuthorizeSubmit}
               >
                 {userAlreadyWriteAuthorized

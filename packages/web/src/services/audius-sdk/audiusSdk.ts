@@ -5,9 +5,6 @@ import {
   SolanaRelay,
   ArchiverService
 } from '@audius/sdk'
-import { createWalletClient, custom, RpcRequestError } from 'viem'
-import { mainnet } from 'viem/chains'
-import { getHttpRpcClient } from 'viem/utils'
 
 import { env } from 'services/env'
 
@@ -57,38 +54,7 @@ export const initSdk = async () => {
     })
   )
 
-  // Set up a relay to identity for Ethereum RPC requests so that identity can
-  // pay for gas fees on approved transactions.
   const audiusWalletClient = await getAudiusWalletClient()
-  const ethWalletClient = createWalletClient({
-    account: '0x0000000000000000000000000000000000000000', // dummy replaced by relay DO NOT REMOVE
-    chain: mainnet,
-    transport: custom({
-      request: async (request) => {
-        const url = `${env.IDENTITY_SERVICE}/ethereum/rpc`
-        const message = `signature:${new Date().getTime()}`
-        const signature = await audiusWalletClient.signMessage({ message })
-        const rpcClient = getHttpRpcClient(url, {
-          fetchOptions: {
-            headers: {
-              'Encoded-Data-Message': message,
-              'Encoded-Data-Signature': signature
-            }
-          }
-        })
-        const res = await rpcClient.request({ body: request })
-        if ('result' in res) {
-          return res.result
-        }
-        throw new RpcRequestError({
-          body: request,
-          error:
-            'error' in res ? res.error : { code: 0, message: 'Unknown error' },
-          url
-        })
-      }
-    })
-  })
 
   const audiusSdk = createSdkWithServices({
     appName: env.APP_NAME,
@@ -98,7 +64,6 @@ export const initSdk = async () => {
     services: {
       solanaRelay,
       audiusWalletClient,
-      ethWalletClient,
       archiverService
     }
   })

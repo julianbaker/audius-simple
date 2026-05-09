@@ -62,8 +62,6 @@ const formatUserData = (user: any): string => {
     album_count: user.album_count,
     profile_picture: user.profile_picture,
     cover_photo: user.cover_photo,
-    wallet: user.wallet,
-    associated_wallets: user.associated_wallets,
     created_at: user.created_at,
     updated_at: user.updated_at
   }

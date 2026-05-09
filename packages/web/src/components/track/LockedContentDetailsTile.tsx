@@ -1,7 +1,5 @@
-import { PurchaseableContentMetadata } from '@audius/common/hooks'
 import {
   SquareSizes,
-  isContentUSDCPurchaseGated,
   Track,
   UserMetadata,
   Collection
@@ -10,7 +8,6 @@ import { Nullable } from '@audius/common/utils'
 import {
   Flex,
   Text,
-  IconCart,
   IconComponent,
   IconUserFollowing,
   Image
@@ -26,33 +23,25 @@ import styles from './LockedContentDetailsTile.module.css'
 import { TrackDogEar } from './TrackDogEar'
 
 const messages = {
-  by: 'By',
-  followersOnly: 'FOLLOWERS ONLY',
-  premiumTrack: (contentType: 'track' | 'album') =>
-    `PREMIUM ${contentType.toUpperCase()}`,
-  earn: (amount: string) => `Earn ${amount} $AUDIO for this purchase!`
+  followersOnly: 'FOLLOWERS ONLY'
 }
 
 type LockedContentDetailsTileProps = {
-  metadata: PurchaseableContentMetadata | Track | Collection
+  metadata: Track | Collection
   owner: UserMetadata
   showLabel?: boolean
   disabled?: boolean
-  earnAmount?: string
 }
 
 export const LockedContentDetailsTile = ({
   metadata,
   owner,
   showLabel = true,
-  disabled = false,
-  earnAmount
+  disabled = false
 }: LockedContentDetailsTileProps) => {
-  const { stream_conditions: streamConditions } = metadata
   const isAlbum = 'playlist_id' in metadata
   const contentId = isAlbum ? metadata.playlist_id : metadata.track_id
   const title = isAlbum ? metadata.playlist_name : metadata.title
-  const isDownloadGated = !isAlbum && metadata.is_download_gated
 
   const { imageUrl: trackArt } = useTrackCoverArt({
     trackId: contentId,
@@ -65,21 +54,9 @@ export const LockedContentDetailsTile = ({
   const image = isAlbum ? albumArt : trackArt
 
   const label = `${title} by ${owner.name}`
-  const isUSDCPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
 
-  let IconComponent: Nullable<IconComponent>
-  let message: Nullable<string>
-
-  if (isUSDCPurchaseGated) {
-    IconComponent = IconCart
-    message = messages.premiumTrack(isAlbum ? 'album' : 'track')
-  } else if (isDownloadGated) {
-    IconComponent = null
-    message = null
-  } else {
-    IconComponent = IconUserFollowing
-    message = messages.followersOnly
-  }
+  const IconComponent: Nullable<IconComponent> = IconUserFollowing
+  const message: Nullable<string> = messages.followersOnly
 
   return (
     <Flex
@@ -106,15 +83,8 @@ export const LockedContentDetailsTile = ({
       <Flex column css={{ overflow: 'hidden' }} gap='s'>
         {showLabel && IconComponent && message ? (
           <Flex gap='s' alignItems='center'>
-            <IconComponent
-              size='s'
-              color={isUSDCPurchaseGated ? 'premium' : 'special'}
-            />
-            <Text
-              variant='label'
-              size='s'
-              color={isUSDCPurchaseGated ? 'premium' : 'special'}
-            >
+            <IconComponent size='s' color='special' />
+            <Text variant='label' size='s' color='special'>
               {message}
             </Text>
           </Flex>
@@ -129,14 +99,6 @@ export const LockedContentDetailsTile = ({
             userId={owner.user_id}
             disabled={disabled}
           />
-          {earnAmount ? (
-            <Flex alignItems='center' gap='xs' pt='xs'>
-              <IconCart size='l' color='premium' />
-              <Text variant='body' size='xs' strength='strong' color='premium'>
-                {messages.earn(earnAmount)}
-              </Text>
-            </Flex>
-          ) : null}
         </Flex>
       </Flex>
     </Flex>

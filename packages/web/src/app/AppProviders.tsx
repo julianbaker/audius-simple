@@ -11,7 +11,6 @@ import {
   RouterProvider
 } from 'react-router'
 import { PersistGate } from 'redux-persist/integration/react'
-import { WagmiProvider } from 'wagmi'
 
 import { useIsMobile } from 'hooks/useIsMobile'
 import { env } from 'services/env'
@@ -25,7 +24,6 @@ import {
   getThemePaletteFromStorage
 } from 'utils/theme/theme'
 
-import { wagmiAdapter } from './ReownAppKitModal'
 import { createRoutes } from './routes'
 
 type AppProvidersProps = {
@@ -76,17 +74,15 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
   }, [basename])
 
   return (
-    <WagmiProvider config={wagmiAdapter.wagmiConfig}>
-      <QueryClientProvider client={queryClient}>
-        <MediaProvider>
-          <ReduxProvider store={store}>
-            <PersistGate loading={null} persistor={persistor}>
-              <RouterProvider router={router} />
-            </PersistGate>
-          </ReduxProvider>
-        </MediaProvider>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
-    </WagmiProvider>
+    <QueryClientProvider client={queryClient}>
+      <MediaProvider>
+        <ReduxProvider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
+            <RouterProvider router={router} />
+          </PersistGate>
+        </ReduxProvider>
+      </MediaProvider>
+      <ReactQueryDevtools />
+    </QueryClientProvider>
   )
 }

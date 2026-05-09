@@ -10,7 +10,7 @@ import {
   ThemeMode,
   ThemePalette
 } from '@audius/common/models'
-import { API_TERMS, FAN_CLUB_TERMS } from '@audius/common/src/utils/route'
+import { API_TERMS } from '@audius/common/src/utils/route'
 import {
   BrowserNotificationSetting,
   EmailFrequency,
@@ -20,8 +20,7 @@ import {
   themeSelectors,
   themeActions,
   signOutActions,
-  musicConfettiActions,
-  useTierAndVerifiedForUser
+  musicConfettiActions
 } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import {
@@ -55,7 +54,7 @@ import { useDispatch } from 'react-redux'
 import { Link, useSearchParams } from 'react-router'
 
 import { useModalState } from 'common/hooks/useModalState'
-import { make, useRecord } from 'common/store/analytics/actions'
+import { make } from 'common/store/analytics/actions'
 import { ChangeEmailModal } from 'components/change-email/ChangeEmailModal'
 import { ChangePasswordModal } from 'components/change-password/ChangePasswordModal'
 import { Header } from 'components/header/desktop/Header'
@@ -89,10 +88,8 @@ import { ListeningHistorySettingsCard } from './ListeningHistory'
 import { AccountsManagingYouSettingsCard } from './ManagerMode/AccountsManagingYouSettingsCard'
 import { AccountsYouManageSettingsCard } from './ManagerMode/AccountsYouManageSettingsCard'
 import NotificationSettingsModal from './NotificationSettingsModal'
-import { PayoutWalletSettingsCard } from './PayoutWallet/PayoutWalletSettingsCard'
 import SettingsCard from './SettingsCard'
 import styles from './SettingsPage.module.css'
-import { WormholeConversionSettingsCard } from './WormholeConversionSettingsCard'
 
 const { show } = musicConfettiActions
 const { signOut: signOutAction } = signOutActions
@@ -113,13 +110,7 @@ const {
 } = settingsPageActions
 const { subscribeBrowserPushNotifications } = accountActions
 
-const {
-  CHECK_PAGE,
-  DOWNLOAD_LINK,
-  PRIVACY_POLICY,
-  PRIVATE_KEY_EXPORTER_SETTINGS_PAGE,
-  TERMS_OF_SERVICE
-} = route
+const { CHECK_PAGE, DOWNLOAD_LINK, PRIVACY_POLICY, TERMS_OF_SERVICE } = route
 const { version } = packageInfo
 
 const EMAIL_TOAST_TIMEOUT = 2000
@@ -145,23 +136,17 @@ export const SettingsPage = () => {
 
   const { data: accountData } = useCurrentAccountUser({
     select: (user) => ({
-      handle: user?.handle,
-      userId: user?.user_id,
       isVerified: user?.is_verified
     })
   })
-  const { handle, userId, isVerified } = accountData ?? {}
+  const { isVerified } = accountData ?? {}
   const theme = useSelector(getTheme)
   const themePalette = useSelector(getThemePalette)
   const themeMode = useSelector(getThemeMode)
   const frostedSurfaceIntensity = useSelector(getFrostedSurfaceIntensity)
   const emailFrequency = useSelector(getEmailFrequency)
   const notificationSettings = useSelector(getBrowserNotificationSettings)
-  const { tier } = useTierAndVerifiedForUser(userId)
-  const showMatrix =
-    tier === 'gold' ||
-    tier === 'platinum' ||
-    process.env.NODE_ENV === 'development'
+  const showMatrix = process.env.NODE_ENV === 'development'
 
   const [isSignOutModalVisible, setIsSignOutModalVisible] = useState(false)
   const [
@@ -300,11 +285,6 @@ export const SettingsPage = () => {
     },
     [dispatch]
   )
-  const record = useRecord()
-  const recordExportPrivateKeyLinkClicked = useCallback(() => {
-    record(make(Name.EXPORT_PRIVATE_KEY_LINK_CLICKED, { handle, userId }))
-  }, [record, handle, userId])
-
   const goToVerification = useCallback(() => {
     dispatch(push(CHECK_PAGE))
   }, [dispatch])
@@ -675,8 +655,6 @@ export const SettingsPage = () => {
         <AuthorizedAppsSettingsCard />
         <DeveloperAppsSettingsCard />
         <ListeningHistorySettingsCard />
-        <PayoutWalletSettingsCard />
-        <WormholeConversionSettingsCard />
       </div>
       <div className={styles.version}>
         <Button
@@ -716,25 +694,7 @@ export const SettingsPage = () => {
           >
             {settingsMessages.apiTerms}
           </Link>
-          -{' '}
-          <Link
-            className={styles.link}
-            to={FAN_CLUB_TERMS}
-            target='_blank'
-            rel='noreferrer'
-          >
-            {settingsMessages.fanClubTerms}
-          </Link>
         </span>
-        {!isManagedAccount ? (
-          <Link
-            className={cn(styles.link, styles.showPrivateKey)}
-            to={PRIVATE_KEY_EXPORTER_SETTINGS_PAGE}
-            onClick={recordExportPrivateKeyLinkClicked}
-          >
-            {settingsMessages.showPrivateKey}
-          </Link>
-        ) : null}
       </div>
       <Modal
         isOpen={isSignOutModalVisible}

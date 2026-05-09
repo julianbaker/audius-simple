@@ -16,7 +16,7 @@ export type EditCommentArgs = {
   mentions?: CommentMention[]
   trackId: ID
   currentSort: any
-  entityType?: 'Track' | 'FanClub'
+  entityType?: 'Track'
 }
 
 export const useEditComment = () => {

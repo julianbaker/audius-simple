@@ -47,6 +47,7 @@ describe('getCollectionsBatcher', () => {
     },
     user: {
       albumCount: 0,
+      artistCoinBadge: {},
       artistPickTrackId: undefined,
       bio: '',
       coverPhoto: {
@@ -80,6 +81,7 @@ describe('getCollectionsBatcher', () => {
       isAvailable: true,
       ercWallet: '',
       splWallet: '',
+      splUsdcWallet: '',
       totalAudioBalance: 0,
       wallet: '',
       balance: '0',
@@ -106,8 +108,6 @@ describe('getCollectionsBatcher', () => {
       allowAiAttribution: false,
       supporterCount: 0,
       supportingCount: 0,
-      artistCoinBadge: {},
-      splUsdcWallet: '',
       hasCollectibles: false
     }
   })

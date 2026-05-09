@@ -37,18 +37,14 @@ export enum Feature {
   SignIn = 'sign-in',
   Upload = 'upload',
   Playback = 'playback',
-  Purchase = 'purchase',
   Comments = 'comments',
   Chats = 'chats',
   Social = 'social',
   Notifications = 'notifications',
-  Rewards = 'rewards',
   Edit = 'edit',
   Events = 'events',
   Remixes = 'remixes',
-  TanQuery = 'tan-query',
-  SendTokens = 'send-tokens',
-  FanClubs = 'fan-clubs'
+  TanQuery = 'tan-query'
 }
 
 export type ReportToSentryArgs = {

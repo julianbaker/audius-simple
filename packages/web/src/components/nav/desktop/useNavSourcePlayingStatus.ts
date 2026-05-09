@@ -3,8 +3,7 @@ import { useMemo } from 'react'
 import {
   FEED_PAGE,
   TRENDING_PAGE,
-  LIBRARY_PAGE,
-  EXPLORE_PAGE
+  LIBRARY_PAGE
 } from '@audius/common/src/utils/route'
 import { playbackSelectors, QueueSource } from '@audius/common/store'
 import { useSelector } from 'react-redux'
@@ -37,8 +36,6 @@ export const useNavSourcePlayingStatus = () => {
       case QueueSource.DISCOVER_TRENDING_MONTH:
       case QueueSource.DISCOVER_TRENDING_ALL_TIME:
         return TRENDING_PAGE
-      case QueueSource.EXPLORE_PREMIUM_TRACKS:
-        return EXPLORE_PAGE
       case QueueSource.SAVED_TRACKS:
         return LIBRARY_PAGE
       default:

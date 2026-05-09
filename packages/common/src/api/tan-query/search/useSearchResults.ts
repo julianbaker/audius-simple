@@ -15,9 +15,10 @@ import {
   SearchSource,
   UserMetadata,
   UserCollectionMetadata,
-  UserTrackMetadata
+  UserTrackMetadata,
+  filterUnsupportedCryptoGatedTracks
 } from '~/models'
-import { FeatureFlags } from '~/services'
+import { filterUnsupportedCryptoGatedCollections } from '~/models/Collection'
 import { SearchKind, SearchSortMethod } from '~/store'
 import { Genre, formatMusicalKey } from '~/utils'
 
@@ -50,7 +51,6 @@ export type SearchFilters = {
   key?: string
   isVerified?: boolean
   hasDownloads?: boolean
-  isPremium?: boolean
 }
 
 export type SearchFilter = keyof SearchFilters
@@ -128,7 +128,7 @@ const useSearchQueryProps = <T>(
     pageSize,
     ...filters
   }
-  const { audiusSdk, getFeatureEnabled, analytics } = useQueryContext()
+  const { audiusSdk, analytics } = useQueryContext()
   const queryClient = useQueryClient()
 
   return {
@@ -145,8 +145,6 @@ const useSearchQueryProps = <T>(
       albums: UserCollectionMetadata[]
       playlists: UserCollectionMetadata[]
     }> => {
-      const isUSDCEnabled = await getFeatureEnabled(FeatureFlags.USDC_PURCHASES)
-
       const kind = category as SearchKind
 
       if (!query && isEmpty(filters)) {
@@ -170,7 +168,7 @@ const useSearchQueryProps = <T>(
         query: isTagsSearch ? query.slice(1) : query,
         limit: pageSize,
         offset: pageParam,
-        includePurchaseable: isUSDCEnabled,
+        includePurchaseable: false,
         bpmMin,
         bpmMax,
         key: key ? [key] : undefined,
@@ -178,8 +176,7 @@ const useSearchQueryProps = <T>(
         mood: filters.mood ? [filters.mood] : undefined,
         sortMethod,
         isVerified: filters.isVerified,
-        hasDownloads: filters.hasDownloads,
-        isPurchaseable: filters.isPremium
+        hasDownloads: filters.hasDownloads
       }
 
       // Fire analytics only for the first page of results
@@ -207,7 +204,7 @@ const useSearchQueryProps = <T>(
         ? await sdk.search.searchTags(searchParams)
         : await sdk.search.search(searchParams)
 
-      const { tracks, playlists, albums, users } = searchResultsFromSDK(
+      let { tracks, playlists, albums, users } = searchResultsFromSDK(
         data,
         queryClient
       )
@@ -241,6 +238,7 @@ const useSearchQueryProps = <T>(
 
       // Prime entity cache data & the individual search slice data
       if (tracks?.length) {
+        tracks = filterUnsupportedCryptoGatedTracks(tracks)
         primeTrackData({ tracks, queryClient })
         if (shouldPrimeCache) {
           primeSearchSlice(
@@ -258,6 +256,8 @@ const useSearchQueryProps = <T>(
       }
 
       if (albums?.length || playlists?.length) {
+        albums = filterUnsupportedCryptoGatedCollections(albums)
+        playlists = filterUnsupportedCryptoGatedCollections(playlists)
         primeCollectionData({
           collections: [...albums, ...playlists],
           queryClient

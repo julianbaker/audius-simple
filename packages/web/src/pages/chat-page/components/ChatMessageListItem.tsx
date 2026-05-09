@@ -25,7 +25,6 @@ import { CONTENT_EXPANDED_LISTENER_KEY } from './ChatMessageList'
 import styles from './ChatMessageListItem.module.css'
 import { ChatMessagePlaylist } from './ChatMessagePlaylist'
 import { ChatMessageTrack } from './ChatMessageTrack'
-import { FanClubHeader } from './FanClubHeader'
 import { LinkPreview } from './LinkPreview'
 import { ReactionPopupMenu } from './ReactionPopupMenu'
 
@@ -39,8 +38,7 @@ type ChatMessageListItemProps = {
 }
 
 const messages = {
-  error: 'Message Failed to Send. Click to Retry.',
-  membersOnly: 'Members Only'
+  error: 'Message Failed to Send. Click to Retry.'
 }
 
 export const ChatMessageListItem = memo(function ChatMessageListItem(
@@ -211,11 +209,6 @@ export const ChatMessageListItem = memo(function ChatMessageListItem(
       >
         <Flex className={styles.bubbleCorners}>
           <Flex column className={styles.bubbleContent}>
-            <FanClubHeader
-              userId={senderUserId}
-              audience={message.audience}
-              className={styles.fanClubHeader}
-            />
             {isCollectionUrl(linkValue) ? (
               <ChatMessagePlaylist
                 className={cn(styles.unfurl, styles.playlistUnfurl)}

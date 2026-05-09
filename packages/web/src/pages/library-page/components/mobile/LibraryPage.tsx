@@ -181,7 +181,7 @@ const useTabContainerRef = ({
   }, [resultsLength, hasNoResults])
 
   useEffect(() => {
-    // When the selected category (favorites/reposts/purchased/all) changes, recalculate the height of the container and scroll to the top.
+    // When the selected category (favorites/reposts/all) changes, recalculate the height of the container and scroll to the top.
     if (containerRef.current) {
       contentRefCallback(containerRef.current, true)
       window.scroll(0, SCROLL_HEIGHT)
@@ -257,7 +257,7 @@ const TracksLineup = ({
     } else if (selectedCategory === LibraryCategory.Repost) {
       return emptyStateMessages.emptyTrackRepostsHeader
     } else {
-      return emptyStateMessages.emptyTrackPurchasedHeader
+      return emptyStateMessages.emptyTrackAllHeader
     }
   })
 

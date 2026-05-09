@@ -1,8 +1,6 @@
 import {
   AudiusWalletClient,
   ClaimableTokensClient,
-  PaymentRouterClient,
-  RewardManagerClient,
   createSdkWithServices,
   StorageNodeSelectorService
 } from '@audius/sdk'
@@ -13,8 +11,6 @@ export const audiusSdk = () => {
     environment: 'development',
     services: {
       claimableTokensClient: (() => {}) as unknown as ClaimableTokensClient,
-      rewardManagerClient: (() => {}) as unknown as RewardManagerClient,
-      paymentRouterClient: (() => {}) as unknown as PaymentRouterClient,
       storageNodeSelector: (() => {}) as unknown as StorageNodeSelectorService,
       audiusWalletClient: {
         signMessage: () => {},

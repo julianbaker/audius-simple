@@ -1,7 +1,6 @@
 import {
   AccessConditions,
   isContentFollowGated,
-  isContentUSDCPurchaseGated,
   StreamTrackAvailabilityType
 } from '~/models'
 
@@ -15,22 +14,15 @@ export const getUsersMayLoseAccess = ({
   availability: StreamTrackAvailabilityType
   initialStreamConditions?: Nullable<AccessConditions>
 }) => {
-  const isInitiallyUsdcGated = isContentUSDCPurchaseGated(
-    initialStreamConditions
-  )
   const isInitiallyFollowGated = isContentFollowGated(initialStreamConditions)
 
-  const stillUsdcGated =
-    isInitiallyUsdcGated &&
-    availability === StreamTrackAvailabilityType.USDC_PURCHASE
   const stillFollowGated =
     isInitiallyFollowGated &&
     availability === StreamTrackAvailabilityType.FOLLOW_GATED
-  const stillSameGate = stillUsdcGated || stillFollowGated
+  const stillSameGate = stillFollowGated
 
   return (
     !stillSameGate &&
-    !isInitiallyUsdcGated &&
     // why do we have both FREE and PUBLIC types
     // and when is one used over the other?
     ![

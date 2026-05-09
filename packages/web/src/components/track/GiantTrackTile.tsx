@@ -8,7 +8,6 @@ import {
 } from '@audius/common/api'
 import { useFeatureFlag } from '@audius/common/hooks'
 import {
-  isContentUSDCPurchaseGated,
   ID,
   FieldVisibility,
   Remix,
@@ -17,7 +16,6 @@ import {
 } from '@audius/common/models'
 import { FeatureFlags } from '@audius/common/services'
 import {
-  PurchaseableContentType,
   useEarlyReleaseConfirmationModal,
   usePublishConfirmationModal
 } from '@audius/common/store'
@@ -170,7 +168,6 @@ export const GiantTrackTile = ({
   onFollow,
   onMakePublic,
   onPlay,
-  onPreview,
   onSave,
   onShare,
   onRepost,
@@ -210,17 +207,11 @@ export const GiantTrackTile = ({
 
   const isLongFormContent =
     genre === Genre.Podcasts || genre === Genre.Audiobooks
-  const isUSDCPurchaseGated = isContentUSDCPurchaseGated(streamConditions)
   const { data: track } = useTrack(trackId, {
-    select: (track) => pick(track, ['is_downloadable', 'preview_cid'])
+    select: (track) => pick(track, ['is_downloadable'])
   })
   const shouldShowDownloadSection = !!track?.is_downloadable
-  // Preview button is shown for USDC-gated tracks if user does not have access
-  // or is the owner
-  const showPreview =
-    isUSDCPurchaseGated && (isOwner || !hasStreamAccess) && track?.preview_cid
-  // Play button is conditionally hidden for USDC-gated tracks when the user does not have access
-  const showPlay = isUSDCPurchaseGated ? hasStreamAccess : true
+  const showPlay = true
   const shouldShowScheduledRelease =
     isScheduledRelease && dayjs(releaseDate).isAfter(dayjs())
   const [isDescriptionExpanded, toggleDescriptionExpanded] = useToggle(false)
@@ -594,15 +585,6 @@ export const GiantTrackTile = ({
                   trackId={trackId}
                 />
               ) : null}
-              {showPreview ? (
-                <PlayPauseButton
-                  className={styles.playbackButton}
-                  playing={playing && previewing}
-                  onPlay={onPreview}
-                  trackId={trackId}
-                  isPreview
-                />
-              ) : null}
               {isLongFormContent ? (
                 <GiantTrackTileProgressInfo
                   duration={duration}
@@ -655,7 +637,7 @@ export const GiantTrackTile = ({
           <GatedContentSection
             isLoading={isLoading}
             contentId={trackId}
-            contentType={PurchaseableContentType.TRACK}
+            contentType='track'
             streamConditions={streamConditions}
             hasStreamAccess={hasStreamAccess}
             isOwner={isOwner}

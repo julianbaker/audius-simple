@@ -2,14 +2,12 @@ import { AccessType } from '@audius/common/models'
 import { formatReleaseDate } from '@audius/common/utils'
 import {
   IconUserFollowing,
-  IconCart,
   IconReceive,
   IconCalendarMonth,
   IconVisibilityHidden,
   IconColors,
   Flex,
-  Text,
-  IconFanClub
+  Text
 } from '@audius/harmony'
 
 type AccessTypeLabelProps = {
@@ -39,25 +37,10 @@ const ACCESS_TYPE_CONFIG: Record<AccessType, AccessTypeConfig> = {
     label: 'Hidden',
     color: 'subdued'
   },
-  [AccessType.PREMIUM]: {
-    icon: IconCart,
-    label: 'Premium',
-    color: 'premium'
-  },
-  [AccessType.PREMIUM_EXTRAS]: {
-    icon: IconReceive,
-    label: 'Extras',
-    color: 'premium'
-  },
   [AccessType.FOLLOW_GATED]: {
     icon: IconUserFollowing,
     label: 'Followers Only',
     color: 'special'
-  },
-  [AccessType.TOKEN_GATED]: {
-    icon: IconFanClub,
-    label: 'Fan Club',
-    color: 'subdued'
   },
   [AccessType.EXTRAS]: {
     icon: IconReceive,

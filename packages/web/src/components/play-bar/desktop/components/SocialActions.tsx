@@ -3,21 +3,21 @@ import { useCallback } from 'react'
 import { useToggleFavoriteTrack, useTrack } from '@audius/common/api'
 import { useGatedContentAccess } from '@audius/common/hooks'
 import {
-  ModalSource,
   ID,
   RepostSource,
-  FavoriteSource
+  FavoriteSource,
+  isContentFollowGated
 } from '@audius/common/models'
 import {
-  usePremiumContentPurchaseModal,
+  gatedContentActions,
   gatedContentSelectors,
-  PurchaseableContentType,
   tracksSocialActions
 } from '@audius/common/store'
 import { Flex, Tooltip } from '@audius/harmony'
 import cn from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { useModalState } from 'common/hooks/useModalState'
 import AnimatedIconButton, {
   AnimatedIconType
 } from 'components/animated-button/AnimatedIconButton'
@@ -28,6 +28,7 @@ import { useIsMatrix } from 'utils/theme/theme'
 import styles from './SocialActions.module.css'
 
 const { getGatedContentStatusMap } = gatedContentSelectors
+const { setLockedContentId } = gatedContentActions
 
 const { repostTrack, undoRepostTrack } = tracksSocialActions
 
@@ -60,14 +61,11 @@ export const SocialActions = ({
 
   const gatedTrackStatusMap = useSelector(getGatedContentStatusMap)
   const gatedTrackStatus = trackId && gatedTrackStatusMap[trackId]
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
+  const [, setGatedModalVisibility] = useModalState('LockedContent')
   const onClickPill = useRequiresAccountOnClick(() => {
-    openPremiumContentPurchaseModal(
-      { contentId: trackId, contentType: PurchaseableContentType.TRACK },
-      { source: ModalSource.PlayBar }
-    )
-  }, [trackId, openPremiumContentPurchaseModal])
+    dispatch(setLockedContentId({ id: trackId }))
+    setGatedModalVisibility(true)
+  }, [dispatch, setGatedModalVisibility, trackId])
 
   const { hasStreamAccess } = useGatedContentAccess(track)
 
@@ -94,7 +92,7 @@ export const SocialActions = ({
   return (
     <Flex className={cn(styles.root, { [styles.compact]: compact })}>
       {track?.stream_conditions &&
-      'usdc_purchase' in track.stream_conditions &&
+      isContentFollowGated(track.stream_conditions) &&
       !hasStreamAccess ? (
         <GatedConditionsPill
           showIcon={false}

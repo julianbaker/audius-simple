@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import {
-  useCurrentAccountUser,
-  useUserByParams,
-  useQueryContext,
-  QUERY_KEYS
-} from '@audius/common/api'
+import { useCurrentAccountUser, useUserByParams } from '@audius/common/api'
 import { useIsArtist } from '@audius/common/hooks'
 import {
   Name,
@@ -36,8 +31,7 @@ import {
   followingUserListActions,
   followersUserListActions
 } from '@audius/common/store'
-import { dayjs, getErrorMessage, Nullable, route } from '@audius/common/utils'
-import { useQueryClient } from '@tanstack/react-query'
+import { dayjs, getErrorMessage, route } from '@audius/common/utils'
 import { useDispatch, useSelector } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
 
@@ -71,8 +65,6 @@ export const useProfilePage = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const queryClient = useQueryClient()
-  const { env } = useQueryContext()
   const pathname = getPathname(location)
   const params = parseUserRoute(pathname)
   const handleLower = params?.handle?.toLowerCase() as string
@@ -134,13 +126,6 @@ export const useProfilePage = () => {
     null
   )
   const [updatedWebsite, setUpdatedWebsite] = useState<string | null>(null)
-  const [updatedFanClubBadge, setUpdatedFanClubBadge] = useState<
-    Nullable<{
-      mint: string
-      logo_uri: string
-      ticker: string
-    }>
-  >(null)
 
   // Effects
   useEffect(() => {
@@ -205,7 +190,6 @@ export const useProfilePage = () => {
     setUpdatedInstagramHandle(null)
     setUpdatedTikTokHandle(null)
     setUpdatedWebsite(null)
-    setUpdatedFanClubBadge(null)
     setAreArtistRecommendationsVisible(false)
   }, [profile?.handle, params?.tab])
 
@@ -311,30 +295,6 @@ export const useProfilePage = () => {
     profile && updatedWebsite !== null
       ? updatedWebsite
       : (profile?.website ?? '')
-
-  // Determine fan club badge
-  let fanClubBadge = null
-  if (profile) {
-    if (updatedFanClubBadge !== null) {
-      fanClubBadge = updatedFanClubBadge
-    } else {
-      if (profile.coin_flair_mint === '') {
-        fanClubBadge = {
-          mint: '__none__',
-          logo_uri: '',
-          ticker: ''
-        }
-      } else if (profile.coin_flair_mint === null) {
-        fanClubBadge = {
-          mint: '__default__',
-          logo_uri: '',
-          ticker: ''
-        }
-      } else {
-        fanClubBadge = profile.fan_club_badge || null
-      }
-    }
-  }
 
   const hasProfilePicture =
     profile &&
@@ -456,7 +416,6 @@ export const useProfilePage = () => {
     setUpdatedInstagramHandle(null)
     setUpdatedTikTokHandle(null)
     setUpdatedWebsite(null)
-    setUpdatedFanClubBadge(null)
   }, [])
 
   const onCancel = useCallback(() => {
@@ -466,7 +425,6 @@ export const useProfilePage = () => {
     setUpdatedProfilePicture(null)
     setUpdatedBio(null)
     setUpdatedLocation(null)
-    setUpdatedFanClubBadge(null)
   }, [])
 
   const updateName = useCallback((name: string) => setUpdatedName(name), [])
@@ -528,95 +486,6 @@ export const useProfilePage = () => {
     [updatedCoverPhoto]
   )
 
-  const updateFanClubBadge = useCallback(
-    async (
-      badge: Nullable<{
-        mint: string
-        logo_uri: string
-        ticker: string
-      }>
-    ) => {
-      setUpdatedFanClubBadge(badge)
-
-      // Optimistically update the user cache
-      if (profile?.user_id && queryClient) {
-        let optimisticBadge = badge
-        if (badge?.mint === '__default__') {
-          try {
-            const userCoinsData = queryClient.getQueryData([
-              'userCoins',
-              { userId: profile.user_id }
-            ]) as any
-
-            if (userCoinsData) {
-              const excludedMints = [
-                env.WAUDIO_MINT_ADDRESS,
-                env.USDC_MINT_ADDRESS
-              ]
-
-              const ownedCoin = userCoinsData.find(
-                (coin: any) =>
-                  coin.ownerId === profile.user_id &&
-                  !excludedMints.includes(coin.mint)
-              )
-
-              const mostHeldCoin = userCoinsData.find(
-                (coin: any) =>
-                  coin.balance > 0 && !excludedMints.includes(coin.mint)
-              )
-
-              const firstEligibleCoin = ownedCoin ?? mostHeldCoin
-
-              if (firstEligibleCoin) {
-                optimisticBadge = {
-                  mint: firstEligibleCoin.mint,
-                  logo_uri: firstEligibleCoin.logoUri,
-                  ticker: firstEligibleCoin.ticker
-                }
-              }
-            }
-          } catch (error) {
-            console.error('Error computing default coin badge:', error)
-          }
-        }
-
-        queryClient.setQueryData(
-          [QUERY_KEYS.user, profile.user_id],
-          (prevUser: any) => {
-            if (!prevUser) return undefined
-
-            let fanClubBadge = null
-            let coinFlairMint = null
-
-            if (optimisticBadge) {
-              if (optimisticBadge.mint === '__default__') {
-                coinFlairMint = null
-                fanClubBadge = null
-              } else if (optimisticBadge.mint === '__none__') {
-                coinFlairMint = ''
-                fanClubBadge = null
-              } else {
-                coinFlairMint = optimisticBadge.mint
-                fanClubBadge = {
-                  mint: optimisticBadge.mint,
-                  logo_uri: optimisticBadge.logo_uri,
-                  ticker: optimisticBadge.ticker
-                }
-              }
-            }
-
-            return {
-              ...prevUser,
-              coin_flair_mint: coinFlairMint,
-              fan_club_badge: fanClubBadge
-            }
-          }
-        )
-      }
-    },
-    [profile, queryClient, env]
-  )
-
   const updateProfile = useCallback(
     (metadata: any) => {
       dispatch(profileActions.updateProfile(metadata))
@@ -667,39 +536,6 @@ export const useProfilePage = () => {
       updatedMetadata.website = updatedWebsite
     }
 
-    let fanClubBadgeValue = null
-    if (updatedFanClubBadge !== null) {
-      fanClubBadgeValue = updatedFanClubBadge
-    } else {
-      if (profile.coin_flair_mint === '') {
-        fanClubBadgeValue = {
-          mint: '__none__',
-          logo_uri: '',
-          ticker: ''
-        }
-      } else if (profile.coin_flair_mint === null) {
-        fanClubBadgeValue = {
-          mint: '__default__',
-          logo_uri: '',
-          ticker: ''
-        }
-      } else {
-        fanClubBadgeValue = profile.fan_club_badge || null
-      }
-    }
-
-    if (fanClubBadgeValue) {
-      if (fanClubBadgeValue.mint === '__default__') {
-        updatedMetadata.coin_flair_mint = null
-      } else if (fanClubBadgeValue.mint === '__none__') {
-        updatedMetadata.coin_flair_mint = ''
-      } else {
-        updatedMetadata.coin_flair_mint = fanClubBadgeValue.mint
-      }
-    } else {
-      updatedMetadata.coin_flair_mint = null
-    }
-
     updateProfile(updatedMetadata)
   }, [
     profile,
@@ -712,7 +548,6 @@ export const useProfilePage = () => {
     updatedInstagramHandle,
     updatedTikTokHandle,
     updatedWebsite,
-    updatedFanClubBadge,
     updateProfile,
     dispatch
   ])
@@ -806,7 +641,6 @@ export const useProfilePage = () => {
     updatedInstagramHandle !== null ||
     updatedTikTokHandle !== null ||
     updatedWebsite !== null ||
-    updatedFanClubBadge !== null ||
     updatedCoverPhoto !== null ||
     updatedProfilePicture !== null
 
@@ -842,7 +676,6 @@ export const useProfilePage = () => {
     instagramVerified,
     tikTokVerified,
     website,
-    fanClubBadge,
     hasProfilePicture: !!hasProfilePicture,
     following,
     mode,
@@ -900,7 +733,6 @@ export const useProfilePage = () => {
     updateInstagramHandle,
     updateTikTokHandle,
     updateWebsite,
-    updateFanClubBadge,
     updateCoverPhoto,
     updateProfile,
     didChangeTabsFrom,

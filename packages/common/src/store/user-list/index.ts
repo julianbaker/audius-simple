@@ -2,11 +2,6 @@ export * as userListActions from './actions'
 export * from './reducer'
 export * from './types'
 
-export * as coinLeaderboardUserListActions from './coin-leaderboard/actions'
-export * as coinLeaderboardUserListSelectors from './coin-leaderboard/selectors'
-export * from './coin-leaderboard/types'
-export { default as coinLeaderboardUserListReducer } from './coin-leaderboard/reducers'
-
 export * as repostsUserListActions from './reposts/actions'
 export * as repostsUserListSelectors from './reposts/selectors'
 export * from './reposts/types'
@@ -36,10 +31,6 @@ export * from './favorites/types'
 export * as relatedArtistsUserListActions from './related-artists/actions'
 export * as relatedArtistsUserListSelectors from './related-artists/selectors'
 export * from './related-artists/types'
-
-export * as purchasersUserListActions from './purchasers/actions'
-export * as purchasersUserListSelectors from './purchasers/selectors'
-export * from './purchasers/types'
 
 export * as remixersUserListActions from './remixers/actions'
 export * as remixersUserListSelectors from './remixers/selectors'

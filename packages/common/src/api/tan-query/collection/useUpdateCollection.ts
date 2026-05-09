@@ -11,9 +11,9 @@ import {
   useCurrentUserId
 } from '~/api'
 import { useQueryContext } from '~/api/tan-query/utils'
-import { isContentUSDCPurchaseGated } from '~/models'
 import { Collection } from '~/models/Collection'
 import { ID } from '~/models/Identifiers'
+import { stripUnsupportedCryptoGatedConditions } from '~/models/Track'
 import { renameAccountPlaylist } from '~/store/account/slice'
 import { EditCollectionValues } from '~/store/cache/collections/types'
 import { removeNullable } from '~/utils'
@@ -69,28 +69,11 @@ export const useUpdateCollection = () => {
         )
       }
 
-      // Handle premium metadata for albums
-      if (
-        collectionUpdate.is_album &&
-        isContentUSDCPurchaseGated(collectionUpdate.stream_conditions)
-      ) {
-        const priceCents = Number(
-          collectionUpdate.stream_conditions.usdc_purchase.price
+      collectionUpdate.stream_conditions =
+        stripUnsupportedCryptoGatedConditions(
+          collectionUpdate.stream_conditions
         )
-
-        // Update the stream conditions with the price and splits
-        collectionUpdate.stream_conditions = {
-          usdc_purchase: {
-            price: priceCents,
-            splits: [
-              {
-                user_id: currentUserId,
-                percentage: 100
-              }
-            ]
-          }
-        }
-      }
+      collectionUpdate.is_stream_gated = !!collectionUpdate.stream_conditions
 
       const sdkMetadata = playlistMetadataForUpdateWithSDK(
         collectionUpdate as Collection

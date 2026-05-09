@@ -92,7 +92,7 @@ export const getTierForUser = (totalBalance: Nullable<StringWei>) => {
   return getTierAndNumberForBalance(balance).tier
 }
 
-// The other fns here use wei formatting, new fan club data doesnt use wei
+// The other fns here use wei formatting, some API balance data does not.
 export const getTierForUserNonWei = (totalBalance: Nullable<StringWei>) => {
   const balance = totalBalance ?? ('0' as StringWei)
   return getTierAndNumberForBalance(balance, false).tier

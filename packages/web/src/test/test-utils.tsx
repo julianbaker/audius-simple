@@ -14,9 +14,6 @@ import { Provider } from 'react-redux'
 import { BrowserRouter, useNavigate } from 'react-router'
 import { PartialDeep } from 'type-fest'
 import { it as vitestIt } from 'vitest'
-import { WagmiProvider, createConfig, http } from 'wagmi'
-import { mainnet } from 'wagmi/chains'
-import { mock } from 'wagmi/connectors'
 
 import { RouterContextProvider } from 'components/animated-switch/RouterContextProvider'
 import { ToastContextProvider } from 'components/toast/ToastContext'
@@ -29,19 +26,6 @@ import { AppState } from 'store/types'
 
 import { createMockAppContext } from './mocks/app-context'
 import { audiusSdk } from './mocks/audiusSdk'
-
-// Create a mock wagmi config for testing
-const mockWagmiConfig = createConfig({
-  chains: [mainnet],
-  connectors: [
-    mock({
-      accounts: ['0x0000000000000000000000000000000000000000']
-    })
-  ],
-  transports: {
-    [mainnet.id]: http()
-  }
-})
 
 type TestOptions = {
   reduxState?: PartialDeep<AppState>
@@ -105,25 +89,23 @@ const TestProviders =
     )
 
     return (
-      <WagmiProvider config={mockWagmiConfig}>
-        <MediaProvider>
-          <QueryClientProvider client={queryClient}>
-            <QueryContext.Provider value={queryContext}>
-              <ThemeProvider theme='day'>
-                <ReduxProvider initialStoreState={reduxState}>
-                  {skipRouter ? (
-                    content
-                  ) : (
-                    <BrowserRouter>
-                      <NavigationSetup>{content}</NavigationSetup>
-                    </BrowserRouter>
-                  )}
-                </ReduxProvider>
-              </ThemeProvider>
-            </QueryContext.Provider>
-          </QueryClientProvider>
-        </MediaProvider>
-      </WagmiProvider>
+      <MediaProvider>
+        <QueryClientProvider client={queryClient}>
+          <QueryContext.Provider value={queryContext}>
+            <ThemeProvider theme='day'>
+              <ReduxProvider initialStoreState={reduxState}>
+                {skipRouter ? (
+                  content
+                ) : (
+                  <BrowserRouter>
+                    <NavigationSetup>{content}</NavigationSetup>
+                  </BrowserRouter>
+                )}
+              </ReduxProvider>
+            </ThemeProvider>
+          </QueryContext.Provider>
+        </QueryClientProvider>
+      </MediaProvider>
     )
   }
 

@@ -8,7 +8,10 @@ import {
   playlistMetadataForCreateWithSDK,
   fileToSdk
 } from '~/adapters'
-import { isContentUSDCPurchaseGated, type FieldVisibility } from '~/models'
+import {
+  stripUnsupportedCryptoGatedConditions,
+  type FieldVisibility
+} from '~/models'
 import type { CollectionValues } from '~/schemas'
 import {
   type TrackMetadataForUpload,
@@ -26,11 +29,7 @@ import { getUserQueryKey } from '../users/useUser'
 import { useQueryContext, type QueryContextType } from '../utils'
 
 import { mutationOptions } from './mutationOptions'
-import {
-  publishTracks,
-  addPremiumMetadata,
-  getUSDCMetadata
-} from './usePublishTracks'
+import { publishTracks } from './usePublishTracks'
 
 type PublishCollectionContext = Pick<
   QueryContextType,
@@ -58,52 +57,42 @@ const getPublishCollectionOptions = (context: PublishCollectionContext) =>
         throw new Error('User ID and wallet are required to publish collection')
       }
 
-      // If the collection is a premium album, this will populate the premium metadata (price/splits/etc)
-      let albumTrackPrice: number | undefined
-      if (
-        params.collectionMetadata.is_album &&
-        isContentUSDCPurchaseGated(params.collectionMetadata.stream_conditions)
-      ) {
-        // albumTrackPrice will be parsed out of the collection metadata, so we keep a copy here
-        albumTrackPrice =
-          params.collectionMetadata.stream_conditions?.usdc_purchase
-            .albumTrackPrice ?? undefined
-        params.collectionMetadata.stream_conditions = getUSDCMetadata(
-          userId,
+      const collectionMetadata = {
+        ...params.collectionMetadata,
+        stream_conditions: stripUnsupportedCryptoGatedConditions(
           params.collectionMetadata.stream_conditions
-        )
+        ) as typeof params.collectionMetadata.stream_conditions,
+        download_conditions: stripUnsupportedCryptoGatedConditions(
+          params.collectionMetadata.download_conditions
+        ) as typeof params.collectionMetadata.download_conditions
       }
+      collectionMetadata.is_stream_gated = !!collectionMetadata.stream_conditions
+      collectionMetadata.is_download_gated =
+        !!collectionMetadata.download_conditions
 
       // Combine collection metadata into each track's metadata
       for (const track of params.tracks) {
-        track.metadata = combineMetadata(
-          userId,
-          track.metadata,
-          params.collectionMetadata,
-          albumTrackPrice
-        )
+        track.metadata = combineMetadata(track.metadata, collectionMetadata)
       }
 
       // Publish all the tracks first
       const publishedTracks = await publishTracks(
         {
           ...context,
-          kind: params.collectionMetadata.is_album ? 'album' : 'playlist'
+          kind: collectionMetadata.is_album ? 'album' : 'playlist'
         },
         params.tracks
       )
 
       // For collection artwork, use the existing flow (not TUS) to keep things simple for now.
-      const { artwork } = params.collectionMetadata
+      const { artwork } = collectionMetadata
       const artworkBlob =
         artwork && 'file' in artwork ? (artwork?.file ?? null) : null
       const coverArtFile = artworkBlob
         ? fileToSdk(artworkBlob, 'cover_art')
         : undefined
-      if (params.collectionMetadata.is_album) {
-        const metadata = albumMetadataForCreateWithSDK(
-          params.collectionMetadata
-        )
+      if (collectionMetadata.is_album) {
+        const metadata = albumMetadataForCreateWithSDK(collectionMetadata)
         metadata.playlistContents = publishedTracks
           .filter((t) => !!t.trackId)
           .map((t) => ({
@@ -118,7 +107,7 @@ const getPublishCollectionOptions = (context: PublishCollectionContext) =>
         })
       } else {
         const metadata = playlistMetadataForCreateWithSDK(
-          params.collectionMetadata
+          collectionMetadata
         )
         metadata.playlistContents = publishedTracks
           .filter((t) => !!t.trackId)
@@ -228,10 +217,8 @@ export const usePublishCollection = (
  * taking the metadata from the playlist when the track is missing it.
  */
 function combineMetadata(
-  userId: number,
   trackMetadata: TrackMetadataForUpload,
-  collectionMetadata: CollectionValues,
-  albumTrackPrice?: number
+  collectionMetadata: CollectionValues
 ) {
   const metadata = trackMetadata
 
@@ -268,24 +255,5 @@ function combineMetadata(
     metadata.field_visibility = booleanFieldVisibility
   }
 
-  // If the tracks were added as part of a premium album, add all the necessary premium track metadata
-  if (albumTrackPrice !== undefined && albumTrackPrice > 0) {
-    // is_download_gated must always be set to true for all premium tracks
-    metadata.is_download_gated = true
-    metadata.download_conditions = {
-      usdc_purchase: {
-        price: albumTrackPrice,
-        splits: []
-      }
-    }
-    // Set up initial stream gating values
-    metadata.is_stream_gated = true
-    metadata.preview_start_seconds = 0
-    metadata.stream_conditions = {
-      usdc_purchase: { price: albumTrackPrice, splits: [] }
-    }
-    // Add splits to stream & download conditions
-    addPremiumMetadata(userId, metadata)
-  }
   return metadata
 }

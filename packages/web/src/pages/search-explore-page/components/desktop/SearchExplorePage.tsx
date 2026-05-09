@@ -39,8 +39,6 @@ import {
 import { CategoryView } from 'pages/search-page/types'
 
 import { ArtistSpotlightSection } from './ArtistSpotlightSection'
-import { BestSellingAlbumsSection } from './BestSellingAlbumsSection'
-import { FanClubsExploreSection } from './FanClubsExploreSection'
 import { FeaturedPlaylistsSection } from './FeaturedPlaylistsSection'
 import { FeaturedRemixContestsSection } from './FeaturedRemixContestsSection'
 import { FeelingLuckySection } from './FeelingLuckySection'
@@ -197,19 +195,9 @@ const SearchExplorePage = ({
       element: <NewAlbumReleasesSection />
     },
     {
-      key: 'bestSellingAlbums',
-      shouldRender: showAlbumContent,
-      element: <BestSellingAlbumsSection />
-    },
-    {
       key: 'featuredRemixContests',
       shouldRender: showTrackContent,
       element: <FeaturedRemixContestsSection />
-    },
-    {
-      key: 'fanClubs',
-      shouldRender: categoryKey === CategoryView.ALL,
-      element: <FanClubsExploreSection />
     },
     {
       key: 'quickSearch',

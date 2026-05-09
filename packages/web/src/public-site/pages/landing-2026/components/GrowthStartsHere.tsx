@@ -18,7 +18,7 @@ const messages = {
     },
     {
       title: 'Engage in Contests',
-      body: 'Join contests hosted by your favorite artists, labels, and collectives to win official releases, production gear, cash, and more.'
+      body: 'Join contests hosted by your favorite artists, labels, and collectives to win official releases, production gear, feedback, and more.'
     }
   ]
 }

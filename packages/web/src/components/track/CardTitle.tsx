@@ -1,25 +1,13 @@
-import {
-  isContentUSDCPurchaseGated,
-  AccessConditions,
-  isContentTokenGated
-} from '@audius/common/models'
+import { AccessConditions } from '@audius/common/models'
 import { Nullable } from '@audius/common/utils'
-import {
-  Text,
-  IconCart,
-  IconUserFollowing,
-  Flex,
-  IconFanClub
-} from '@audius/harmony'
+import { Text, IconUserFollowing, Flex } from '@audius/harmony'
 
 const messages = {
   trackTitle: 'TRACK',
   podcastTitle: 'PODCAST',
   remixTitle: 'REMIX',
   hiddenTrackTooltip: 'Anyone with a link to this page will be able to see it',
-  coinGated: 'COIN GATED',
   followersOnly: 'FOLLOWERS ONLY',
-  premiumTrack: 'PREMIUM TRACK',
   remixContest: 'REMIX CONTEST'
 }
 
@@ -39,7 +27,6 @@ export const CardTitle = ({
   isRemix,
   isStreamGated,
   isPodcast,
-  streamConditions,
   isRemixContest
 }: CardTitleProps) => {
   let content
@@ -51,23 +38,11 @@ export const CardTitle = ({
       </Text>
     )
   } else if (isStreamGated) {
-    let icon
-    let message
-    if (isContentUSDCPurchaseGated(streamConditions)) {
-      icon = <IconCart size='s' color='subdued' />
-      message = messages.premiumTrack
-    } else if (isContentTokenGated(streamConditions)) {
-      icon = <IconFanClub size='s' color='subdued' />
-      message = messages.coinGated
-    } else {
-      icon = <IconUserFollowing size='s' color='subdued' />
-      message = messages.followersOnly
-    }
     content = (
       <Flex gap='s' alignItems='center' justifyContent='center'>
-        {icon}
+        <IconUserFollowing size='s' color='subdued' />
         <Text variant='label' color='subdued'>
-          {message}
+          {messages.followersOnly}
         </Text>
       </Flex>
     )

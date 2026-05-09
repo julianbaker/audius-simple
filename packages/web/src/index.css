@@ -170,7 +170,7 @@ body,
   visibility: hidden;
 }
 
-/* Ensures the coinflow chargeback protection module is rendered off-screen to prevent ui jitter */
+/* Hide vendor storage iframes that can otherwise affect layout. */
 body > iframe#storageIframe,
 body > iframe[src='about:blank'] {
   display: none !important;

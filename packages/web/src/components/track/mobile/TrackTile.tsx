@@ -8,18 +8,14 @@ import {
 } from '@audius/common/api'
 import { useGatedContentAccess } from '@audius/common/hooks'
 import {
-  ModalSource,
-  isContentUSDCPurchaseGated,
   ID,
   FavoriteSource,
   ShareSource,
   RepostSource
 } from '@audius/common/models'
 import {
-  usePremiumContentPurchaseModal,
   gatedContentActions,
   gatedContentSelectors,
-  PurchaseableContentType,
   tracksSocialActions,
   mobileOverflowMenuUIActions,
   shareModalUIActions,
@@ -292,14 +288,11 @@ export const TrackTile = ({
   })
 
   const [, setModalVisibility] = useModalState('LockedContent')
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
   const gatedTrackStatusMap = useSelector(getGatedContentStatusMap)
   const gatedTrackId = isStreamGated ? id : null
   const gatedTrackStatus = gatedTrackId
     ? gatedTrackStatusMap[gatedTrackId]
     : undefined
-  const isPurchase = isContentUSDCPurchaseGated(streamConditions)
 
   const onToggleRepost = useCallback(() => toggleRepost(id), [toggleRepost, id])
 
@@ -330,25 +323,10 @@ export const TrackTile = ({
   }, [gatedTrackId, dispatch, setModalVisibility])
 
   const onClickPill = useCallback(() => {
-    if (isPurchase && gatedTrackId) {
-      openPremiumContentPurchaseModal(
-        {
-          contentId: gatedTrackId,
-          contentType: PurchaseableContentType.TRACK
-        },
-        { source: source ?? ModalSource.TrackTile }
-      )
-    } else if (gatedTrackId && !hasStreamAccess) {
+    if (gatedTrackId && !hasStreamAccess) {
       openLockedContentModal()
     }
-  }, [
-    isPurchase,
-    gatedTrackId,
-    hasStreamAccess,
-    openPremiumContentPurchaseModal,
-    source,
-    openLockedContentModal
-  ])
+  }, [gatedTrackId, hasStreamAccess, openLockedContentModal])
 
   useEffect(() => {
     if (!loading) {

@@ -26,34 +26,6 @@ const FollowGatedConditionsSchema = z
   })
   .strict()
 
-const TokenGatedConditionsSchema = z
-  .object({
-    token_gate: z.object({
-      token_mint: z.string(),
-      token_amount: z.number().positive().min(1)
-    })
-  })
-  .strict()
-
-/** Same as API extended_payment_split (snake-cased) */
-const PaymentSplitSchema = z.object({
-  user_id: z.number(),
-  percentage: z.number().min(0).max(100),
-  payout_wallet: z.string().optional(),
-  amount: z.number().nonnegative().optional(),
-  eth_wallet: z.optional(z.string())
-})
-
-/** Same as SDK but snake-cased for USDC purchase conditions */
-const USDCPurchaseConditionsSchema = z
-  .object({
-    usdc_purchase: z.object({
-      price: z.number().positive(),
-      splits: z.array(PaymentSplitSchema).default([])
-    })
-  })
-  .strict()
-
 /** Same as SDK. */
 const GenreSchema = z
   .enum(Object.values(Genre) as [Genre, ...Genre[]])
@@ -91,26 +63,14 @@ const DDEXRightsController = z
   })
   .strict()
 
-const premiumMetadataSchema = z.object({
+const gatedMetadataSchema = z.object({
   is_stream_gated: z.optional(z.boolean()).nullable(),
   stream_conditions: z
-    .optional(
-      z.union([
-        FollowGatedConditionsSchema,
-        USDCPurchaseConditionsSchema,
-        TokenGatedConditionsSchema
-      ])
-    )
+    .optional(FollowGatedConditionsSchema)
     .nullable(),
   is_download_gated: z.optional(z.boolean()).nullable(),
   download_conditions: z
-    .optional(
-      z.union([
-        FollowGatedConditionsSchema,
-        USDCPurchaseConditionsSchema,
-        TokenGatedConditionsSchema
-      ])
-    )
+    .optional(FollowGatedConditionsSchema)
     .nullable()
 })
 
@@ -194,7 +154,7 @@ const createSdkSchema = () =>
       bpm: z.optional(z.number().nullable()),
       musicalKey: z.optional(z.string().nullable())
     })
-    .merge(premiumMetadataSchema)
+    .merge(gatedMetadataSchema)
     .merge(hiddenMetadataSchema)
 
 /**
@@ -275,24 +235,7 @@ export const createCollectionSchema = (collectionType: 'playlist' | 'album') =>
       is_downloadable: z.optional(z.boolean()),
       isUpload: z.optional(z.boolean())
     })
-    .merge(
-      premiumMetadataSchema.extend({
-        stream_conditions: z
-          .intersection(
-            USDCPurchaseConditionsSchema,
-            z.object({
-              usdc_purchase: z.object({
-                // Album uploads set a price for all tracks.
-                // Note: this is made "required" via validation logic, set to optional here to avoid TS conflicts
-                // but is also prefilled in the form component (USDCPurchaseFields)
-                albumTrackPrice: z.optional(z.number().nullable())
-              })
-            })
-          )
-          .optional()
-          .nullable()
-      })
-    )
+    .merge(gatedMetadataSchema)
     .merge(hiddenMetadataSchema)
     .superRefine((data, ctx) => {
       // For albums, artwork is always required

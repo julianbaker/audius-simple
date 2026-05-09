@@ -3,12 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { trackMetadataForUploadToSdk } from '~/adapters'
 import {
-  isContentUSDCPurchaseGated,
-  type USDCPurchaseConditions,
   Name,
-  Feature
+  Feature,
+  isContentUnsupportedCryptoGated,
+  stripUnsupportedCryptoGatedConditions
 } from '~/models'
-import { createUserBankIfNeeded } from '~/services/audius-backend'
 import { ProgressStatus, uploadActions } from '~/store'
 import type { TrackMetadataForUpload } from '~/store'
 
@@ -29,7 +28,6 @@ type PublishTracksContext = Pick<
   'audiusSdk' | 'analytics' | 'dispatch' | 'reportToSentry'
 > & {
   userId: number
-  ethAddress?: string | null
   kind?: 'tracks' | 'album' | 'playlist'
 }
 
@@ -47,7 +45,6 @@ export const publishTracks = async (
 ) => {
   const {
     userId,
-    ethAddress,
     kind,
     audiusSdk,
     dispatch,
@@ -61,31 +58,9 @@ export const publishTracks = async (
 
   const sdk = await audiusSdk()
 
-  if (
-    ethAddress &&
-    params.some(
-      (p) =>
-        isContentUSDCPurchaseGated(p.metadata.stream_conditions) ||
-        isContentUSDCPurchaseGated(p.metadata.download_conditions)
-    )
-  ) {
-    createUserBankIfNeeded(sdk, {
-      mint: 'USDC',
-      ethAddress,
-      recordAnalytics: track
-    }).catch((error) => {
-      reportToSentry({
-        error,
-        additionalInfo: { userId, ethAddress },
-        feature: Feature.Upload,
-        name: 'Ensure USDC userbank on track upload'
-      })
-    })
-  }
-
   return await Promise.all(
     params.map(async (param) => {
-      const snakeMetadata = addPremiumMetadata(userId, param.metadata)
+      const snakeMetadata = stripUnsupportedCryptoGateMetadata(param.metadata)
 
       const trackId = await sdk.tracks.generateTrackId()
       const camelMetadata = trackMetadataForUploadToSdk({
@@ -214,7 +189,6 @@ export const usePublishTracks = (
     ...getPublishTracksOptions({
       ...queryContext,
       userId: userId!,
-      ethAddress: accountUser?.wallet,
       kind
     }),
     onSuccess: async (data) => {
@@ -245,52 +219,31 @@ export const usePublishTracks = (
   })
 }
 
-/*
- * Given a user's bank and USDC purchase conditions,
- * returns updated conditions with price in WEI and splits in the new array format.
- */
-export function getUSDCMetadata(
-  userId: number,
-  stream_conditions: USDCPurchaseConditions
-): USDCPurchaseConditions {
-  const priceCents = stream_conditions.usdc_purchase.price
+export function stripUnsupportedCryptoGateMetadata<
+  T extends TrackMetadataForUpload
+>(track: T): T {
+  const hadUnsupportedStreamGate = isContentUnsupportedCryptoGated(
+    track.stream_conditions
+  )
+  const hadUnsupportedDownloadGate = isContentUnsupportedCryptoGated(
+    track.download_conditions
+  )
+
   return {
-    usdc_purchase: {
-      price: priceCents,
-      ...(stream_conditions.usdc_purchase.albumTrackPrice != null && {
-        albumTrackPrice: stream_conditions.usdc_purchase.albumTrackPrice
-      }),
-      splits: [
-        {
-          user_id: userId,
-          percentage: 100
-        }
-      ]
-    }
-  }
-}
-
-/**
- * Adds relevant premium metadata
- * Converts prices to WEI and adds splits for USDC purchasable content.
- */
-export function addPremiumMetadata<T extends TrackMetadataForUpload>(
-  userId: number,
-  track: T
-) {
-  // download_conditions could be set separately from stream_conditions, so we check for them first
-  if (isContentUSDCPurchaseGated(track.download_conditions)) {
-    track.download_conditions = getUSDCMetadata(
-      userId,
+    ...track,
+    is_stream_gated:
+      !!stripUnsupportedCryptoGatedConditions(track.stream_conditions),
+    stream_conditions: stripUnsupportedCryptoGatedConditions(
+      track.stream_conditions
+    ),
+    ...(hadUnsupportedStreamGate ? { preview_start_seconds: null } : {}),
+    is_download_gated:
+      !!stripUnsupportedCryptoGatedConditions(track.download_conditions),
+    download_conditions: stripUnsupportedCryptoGatedConditions(
       track.download_conditions
-    )
+    ),
+    ...(hadUnsupportedDownloadGate
+      ? { is_downloadable: false, is_original_available: false }
+      : {})
   }
-
-  if (isContentUSDCPurchaseGated(track.stream_conditions)) {
-    track.stream_conditions = getUSDCMetadata(userId, track.stream_conditions)
-    // If stream_conditions are set, download_conditions should always match
-    track.download_conditions = getUSDCMetadata(userId, track.stream_conditions)
-  }
-
-  return track
 }

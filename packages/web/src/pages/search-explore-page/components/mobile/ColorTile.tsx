@@ -2,8 +2,6 @@ import { ReactNode } from 'react'
 
 import cn from 'classnames'
 
-import IconAudioRewardsPill from 'assets/img/iconAudioRewardsPill.svg'
-
 import styles from './ColorTile.module.css'
 
 type ColorTileProps = {
@@ -16,7 +14,6 @@ type ColorTileProps = {
   emoji?: string
   className?: string
   goToRoute: (route: string) => void
-  isIncentivized?: boolean
 }
 
 const ColorTile = ({
@@ -28,8 +25,7 @@ const ColorTile = ({
   icon,
   emoji,
   className,
-  goToRoute,
-  isIncentivized
+  goToRoute
 }: ColorTileProps) => {
   const onClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault()
@@ -51,11 +47,6 @@ const ColorTile = ({
       <p className={styles.description}>{description}</p>
       {emoji && <i className={`emoji xl ${emoji}`} />}
       {icon && <div className={styles.icon}>{icon}</div>}
-      {isIncentivized ? (
-        <div className={styles.rewardsPill}>
-          <IconAudioRewardsPill />
-        </div>
-      ) : null}
     </a>
   )
 }

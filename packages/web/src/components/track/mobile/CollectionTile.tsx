@@ -9,8 +9,6 @@ import {
 } from '@audius/common/api'
 import {
   ID,
-  ModalSource,
-  isContentUSDCPurchaseGated,
   Name,
   ShareSource,
   RepostSource,
@@ -20,8 +18,6 @@ import {
 } from '@audius/common/models'
 import {
   gatedContentActions,
-  PurchaseableContentType,
-  usePremiumContentPurchaseModal,
   collectionsSocialActions,
   mobileOverflowMenuUIActions,
   shareModalUIActions,
@@ -260,7 +256,6 @@ export const CollectionTile = ({
   variant,
   containerClassName,
   isFeed = false,
-  source,
   noShimmer
 }: OwnProps) => {
   const dispatch = useDispatch()
@@ -565,26 +560,11 @@ export const CollectionTile = ({
     }
   }, [dispatch, id, setModalVisibility])
 
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
-  const isPurchase = isContentUSDCPurchaseGated(collection?.stream_conditions)
-
   const onClickGatedUnlockPill = useRequiresAccountOnClick(() => {
-    if (isPurchase && id) {
-      openPremiumContentPurchaseModal(
-        { contentId: id, contentType: PurchaseableContentType.ALBUM },
-        { source: source ?? ModalSource.TrackTile }
-      )
-    } else if (id && !hasStreamAccess) {
+    if (id && !hasStreamAccess) {
       openLockedContentModal()
     }
-  }, [
-    isPurchase,
-    id,
-    openPremiumContentPurchaseModal,
-    hasStreamAccess,
-    openLockedContentModal
-  ])
+  }, [id, hasStreamAccess, openLockedContentModal])
 
   if (!collection) {
     return null

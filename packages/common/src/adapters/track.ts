@@ -273,8 +273,6 @@ export const trackMetadataForUploadToSdk = (
         'isrc',
         'iswc',
         'is_unlisted',
-        'is_premium',
-        'premium_conditions',
         'is_stream_gated',
         'stream_conditions',
         'is_download_gated',

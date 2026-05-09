@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 
 import { useQueryContext } from '~/api/tan-query/utils'
 import { ID } from '~/models/Identifiers'
+import { filterUnsupportedCryptoGatedTracks } from '~/models/Track'
 
 import { getTracksBatcher } from '../batchers/getTracksBatcher'
 import { TQTrack } from '../models'
@@ -74,11 +75,15 @@ export const useTracks = (
   })
 
   const { data: tracks } = queryResults
+  const filteredTracks = useMemo(
+    () => filterUnsupportedCryptoGatedTracks(tracks ?? []),
+    [tracks]
+  )
 
-  const byId = useMemo(() => keyBy(tracks, 'track_id'), [tracks])
+  const byId = useMemo(() => keyBy(filteredTracks, 'track_id'), [filteredTracks])
 
   return {
-    data: tracks,
+    data: filteredTracks,
     byId,
     status: queryResults.status,
     isPending: queryResults.isPending,

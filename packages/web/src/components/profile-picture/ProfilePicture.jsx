@@ -1,19 +1,14 @@
-import { memo, useState, useEffect, useMemo } from 'react'
+import { memo, useState, useEffect } from 'react'
 
-import { useArtistCreatedFanClub } from '@audius/common/api'
 import { SquareSizes } from '@audius/common/models'
-import { route } from '@audius/common/utils'
-import { useTheme, Image } from '@audius/harmony'
+import { Image } from '@audius/harmony'
 import cn from 'classnames'
 import Lottie from 'lottie-react'
 import PropTypes from 'prop-types'
-import { useNavigate } from 'react-router'
 
 import loadingSpinner from 'assets/animations/loadingSpinner.json'
-import { TokenIcon } from 'components/buy-sell-modal/TokenIcon'
 import ImageSelectionButton from 'components/image-selection/ImageSelectionButton'
 import { useProfilePicture } from 'hooks/useProfilePicture'
-import { env } from 'services/env'
 
 import styles from './ProfilePicture.module.css'
 
@@ -43,28 +38,6 @@ const ProfilePicture = ({
   const [processing, setProcessing] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
 
-  const { data: ownedCoin } = useArtistCreatedFanClub(userId)
-  const navigate = useNavigate()
-
-  const handleCoinClick = () => {
-    if (ownedCoin?.ticker) {
-      navigate(route.coinPage(ownedCoin.ticker))
-    }
-  }
-
-  const shouldShowFanClubBadge = useMemo(() => {
-    if (!ownedCoin?.mint || !ownedCoin?.logoUri) {
-      return false
-    }
-
-    // Don't show for wAUDIO
-    if (ownedCoin.mint === env.WAUDIO_MINT_ADDRESS) {
-      return false
-    }
-
-    return true
-  }, [ownedCoin?.mint, ownedCoin?.logoUri])
-
   useEffect(() => {
     if (editMode) {
       setHasChanged(false)
@@ -86,8 +59,6 @@ const ProfilePicture = ({
   const onClose = () => {
     setModalOpen(false)
   }
-
-  const { color } = useTheme()
 
   return (
     <div
@@ -127,23 +98,6 @@ const ProfilePicture = ({
             source='ProfilePicture'
           />
         ) : null}
-        {shouldShowFanClubBadge && (
-          <TokenIcon
-            logoURI={ownedCoin?.logoUri}
-            css={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              zIndex: 10,
-              cursor: 'pointer'
-            }}
-            hex
-            w={64}
-            h={64}
-            borderColor={color.static.white}
-            onClick={handleCoinClick}
-          />
-        )}
       </div>
     </div>
   )

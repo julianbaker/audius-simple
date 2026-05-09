@@ -7,7 +7,7 @@ import {
 
 import { transformAndCleanList, userTrackMetadataFromSDK } from '~/adapters'
 import { useQueryContext } from '~/api/tan-query/utils'
-import { ID } from '~/models/Identifiers'
+import { filterUnsupportedCryptoGatedTracks, ID } from '~/models'
 import { TracksSortMode } from '~/store/pages/profile/types'
 
 import { QUERY_KEYS } from '../queryKeys'
@@ -80,9 +80,11 @@ export const useProfileTracks = (
 
       if (!tracks) return []
 
-      const processedTracks = transformAndCleanList(
+      const processedTracks = filterUnsupportedCryptoGatedTracks(
+        transformAndCleanList(
         tracks,
         userTrackMetadataFromSDK
+        )
       )
       primeTrackData({ tracks: processedTracks, queryClient })
 

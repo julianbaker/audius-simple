@@ -8,7 +8,7 @@ import {
 import { userTrackMetadataFromSDK } from '~/adapters/track'
 import { transformAndCleanList } from '~/adapters/utils'
 import { useQueryContext } from '~/api/tan-query/utils'
-import { ID } from '~/models'
+import { filterUnsupportedCryptoGatedTracks, ID } from '~/models'
 import { UserTrackMetadata } from '~/models/Track'
 
 import { QUERY_KEYS } from '../queryKeys'
@@ -186,10 +186,11 @@ export const useTrackPageLineup = (
         }
       }
 
-      primeTrackData({ tracks, queryClient })
+      const supportedTracks = filterUnsupportedCryptoGatedTracks(tracks)
+      primeTrackData({ tracks: supportedTracks, queryClient })
 
       return {
-        trackIds: tracks.map((track) => track.track_id),
+        trackIds: supportedTracks.map((track) => track.track_id),
         indices
       }
     },

@@ -5,8 +5,8 @@ import {
   useGatedContentAccessMap,
   useGatedContentAccess
 } from '@audius/common/hooks'
-import { SquareSizes, ID, ModalSource } from '@audius/common/models'
-import { OverflowAction, PurchaseableContentType } from '@audius/common/store'
+import { SquareSizes, ID } from '@audius/common/models'
+import { OverflowAction } from '@audius/common/store'
 import { dayjs, formatReleaseDate } from '@audius/common/utils'
 import {
   Box,
@@ -45,7 +45,6 @@ const messages = {
   publishing: 'Publishing...',
   play: 'PLAY',
   pause: 'PAUSE',
-  preview: 'PREVIEW',
   coverArtAltText: 'Collection Cover Art',
   hidden: 'Hidden',
   releases: (releaseDate: string) =>
@@ -88,7 +87,6 @@ const CollectionHeader = ({
   saves = 0,
   reposts,
   onPlay = () => {},
-  onPreview = () => {},
   onShare,
   onSave,
   onRepost,
@@ -115,7 +113,6 @@ const CollectionHeader = ({
   const { hasStreamAccess } = useGatedContentAccess(partialCollection)
   const {
     is_private: isPrivate,
-    is_stream_gated: isPremium,
     is_scheduled_release: isScheduledRelease,
     release_date: releaseDate,
     permalink
@@ -131,9 +128,7 @@ const CollectionHeader = ({
   // otherwise show preview
   const shouldShowPlay =
     (isPlayable && hasStreamAccess) || doesUserHaveAccessToAnyTrack
-  const shouldShowPreview = isPremium && !hasStreamAccess && !shouldShowPlay
-
-  const showPremiumSection = isAlbum && streamConditions && collectionId
+  const showGatedSection = isAlbum && streamConditions && collectionId
   const shouldShowStats = isPublished && (!isPrivate || isOwner)
   const shouldShowScheduledRelease =
     isScheduledRelease && releaseDate && dayjs(releaseDate).isAfter(dayjs())
@@ -234,17 +229,6 @@ const CollectionHeader = ({
             {playing && !previewing ? messages.pause : messages.play}
           </Button>
         ) : null}
-        {shouldShowPreview ? (
-          <Button
-            variant='secondary'
-            iconLeft={playing && previewing ? IconPause : IconPlay}
-            onClick={onPreview}
-            fullWidth
-          >
-            {playing && previewing ? messages.pause : messages.preview}
-          </Button>
-        ) : null}
-
         <ActionButtonRow
           isOwner={isOwner}
           isSaved={isSaved}
@@ -274,19 +258,18 @@ const CollectionHeader = ({
         borderBottom='strong'
         justifyContent='flex-start'
       >
-        {showPremiumSection ? (
+        {showGatedSection ? (
           <Box w='100%'>
             <GatedContentSection
               isLoading={loading}
               contentId={collectionId}
-              contentType={PurchaseableContentType.ALBUM}
+              contentType='album'
               streamConditions={streamConditions}
               hasStreamAccess={!!access?.stream}
               isOwner={isOwner}
               className={styles.gatedContentSectionWrapper}
               buttonClassName={styles.gatedContentSectionButton}
               ownerId={userId}
-              source={ModalSource.CollectionDetails}
             />
           </Box>
         ) : null}

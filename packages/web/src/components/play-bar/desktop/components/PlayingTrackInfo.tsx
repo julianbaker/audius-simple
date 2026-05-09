@@ -82,11 +82,7 @@ const PlayingTrackInfo = ({
   })
   const { hasStreamAccess } = useGatedContentAccess(track)
   const isPreviewing = useSelector(getPreviewing)
-  const shouldShowPreviewLock =
-    isPreviewing ||
-    (track?.stream_conditions &&
-      'usdc_purchase' in track.stream_conditions &&
-      !hasStreamAccess)
+  const shouldShowPreviewLock = isPreviewing || !hasStreamAccess
 
   const spring = useSpring(springProps)
   const profileImage = useProfilePicture({
@@ -125,7 +121,7 @@ const PlayingTrackInfo = ({
             locked
             iconSize='2xs'
             coloredWhenLocked
-            variant='premium'
+            variant='gated'
             text={messages.preview}
           />
         ) : null}

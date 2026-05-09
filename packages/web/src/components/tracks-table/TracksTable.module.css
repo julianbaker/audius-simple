@@ -173,10 +173,6 @@
   transition: opacity 0.07s ease-out;
 }
 
-.purchaseButton {
-  opacity: 0;
-}
-
 .tablePlayButton.active {
   opacity: 1;
 }
@@ -199,9 +195,7 @@
 .tableRow:hover .tablePlayButton,
 .tableRow:focus-within .tablePlayButton,
 .tableRow:hover .trackActionsContainer .tableActionButton,
-.tableRow:focus-within .trackActionsContainer .tableActionButton,
-.tableRow:hover .purchaseButton,
-.tableRow:focus-within .purchaseButton {
+.tableRow:focus-within .trackActionsContainer .tableActionButton {
   opacity: 1;
 }
 
@@ -227,8 +221,7 @@
   background-color: var(--harmony-n-50);
 }
 
-.tableRow.disabled:hover .tablePlayButton,
-.tableRow.disabled:hover .purchaseButton {
+.tableRow.disabled:hover .tablePlayButton {
   opacity: 0;
   pointer-events: none;
 }

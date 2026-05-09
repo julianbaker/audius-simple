@@ -1,4 +1,9 @@
-import { AmountObject } from '~/store/ui'
+type AmountObject = {
+  amount: number
+  amountString: string
+  uiAmount: number
+  uiAmountString: string
+}
 
 export const WALLET_COUNT_LIMIT = 5
 

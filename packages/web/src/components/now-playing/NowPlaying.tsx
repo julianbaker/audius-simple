@@ -5,14 +5,13 @@ import {
   useToggleFavoriteTrack,
   useUser
 } from '@audius/common/api'
-import { useCurrentTrack, useGatedContentAccess } from '@audius/common/hooks'
+import { useCurrentTrack } from '@audius/common/hooks'
 import {
   Name,
   ShareSource,
   RepostSource,
   FavoriteSource,
   PlaybackSource,
-  ModalSource,
   SquareSizes,
   ID
 } from '@audius/common/models'
@@ -25,11 +24,8 @@ import {
   shareModalUIActions,
   OverflowAction,
   OverflowSource,
-  usePremiumContentPurchaseModal,
   playbackRateValueMap,
-  gatedContentSelectors,
-  OverflowActionCallbacks,
-  PurchaseableContentType
+  OverflowActionCallbacks
 } from '@audius/common/store'
 import { Genre, route } from '@audius/common/utils'
 import {
@@ -44,18 +40,15 @@ import { Dispatch } from 'redux'
 
 import { useHistoryContext } from 'app/HistoryProvider'
 import { useRecord, make } from 'common/store/analytics/actions'
-import { LockedStatusBadge } from 'components/locked-status-badge'
 import PlayButton from 'components/play-bar/PlayButton'
 import NextButtonProvider from 'components/play-bar/next-button/NextButtonProvider'
 import PreviousButtonProvider from 'components/play-bar/previous-button/PreviousButtonProvider'
 import RepeatButton from 'components/play-bar/repeat-button/RepeatButton'
 import ShuffleButton from 'components/play-bar/shuffle-button/ShuffleButton'
 import { PlayButtonStatus } from 'components/play-bar/types'
-import { GatedConditionsPill } from 'components/track/GatedConditionsPill'
 import { TrackDogEar } from 'components/track/TrackDogEar'
 import TrackFlair, { Size } from 'components/track-flair/TrackFlair'
 import UserBadges from 'components/user-badges/UserBadges'
-import { useRequiresAccountOnClick } from 'hooks/useRequiresAccount'
 import {
   useTrackCoverArt,
   useTrackCoverArtDominantColor
@@ -85,8 +78,6 @@ const {
   setRepeat: repeat,
   setShuffle: shuffle
 } = playbackActions
-const { getGatedContentStatusMap } = gatedContentSelectors
-
 type OwnProps = {
   onClose: () => void
 }
@@ -100,8 +91,7 @@ const RESTART_THRESHOLD_SEC = 3
 const SKIP_DURATION_SEC = 15
 
 const messages = {
-  nowPlaying: 'Now Playing',
-  preview: 'preview'
+  nowPlaying: 'Now Playing'
 }
 
 const g = withNullGuard((wide: NowPlayingProps) => {
@@ -369,28 +359,6 @@ const NowPlaying = g(
       transition: 'box-shadow 0.3s ease-in-out'
     }
 
-    const gatedTrackStatusMap = useSelector(getGatedContentStatusMap)
-    const gatedTrackStatus =
-      track_id &&
-      gatedTrackStatusMap[typeof track_id === 'number' ? track_id : -1]
-    const { onOpen: openPremiumContentPurchaseModal } =
-      usePremiumContentPurchaseModal()
-    const onClickPill = useRequiresAccountOnClick(() => {
-      openPremiumContentPurchaseModal(
-        {
-          contentId: typeof track_id === 'number' ? track_id : -1,
-          contentType: PurchaseableContentType.TRACK
-        },
-        { source: ModalSource.NowPlaying }
-      )
-    }, [track_id, openPremiumContentPurchaseModal])
-
-    const { hasStreamAccess } = useGatedContentAccess(track)
-    const shouldShowPurchasePreview =
-      track?.stream_conditions &&
-      'usdc_purchase' in track.stream_conditions &&
-      !hasStreamAccess
-
     return (
       <div className={styles.nowPlaying}>
         <div className={styles.header}>
@@ -445,15 +413,6 @@ const NowPlaying = g(
             <div className={styles.title} onClick={goToTrackPage}>
               {title}
             </div>
-            {shouldShowPurchasePreview ? (
-              <LockedStatusBadge
-                locked
-                iconSize='2xs'
-                coloredWhenLocked
-                variant='premium'
-                text={messages.preview}
-              />
-            ) : null}
           </div>
           <div className={styles.artist} onClick={goToProfilePage}>
             {name}
@@ -521,18 +480,6 @@ const NowPlaying = g(
           </div>
         </div>
         <div className={styles.actions}>
-          {shouldShowPurchasePreview && track.stream_conditions ? (
-            <GatedConditionsPill
-              showIcon={false}
-              streamConditions={track.stream_conditions}
-              unlocking={gatedTrackStatus === 'UNLOCKING'}
-              onClick={onClickPill}
-              className={styles.premiumPill}
-              buttonSize='large'
-              contentId={track_id as ID}
-              contentType='track'
-            />
-          ) : null}
           <ActionsBar
             trackId={track_id}
             onToggleRepost={toggleRepost}

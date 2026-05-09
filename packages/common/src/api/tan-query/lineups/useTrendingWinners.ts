@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { userTrackMetadataFromSDK } from '~/adapters/track'
 import { transformAndCleanList } from '~/adapters/utils'
 import { useQueryContext } from '~/api/tan-query/utils'
+import { filterUnsupportedCryptoGatedTracks } from '~/models'
 
 import { QUERY_KEYS } from '../queryKeys'
 import { QueryOptions } from '../types'
@@ -51,9 +52,8 @@ export const useTrendingWinners = (
 
       const sdkResponse = response?.data ?? []
 
-      const tracks = transformAndCleanList(
-        sdkResponse,
-        userTrackMetadataFromSDK
+      const tracks = filterUnsupportedCryptoGatedTracks(
+        transformAndCleanList(sdkResponse, userTrackMetadataFromSDK)
       )
 
       primeTrackData({ tracks, queryClient })

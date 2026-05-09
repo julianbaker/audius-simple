@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef } from 'react'
 
+import { useTracks } from '@audius/common/api'
 import { ID, PlaybackSource, Name } from '@audius/common/models'
 import { playbackActions, playbackSelectors } from '@audius/common/store'
 import type { PlaybackTrack, PlaybackQuerySource } from '@audius/common/store'
@@ -123,6 +124,14 @@ export const TrackLineup = ({
     isMobile || variant === LineupVariant.SECTION || isNarrow
 
   const TrackTile = isSmallTrackTile ? MobileTrackTile : TrackTileDesktop
+  const { data: supportedTracks } = useTracks(trackIds)
+  const supportedTrackIds = useMemo(() => {
+    if (!supportedTracks) return []
+    const supportedTrackIdSet = new Set(
+      supportedTracks.map((track) => track.track_id)
+    )
+    return trackIds.filter((trackId) => supportedTrackIdSet.has(trackId))
+  }, [supportedTracks, trackIds])
 
   // For tile highlight: prefer new playback slice's current track when
   // present, else fall back to legacy current (non-trending flows). Also
@@ -137,11 +146,11 @@ export const TrackLineup = ({
 
   const tracksForPlayback: PlaybackTrack[] = useMemo(
     () =>
-      trackIds.map((id) => ({
+      supportedTrackIds.map((id) => ({
         trackId: id,
         source
       })),
-    [trackIds, source]
+    [supportedTrackIds, source]
   )
 
   const togglePlay = useCallback(
@@ -166,7 +175,7 @@ export const TrackLineup = ({
         )
         return
       }
-      const startIndex = trackIds.indexOf(trackId)
+      const startIndex = supportedTrackIds.indexOf(trackId)
       if (startIndex < 0) return
       dispatch(
         playbackActions.playFrom({
@@ -182,7 +191,7 @@ export const TrackLineup = ({
     [
       dispatch,
       tracksForPlayback,
-      trackIds,
+      supportedTrackIds,
       querySource,
       currentLegacy?.trackId,
       currentLegacy?.source,
@@ -217,9 +226,9 @@ export const TrackLineup = ({
       : styles.section
 
   const visibleTrackIds = useMemo(() => {
-    const end = Math.min(trackIds.length, maxEntries)
-    return trackIds.slice(0, end)
-  }, [trackIds, maxEntries])
+    const end = Math.min(supportedTrackIds.length, maxEntries)
+    return supportedTrackIds.slice(0, end)
+  }, [supportedTrackIds, maxEntries])
 
   const renderSkeletons = useCallback(
     (skeletonCount: number | undefined) => {

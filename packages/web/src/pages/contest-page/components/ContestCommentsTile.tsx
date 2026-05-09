@@ -32,13 +32,13 @@ import {
 import { EntityType } from '@audius/sdk'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { AttachVideoModal } from 'components/attach-video-modal/AttachVideoModal'
 import { ComposerInput } from 'components/composer-input/ComposerInput'
 import { UserLink } from 'components/link/UserLink'
 import { VideoEmbed } from 'components/video-embed/VideoEmbed'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 
 import { Timestamp } from '../../../components/comments/Timestamp'
-import { AttachVideoModal } from '../../fan-club-detail-page/components/AttachVideoModal'
 
 const messages = {
   commentsHeading: 'Comments',
@@ -113,7 +113,7 @@ type ContestCommentsTileProps = {
  * track, this component wires up the event-comment hooks directly and
  * composes a few of the same building blocks (ComposerInput, UserLink,
  * Timestamp). The visual vocabulary matches — that's what the user
- * sees — and the provider can be generalised later as coins/other
+ * sees — and the provider can be generalised later for other contexts
  * entities join comments.
  */
 export const ContestCommentsTile = ({

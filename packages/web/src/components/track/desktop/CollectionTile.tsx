@@ -12,17 +12,13 @@ import {
   FavoriteSource,
   ID,
   Track,
-  isContentUSDCPurchaseGated,
-  ModalSource,
   Name,
   PlaybackSource
 } from '@audius/common/models'
 import {
   collectionsSocialActions,
   shareModalUIActions,
-  playbackSelectors,
-  usePremiumContentPurchaseModal,
-  PurchaseableContentType
+  playbackSelectors
 } from '@audius/common/store'
 import { formatLineupTileDuration, route } from '@audius/common/utils'
 import {
@@ -88,7 +84,6 @@ export type DesktopCollectionTileProps = {
   numLoadingSkeletonRows?: number
   isTrending: boolean
   isFeed?: boolean
-  source?: ModalSource
   noShimmer?: boolean
 }
 
@@ -108,7 +103,6 @@ export const CollectionTile = ({
   hasLoaded,
   isTrending,
   isFeed = false,
-  source,
   noShimmer
 }: DesktopCollectionTileProps) => {
   const dispatch = useDispatch()
@@ -129,7 +123,6 @@ export const CollectionTile = ({
       track_count: collection?.track_count,
       permalink: collection?.permalink,
       is_stream_gated: collection?.is_stream_gated,
-      stream_conditions: collection?.stream_conditions,
       access: collection?.access
     })
   })
@@ -143,7 +136,6 @@ export const CollectionTile = ({
     track_count: trackCount,
     permalink,
     is_stream_gated: isStreamGated,
-    stream_conditions: streamConditions,
     access,
     playlist_owner_id
   } = getCollectionWithFallback(partialCollection)
@@ -215,8 +207,6 @@ export const CollectionTile = ({
   const isActive = useMemo(() => {
     return tracks.some((track) => track.track_id === playingTrackIdState)
   }, [tracks, playingTrackIdState])
-  const { onOpen: openPremiumContentPurchaseModal } =
-    usePremiumContentPurchaseModal()
 
   const isCollectionPlaying = isActive && isPlaying
 
@@ -379,14 +369,9 @@ export const CollectionTile = ({
   const hasStreamAccess = !!access?.stream
 
   const onClickGatedUnlockPill = useRequiresAccountOnClick(() => {
-    const isPurchase = isContentUSDCPurchaseGated(streamConditions)
-    if (isPurchase && id) {
-      openPremiumContentPurchaseModal(
-        { contentId: id, contentType: PurchaseableContentType.ALBUM },
-        { source: source ?? ModalSource.TrackTile }
-      )
+    if (id && !hasStreamAccess) {
     }
-  }, [id, openPremiumContentPurchaseModal, hasStreamAccess])
+  }, [id, hasStreamAccess])
 
   const disableActions = false
 

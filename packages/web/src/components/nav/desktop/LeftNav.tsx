@@ -7,7 +7,6 @@ import { ResizeObserver } from '@juggle/resize-observer'
 import useMeasure from 'react-use-measure'
 
 import { DragAutoscroller } from 'components/drag-autoscroller/DragAutoscroller'
-import { ProfileCompletionPanel } from 'components/profile-progress/ProfileCompletionPanel'
 
 import { AccountDetails } from './AccountDetails'
 import { LeftNavCTA } from './LeftNavCTA'
@@ -16,19 +15,17 @@ import { useNavSidebar } from './NavSidebarContext'
 import { NowPlayingArtworkTile } from './NowPlayingArtworkTile'
 import { RouteNav } from './RouteNav'
 import {
+  HomeNavItem,
   FeedNavItem,
   TrendingNavItem,
   ExploreNavItem,
   ContestsNavItem,
   LibraryNavItem,
   MessagesNavItem,
-  WalletNavItem,
-  RewardsNavItem,
   DashboardNavItem,
   UploadNavItem,
   DevToolsNavItem,
-  PlaylistsNavItem,
-  FanClubsNavItem
+  PlaylistsNavItem
 } from './nav-items'
 
 export const LEFT_NAV_WIDTH = 240
@@ -128,15 +125,13 @@ export const LeftNav = (props: OwnProps) => {
               flex='1 1 auto'
               css={{ overflow: 'hidden' }}
             >
+              <HomeNavItem />
               <TrendingNavItem />
               <FeedNavItem />
               <ExploreNavItem />
               <ContestsNavItem />
               <LibraryNavItem />
               <MessagesNavItem />
-              <WalletNavItem />
-              <FanClubsNavItem />
-              <RewardsNavItem />
               <DashboardNavItem />
               <UploadNavItem />
               <DevToolsNavItem />
@@ -159,7 +154,6 @@ export const LeftNav = (props: OwnProps) => {
           gap='s'
           pb={isCollapsed ? 's' : undefined}
         >
-          {!isCollapsed ? <ProfileCompletionPanel /> : null}
           {!isCollapsed ? <LeftNavCTA /> : null}
           <NowPlayingArtworkTile size={isCollapsed ? 56 : undefined} />
           {isCollapsed ? <LeftNavCTA /> : null}

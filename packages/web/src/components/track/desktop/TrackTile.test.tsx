@@ -77,44 +77,15 @@ describe('TrackTile', () => {
     expect(await screen.findByText('3:00')).toBeInTheDocument()
   })
 
-  const premiumConditions = {
-    usdc_purchase: {
-      price: 100,
-      splits: [{ user_id: artistUser.id, percentage: 100 }]
-    }
-  }
-
-  const matrix = [
-    {
-      name: 'Public Free (non-owner)',
-      overrides: {},
-      assert: async () => {
-        expect(
-          await screen.findByRole('link', { name: /View track: Test Track/ })
-        ).toBeInTheDocument()
-        expect(
-          await screen.findByRole('link', { name: 'Test User' })
-        ).toBeInTheDocument()
-        expect(screen.queryByText('Premium')).not.toBeInTheDocument()
-      }
-    },
-    {
-      name: 'Public Premium (non-owner)',
-      overrides: {
-        is_stream_gated: true,
-        stream_conditions: premiumConditions
-      },
-      assert: async () => {
-        expect(
-          await screen.findByRole('button', { name: '$1.00' })
-        ).toBeInTheDocument()
-      }
-    }
-  ]
-
-  it.each(matrix)('$name', async ({ overrides, assert }) => {
-    renderTrackTile(overrides)
-    await assert()
+  it('Renders public non-owner links without payment labels', async () => {
+    renderTrackTile()
+    expect(
+      await screen.findByRole('link', { name: /View track: Test Track/ })
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByRole('link', { name: 'Test User' })
+    ).toBeInTheDocument()
+    expect(screen.queryByText('$1.00')).not.toBeInTheDocument()
   })
 
   it('keeps the track and artist links focusable', async () => {
