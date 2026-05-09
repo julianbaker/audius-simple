@@ -1,6 +1,9 @@
 {
   "name": "root",
   "version": "1.5.165",
+  "engines": {
+    "node": "22.x"
+  },
   "workspaces": [
     "packages/*",
     "packages/discovery-provider/plugins/pedalboard/apps/*",
