@@ -10,7 +10,6 @@ import {
   ShareSource,
   RepostSource,
   FavoriteSource,
-  PlayableType,
   ID,
   Name
 } from '@audius/common/models'
@@ -35,7 +34,6 @@ import { connect, useDispatch, useSelector } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { make } from 'common/store/analytics/actions'
-import * as embedModalActions from 'components/embed-modal/store/actions'
 import { ToastContext } from 'components/toast/ToastContext'
 import { push } from 'utils/navigation'
 import { albumPage, hostRemixContestPage } from 'utils/route'
@@ -56,7 +54,6 @@ const messages = {
   copiedToClipboard: 'Copied To Clipboard!',
   deleteTrack: 'Delete Track',
   editTrack: 'Edit Track',
-  embed: 'Embed',
   favorite: 'Favorite',
   repost: 'Repost',
   reposted: 'Reposted!',
@@ -92,7 +89,6 @@ export type OwnProps = {
   includeDelete?: boolean
   includeEdit?: boolean
   ddexApp?: string | null
-  includeEmbed?: boolean
   includeFavorite?: boolean
   includeRepost?: boolean
   includeShare?: boolean
@@ -123,7 +119,6 @@ const TrackMenu = ({
   includeAddToPlaylist = true,
   includeArtistPick = true,
   includeEdit = true,
-  includeEmbed = true,
   includeFavorite = true,
   includeAlbumPage = true,
   includeTrackPage = true,
@@ -185,7 +180,6 @@ const TrackMenu = ({
       includeRepost,
       includeShare,
       openAddToCollectionModal,
-      openEmbedModal,
       repostTrack,
       shareTrack,
       trackId,
@@ -311,11 +305,6 @@ const TrackMenu = ({
       onClick: () => onEditTrack(trackId)
     }
 
-    const embedMenuItem = {
-      text: messages.embed,
-      onClick: () => openEmbedModal(trackId)
-    }
-
     const remixContestMenuItem = {
       text: remixContest
         ? messages.editRemixContest
@@ -428,9 +417,6 @@ const TrackMenu = ({
     if (extraMenuItems && extraMenuItems.length > 0) {
       menu.items = menu.items.concat(extraMenuItems)
     }
-    if (includeEmbed && !isDeleted) {
-      menu.items.push(embedMenuItem)
-    }
     if (includeDelete && isOwner && !isDeleted && !ddexApp) {
       menu.items.push(deleteTrackMenuItem)
     }
@@ -474,9 +460,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
       title: string,
       isUnlisted: boolean
     ) =>
-      dispatch(openAddToCollection(collectionType, trackId, title, isUnlisted)),
-    openEmbedModal: (trackId: ID) =>
-      dispatch(embedModalActions.open(trackId, PlayableType.TRACK))
+      dispatch(openAddToCollection(collectionType, trackId, title, isUnlisted))
   }
 }
 

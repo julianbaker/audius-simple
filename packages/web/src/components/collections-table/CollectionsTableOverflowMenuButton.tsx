@@ -36,7 +36,6 @@ export const CollectionsTableOverflowMenuButton = (
   const overflowMenu = {
     type: isAlbum ? 'album' : 'playlist',
     playlistId: collectionId,
-    includeEmbed: !isPrivate && !isStreamGated,
     includeVisitArtistPage: false,
     includeShare: true,
     includeEdit: true,

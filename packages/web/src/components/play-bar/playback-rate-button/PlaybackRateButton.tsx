@@ -6,7 +6,7 @@ import {
   PlaybackRate
 } from '@audius/common/store'
 import {
-  PopupMenu,
+  ResponsivePopupMenu,
   PopupMenuItem,
   IconPlaybackRate0_5x,
   IconPlaybackRate0_8x,
@@ -95,7 +95,7 @@ export const PlaybackRateButton = ({ isMobile }: PlaybackRateButtonProps) => {
   )
 
   return (
-    <PopupMenu
+    <ResponsivePopupMenu
       title={messages.title}
       items={items}
       hideCloseButton

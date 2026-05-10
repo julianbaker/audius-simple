@@ -10,7 +10,6 @@ const props = {
   onShareToDirectMessage: vi.fn(),
   onShareToX: vi.fn(),
   onCopyLink: vi.fn(),
-  onEmbed: vi.fn(),
   onClose: vi.fn(),
   onClosed: vi.fn(),
   shareType: 'track' as const,

@@ -81,7 +81,6 @@ export const OverflowMenuButton = (props: OverflowMenuButtonProps) => {
     isFavorited: has_current_user_saved,
     mount: 'page',
     isOwner,
-    includeEmbed: !is_private && !is_stream_gated,
     includeFavorite: hasStreamAccess,
     includeRepost: hasStreamAccess,
     includeShare: true,

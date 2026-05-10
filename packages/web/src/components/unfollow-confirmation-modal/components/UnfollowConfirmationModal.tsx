@@ -1,6 +1,7 @@
 import { ID } from '@audius/common/models'
+import { IconUserUnfollow } from '@audius/harmony'
 
-import ActionSheetModal from 'components/action-drawer/ActionDrawer'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 type UnfollowConfirmationModalProps = {
   isOpen: boolean
@@ -10,14 +11,11 @@ type UnfollowConfirmationModalProps = {
 }
 
 const messages = {
-  unfollow: 'Unfollow',
+  title: 'Unfollow',
+  description: 'Are you sure you want to unfollow this user?',
+  confirm: 'Unfollow',
   cancel: 'Cancel'
 }
-
-const actions = [
-  { text: messages.unfollow, isDestructive: true },
-  { text: messages.cancel }
-]
 
 const UnfollowConfirmationModal = ({
   isOpen,
@@ -25,26 +23,25 @@ const UnfollowConfirmationModal = ({
   userId,
   unfollowUser
 }: UnfollowConfirmationModalProps) => {
-  const actionCallbacks = [
-    () => {
-      unfollowUser(userId)
-      onClose()
-    },
-    () => {
-      onClose()
-    }
-  ]
-
-  const didSelectRow = (row: number) => {
-    actionCallbacks[row]()
+  const handleConfirm = () => {
+    unfollowUser(userId)
+    onClose()
   }
 
   return (
-    <ActionSheetModal
+    <ResponsiveModal
       isOpen={isOpen}
       onClose={onClose}
-      actions={actions}
-      didSelectRow={didSelectRow}
+      title={messages.title}
+      Icon={IconUserUnfollow}
+      size='s'
+      confirmation={{
+        description: messages.description,
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm,
+        isDestructive: true
+      }}
     />
   )
 }

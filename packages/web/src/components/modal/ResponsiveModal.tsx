@@ -1,9 +1,13 @@
 import { ReactNode } from 'react'
 
 import {
+  Button,
   Flex,
   IconComponent,
   Modal,
+  ModalContent,
+  ModalContentText,
+  ModalFooter,
   ModalHeader,
   ModalTitle,
   Text
@@ -12,13 +16,55 @@ import {
 import Drawer from 'components/drawer/Drawer'
 import { useIsMobile } from 'hooks/useIsMobile'
 
+/**
+ * Shape of the `confirmation` variant — when set, ResponsiveModal renders
+ * a fixed confirmation layout (title → description → cancel/confirm row)
+ * and ignores `children`. Pulls together what was previously hand-rolled
+ * across ~10 confirmation modals plus 2 ActionDrawer-based ones, so every
+ * Audius confirmation now shares one implementation.
+ */
+export type ResponsiveModalConfirmation = {
+  /** Body of the confirmation. Usually a sentence or short paragraph. */
+  description: ReactNode
+  /** Primary action label, e.g. "Delete", "Release Now". */
+  confirmText: string
+  /** Secondary action label. Default: "Cancel". */
+  cancelText?: string
+  /** Called when the user clicks the confirm button. */
+  onConfirm: () => void
+  /**
+   * Called when the user clicks cancel. If omitted, falls back to
+   * `onClose`. (Backdrop tap / ESC / drawer drag-down also call `onClose`.)
+   */
+  onCancel?: () => void
+  /**
+   * Styles the confirm button as destructive (danger color). Use for
+   * deletes, removes, unfollows, etc.
+   */
+  isDestructive?: boolean
+  /**
+   * Loading state on the confirm button. While true, the button shows a
+   * spinner and is non-interactive; cancel is also disabled.
+   */
+  isConfirming?: boolean
+  /**
+   * Text shown on the confirm button while `isConfirming` is true.
+   * Default: keeps `confirmText` and shows the spinner alongside.
+   */
+  confirmingText?: string
+}
+
 export type ResponsiveModalProps = {
   className?: string
   // Core props
   isOpen: boolean
   onClose: () => void
   onClosed?: () => void
-  children: ReactNode
+  /**
+   * Content for the modal body. Required for the default (open-ended)
+   * variant; ignored when `confirmation` is set.
+   */
+  children?: ReactNode
 
   // Content props
   title?: string
@@ -37,22 +83,41 @@ export type ResponsiveModalProps = {
   // Optional overrides
   renderAsDrawer?: boolean // Force drawer on desktop
   renderAsModal?: boolean // Force modal on mobile
+
+  /**
+   * Render a standard confirmation layout (title, description, cancel /
+   * confirm buttons) instead of free-form children. When set, `children`
+   * is ignored. See `ResponsiveModalConfirmation` for the prop shape.
+   */
+  confirmation?: ResponsiveModalConfirmation
 }
+
+const DEFAULT_CANCEL_TEXT = 'Cancel'
 
 /**
  * A responsive modal component that automatically renders as a drawer on mobile
  * and a modal on desktop. It provides a unified API for both experiences.
+ *
+ * Two variants:
+ *
+ *   - **Open-ended (default):** caller supplies `children` for the body.
+ *   - **Confirmation:** pass `confirmation={{ … }}` for a fixed
+ *     title / description / cancel-confirm layout. Replaces the
+ *     hand-rolled confirmation modal pattern across the codebase.
  *
  * @example
  * ```tsx
  * <ResponsiveModal
  *   isOpen={isOpen}
  *   onClose={handleClose}
- *   title="My Modal"
- *   icon={<IconInfo />}
- * >
- *   <p>Modal content here</p>
- * </ResponsiveModal>
+ *   title="Delete Playlist?"
+ *   confirmation={{
+ *     description: 'This cannot be undone.',
+ *     confirmText: 'Delete',
+ *     onConfirm: handleDelete,
+ *     isDestructive: true
+ *   }}
+ * />
  * ```
  */
 const ResponsiveModal = ({
@@ -70,7 +135,8 @@ const ResponsiveModal = ({
   zIndex,
   renderAsDrawer,
   renderAsModal,
-  className
+  className,
+  confirmation
 }: ResponsiveModalProps) => {
   const isMobile = useIsMobile()
   const shouldRenderAsDrawer = renderAsDrawer ?? (isMobile && !renderAsModal)
@@ -91,10 +157,135 @@ const ResponsiveModal = ({
     }
   }
 
+  // ---- Confirmation variant ----
+  if (confirmation) {
+    const {
+      description,
+      confirmText,
+      cancelText = DEFAULT_CANCEL_TEXT,
+      onConfirm,
+      onCancel,
+      isDestructive = false,
+      isConfirming = false,
+      confirmingText
+    } = confirmation
+
+    const handleCancel = onCancel ?? onClose
+    const confirmLabel =
+      isConfirming && confirmingText ? confirmingText : confirmText
+    const confirmVariant = isDestructive ? 'destructive' : 'primary'
+
+    if (shouldRenderAsDrawer) {
+      return (
+        <Drawer
+          isOpen={isOpen}
+          shouldClose={!isOpen}
+          onClose={handleCancel}
+          onClosed={onClosed}
+          isFullscreen={isFullscreen}
+          zIndex={zIndex}
+        >
+          <Flex column gap='l' p='l' pt='l'>
+            {(title || Icon) && (
+              <Flex justifyContent='center'>
+                <ModalTitle title={title} Icon={Icon} />
+              </Flex>
+            )}
+            <Text
+              variant='body'
+              size='m'
+              color='default'
+              textAlign='center'
+            >
+              {description}
+            </Text>
+            {subtitle && (
+              <Text variant='body' size='s' color='subdued' textAlign='center'>
+                {subtitle}
+              </Text>
+            )}
+            <Flex column gap='s'>
+              <Button
+                variant={confirmVariant}
+                onClick={onConfirm}
+                fullWidth
+                isLoading={isConfirming}
+                disabled={isConfirming}
+              >
+                {confirmLabel}
+              </Button>
+              <Button
+                variant='secondary'
+                onClick={handleCancel}
+                fullWidth
+                disabled={isConfirming}
+              >
+                {cancelText}
+              </Button>
+            </Flex>
+          </Flex>
+        </Drawer>
+      )
+    }
+
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={handleCancel}
+        onClosed={onClosed}
+        size={getModalSize(size === 'm' ? 's' : size)}
+        zIndex={zIndex}
+        dismissOnClickOutside={dismissOnClickOutside}
+        className={className}
+      >
+        <ModalHeader>
+          <ModalTitle title={title} Icon={Icon} />
+        </ModalHeader>
+        <ModalContent>
+          <ModalContentText css={{ textAlign: 'center' }}>
+            {description}
+          </ModalContentText>
+          {subtitle && (
+            <Text
+              variant='body'
+              size='s'
+              color='subdued'
+              textAlign='center'
+              mt='s'
+            >
+              {subtitle}
+            </Text>
+          )}
+        </ModalContent>
+        <ModalFooter>
+          <Button
+            variant='secondary'
+            onClick={handleCancel}
+            fullWidth
+            disabled={isConfirming}
+          >
+            {cancelText}
+          </Button>
+          <Button
+            variant={confirmVariant}
+            onClick={onConfirm}
+            fullWidth
+            isLoading={isConfirming}
+            disabled={isConfirming}
+          >
+            {confirmLabel}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    )
+  }
+
+  // ---- Open-ended variant (existing) ----
   if (shouldRenderAsDrawer) {
     return (
       <Drawer
         isOpen={isOpen}
+        shouldClose={!isOpen}
         onClose={onClose}
         onClosed={onClosed}
         isFullscreen={isFullscreen}

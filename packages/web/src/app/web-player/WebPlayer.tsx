@@ -32,7 +32,6 @@ import {
 import { Pages as SignOnPages } from 'common/store/pages/signon/types'
 import AppRedirectListener from 'components/app-redirect-popover/AppRedirectListener'
 import { AppBannerWrapper } from 'components/banner/AppBannerWrapper'
-import { DownloadAppBanner } from 'components/banner/DownloadAppBanner'
 import { UpdateAppBanner } from 'components/banner/UpdateAppBanner'
 import { ChatListener } from 'components/chat-listener/ChatListener'
 import CookieBanner from 'components/cookie-banner/CookieBanner'
@@ -649,7 +648,6 @@ const WebPlayer = (props: WebPlayerProps) => {
   return (
     <div className={styles.root}>
       <AppBannerWrapper>
-        <DownloadAppBanner />
         {/* Re-enable for ToS updates */}
         {/* <TermsOfServiceUpdateBanner /> */}
         {showWebUpdateBanner ? (

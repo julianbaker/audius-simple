@@ -3,27 +3,25 @@ import { useCallback } from 'react'
 import { useCurrentAccount, useUpdatePlaylistLibrary } from '@audius/common/api'
 import { Name } from '@audius/common/models'
 import { playlistLibraryHelpers } from '@audius/common/store'
-import { SetRequired } from 'type-fest'
+import { Flex, IconTrash, Text } from '@audius/harmony'
 
 import { useRecord, make } from 'common/store/analytics/actions'
-import { DeleteConfirmationModal } from 'components/delete-confirmation'
-import { DeleteConfirmationModalProps } from 'components/delete-confirmation/DeleteConfirmationModal'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const { removePlaylistFolderInLibrary } = playlistLibraryHelpers
 
 const messages = {
-  confirmDeleteFolderModalTitle: 'Delete Folder',
-  confirmDeleteFolderModalHeader:
-    'Are you sure you want to delete this folder?',
-  confirmDeleteFolderModalDescription:
-    'Any playlists inside will be moved out before the folder is deleted.',
-  folderEntity: 'Folder'
+  title: 'Delete Folder',
+  header: 'Are you sure you want to delete this folder?',
+  description: 'Any playlists inside will be moved out before the folder is deleted.',
+  confirm: 'Delete Folder',
+  cancel: 'Cancel'
 }
 
-type DeleteFolderConfirmationModalProps = SetRequired<
-  Partial<DeleteConfirmationModalProps>,
-  'visible' | 'onCancel'
-> & {
+type DeleteFolderConfirmationModalProps = {
+  visible: boolean
+  onCancel: () => void
+  onDelete?: () => void
   folderId: string
 }
 
@@ -60,14 +58,28 @@ export const DeleteFolderConfirmationModal = (
   ])
 
   return (
-    <DeleteConfirmationModal
-      header={messages.confirmDeleteFolderModalHeader}
-      description={messages.confirmDeleteFolderModalDescription}
-      title={messages.confirmDeleteFolderModalTitle}
-      entity={messages.folderEntity}
-      onDelete={handleDelete}
-      onCancel={onCancel}
-      visible={visible}
+    <ResponsiveModal
+      isOpen={visible}
+      onClose={onCancel}
+      title={messages.title}
+      Icon={IconTrash}
+      size='s'
+      confirmation={{
+        description: (
+          <Flex column gap='m'>
+            <Text variant='title' size='m'>
+              {messages.header}
+            </Text>
+            <Text variant='body' size='m'>
+              {messages.description}
+            </Text>
+          </Flex>
+        ),
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleDelete,
+        isDestructive: true
+      }}
     />
   )
 }

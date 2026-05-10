@@ -9,9 +9,21 @@ import {
 } from '@audius/common/api'
 import { useAccountSwitcher } from '@audius/common/hooks'
 import { UserMetadata } from '@audius/common/models'
-import { Box, IconButton, IconCaretDown, Popup } from '@audius/harmony'
+import {
+  Box,
+  BottomSheet,
+  IconButton,
+  IconCaretDown,
+  Popup,
+  useMedia
+} from '@audius/harmony'
 
 import { AccountListContent } from './AccountListContent'
+
+const messages = {
+  ariaLabel: 'Switch account',
+  toggleLabel: 'Open Account Switcher'
+}
 
 type AccountSwitcherProps = {
   onVisibilityChange?: (isVisible: boolean) => void
@@ -101,40 +113,71 @@ export const AccountSwitcher = ({
     switchToWeb3User
   ])
 
-  return !isVisible && !isLoadingAccounts ? null : (
+  const { isMobile } = useMedia()
+  const closeSwitcher = useCallback(() => setIsExpanded(false), [])
+
+  // Memoize so the list child doesn't see a new callback reference on every
+  // parent render — keeps row click handlers stable while the sheet animates.
+  const handleAccountSelectedAndClose = useCallback(
+    (user: UserMetadata) => {
+      onAccountSelected(user)
+      closeSwitcher()
+    },
+    [onAccountSelected, closeSwitcher]
+  )
+
+  if (!isVisible && !isLoadingAccounts) return null
+
+  return (
     <Box ref={parentElementRef}>
       <IconButton
         color='default'
-        size='2xs'
-        aria-label='Open Account Switcher'
+        // 2xs is the desktop nav size. On mobile (≤480px) bump to 's' so the
+        // hit area is finger-friendly.
+        size={isMobile ? 's' : '2xs'}
+        aria-label={messages.toggleLabel}
         icon={IconCaretDown}
         disabled={isLoadingAccounts}
         onClick={isVisible ? onClickExpander : undefined}
       />
-      <Popup
-        checkIfClickInside={(target: EventTarget) => {
-          if (target instanceof Element && parentElementRef.current) {
-            return parentElementRef.current.contains(target)
-          }
-          return false
-        }}
-        anchorRef={parentElementRef}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        dismissOnMouseLeave={false}
-        isVisible={isExpanded}
-        onClose={() => setIsExpanded(false)}
-        css={{
-          overflow: 'hidden'
-        }}
-      >
-        <AccountListContent
-          managerAccount={currentWeb3User!}
-          currentUserId={currentUserId!}
-          onAccountSelected={onAccountSelected}
-          accounts={accounts}
-        />
-      </Popup>
+      {isMobile ? (
+        <BottomSheet
+          isOpen={isExpanded}
+          onClose={closeSwitcher}
+          ariaLabel={messages.ariaLabel}
+        >
+          <AccountListContent
+            managerAccount={currentWeb3User!}
+            currentUserId={currentUserId!}
+            onAccountSelected={handleAccountSelectedAndClose}
+            accounts={accounts}
+            fullWidth
+          />
+        </BottomSheet>
+      ) : (
+        <Popup
+          checkIfClickInside={(target: EventTarget) => {
+            if (target instanceof Element && parentElementRef.current) {
+              return parentElementRef.current.contains(target)
+            }
+            return false
+          }}
+          anchorRef={parentElementRef}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+          dismissOnMouseLeave={false}
+          isVisible={isExpanded}
+          onClose={closeSwitcher}
+          css={{ overflow: 'hidden' }}
+        >
+          <AccountListContent
+            managerAccount={currentWeb3User!}
+            currentUserId={currentUserId!}
+            onAccountSelected={onAccountSelected}
+            accounts={accounts}
+          />
+        </Popup>
+      )}
     </Box>
   )
 }

@@ -200,7 +200,6 @@ export const TrackTile = ({
       includeArtistPick: isOwner,
       includeEdit: isOwner,
       ddexApp: track?.ddex_app,
-      includeEmbed: !(is_unlisted || isStreamGated),
       includeFavorite: hasStreamAccess,
       includeRepost: hasStreamAccess,
       includeShare: true,

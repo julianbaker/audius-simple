@@ -1,57 +1,167 @@
-import { ComponentType, lazy } from 'react'
+import { ComponentType, lazy, Suspense } from 'react'
 
 import { Modals as ModalTypes } from '@audius/common/store'
 
-import AddToCollectionModal from 'components/add-to-collection/desktop/AddToCollectionModal'
-import { AlbumTrackRemoveConfirmationModal } from 'components/album-track-remove-confirmation-modal/AlbumTrackRemoveConfirmationModal'
-import AppCTAModal from 'components/app-cta-modal/AppCTAModal'
-import { ArtistPickModal } from 'components/artist-pick-modal/ArtistPickModal'
-import BrowserPushConfirmationModal from 'components/browser-push-confirmation-modal/BrowserPushConfirmationModal'
-import ConfirmerPreview from 'components/confirmer-preview/ConfirmerPreview'
-import DeletePlaylistConfirmationModal from 'components/delete-playlist-confirmation-modal/DeletePlaylistConfirmationModal'
-import { DeleteTrackConfirmationModal } from 'components/delete-track-confirmation-modal/DeleteTrackConfirmationModal'
-import { DownloadTrackArchiveModal } from 'components/download-track-archive-modal/DownloadTrackArchiveModal'
-import { DuplicateAddConfirmationModal } from 'components/duplicate-add-confirmation-modal'
-import { EarlyReleaseConfirmationModal } from 'components/early-release-confirmation-modal'
-import { EditAccessConfirmationModal } from 'components/edit-access-confirmation-modal'
-import EditFolderModal from 'components/edit-folder-modal/EditFolderModal'
-import EmbedModal from 'components/embed-modal/EmbedModal'
-import { FeatureFlagOverrideModal } from 'components/feature-flag-override-modal'
-import { FinalizeWinnersConfirmationModal } from 'components/finalize-winners-confirmation-modal/FinalizeWinnersConfirmationModal'
 import FirstUploadModal from 'components/first-upload-modal/FirstUploadModal'
-import { HideContentConfirmationModal } from 'components/hide-confirmation-modal'
-import { HostRemixContestModal } from 'components/host-remix-contest-modal/HostRemixContestModal'
-import { InboxUnavailableModal } from 'components/inbox-unavailable-modal/InboxUnavailableModal'
-import { LabelAccountModal } from 'components/label-account-modal/LabelAccountModal'
-import { LeavingAudiusModal } from 'components/leaving-audius-modal/LeavingAudiusModal'
-import { LockedContentModal } from 'components/locked-content-modal/LockedContentModal'
 import { PasswordResetModal } from 'components/password-reset/PasswordResetModal'
-import { PublishConfirmationModal } from 'components/publish-confirmation-modal/PublishConfirmationModal'
-import { ReplaceTrackConfirmationModal } from 'components/replace-track-confirmation-modal/ReplaceTrackConfirmationModal'
-import { ReplaceTrackProgressModal } from 'components/replace-track-progress-modal/ReplaceTrackProgressModal'
 import ConnectedMobileOverflowModal from 'components/track-overflow-modal/ConnectedMobileOverflowModal'
 import UnfollowConfirmationModal from 'components/unfollow-confirmation-modal/UnfollowConfirmationModal'
 import { UnsavedChangesDialog } from 'components/unsaved-changes-dialog/UnsavedChangesDialog'
-import { UploadConfirmationModal } from 'components/upload-confirmation-modal'
 import { UserListModal } from 'components/user-list-modal/UserListModal'
-import { WaitForDownloadModal } from 'components/wait-for-download-modal/WaitForDownloadModal'
-import { WelcomeModal } from 'components/welcome-modal/WelcomeModal'
+import { useEnvironment } from 'hooks/useEnvironment'
 import { useIsMobile } from 'hooks/useIsMobile'
-import { ChatBlastModal } from 'pages/chat-page/components/ChatBlastModal'
 
 import AppModal from './AppModal'
-const ShareModal = lazy(() => import('components/share-modal'))
 
+// Dev-only modals: lazy-loaded behind an isProduction gate so they never
+// ship in prod bundles. The components themselves self-gate via dev-mode
+// hotkey state once mounted.
+const ConfirmerPreview = lazy(
+  () => import('components/confirmer-preview/ConfirmerPreview')
+)
+const FeatureFlagOverrideModal = lazy(() =>
+  import('components/feature-flag-override-modal').then((m) => ({
+    default: m.FeatureFlagOverrideModal
+  }))
+)
+
+// All modals registered with the common modal slice are state-gated by
+// AppModal (it returns null when the modal's `isOpen` is false), so
+// lazy-loading their implementations is a pure bundle win — the chunk
+// is only fetched when the user actually opens the modal.
+
+const AddToCollectionModal = lazy(
+  () => import('components/add-to-collection/desktop/AddToCollectionModal')
+)
+const AlbumTrackRemoveConfirmationModal = lazy(() =>
+  import(
+    'components/album-track-remove-confirmation-modal/AlbumTrackRemoveConfirmationModal'
+  ).then((m) => ({ default: m.AlbumTrackRemoveConfirmationModal }))
+)
+const ArtistPickModal = lazy(() =>
+  import('components/artist-pick-modal/ArtistPickModal').then((m) => ({
+    default: m.ArtistPickModal
+  }))
+)
+const BrowserPushConfirmationModal = lazy(
+  () =>
+    import(
+      'components/browser-push-confirmation-modal/BrowserPushConfirmationModal'
+    )
+)
+const ChatBlastModal = lazy(() =>
+  import('pages/chat-page/components/ChatBlastModal').then((m) => ({
+    default: m.ChatBlastModal
+  }))
+)
+const CommentSettingsModal = lazy(
+  () => import('components/comment-settings-modal/CommentSettingsModal')
+)
 const CreateChatModal = lazy(
   () => import('pages/chat-page/components/CreateChatModal')
 )
-
+const DeletePlaylistConfirmationModal = lazy(
+  () =>
+    import(
+      'components/delete-playlist-confirmation-modal/DeletePlaylistConfirmationModal'
+    )
+)
+const DeleteTrackConfirmationModal = lazy(() =>
+  import(
+    'components/delete-track-confirmation-modal/DeleteTrackConfirmationModal'
+  ).then((m) => ({ default: m.DeleteTrackConfirmationModal }))
+)
+const DownloadTrackArchiveModal = lazy(() =>
+  import(
+    'components/download-track-archive-modal/DownloadTrackArchiveModal'
+  ).then((m) => ({ default: m.DownloadTrackArchiveModal }))
+)
+const DuplicateAddConfirmationModal = lazy(() =>
+  import('components/duplicate-add-confirmation-modal').then((m) => ({
+    default: m.DuplicateAddConfirmationModal
+  }))
+)
+const EarlyReleaseConfirmationModal = lazy(() =>
+  import('components/early-release-confirmation-modal').then((m) => ({
+    default: m.EarlyReleaseConfirmationModal
+  }))
+)
+const EditAccessConfirmationModal = lazy(() =>
+  import('components/edit-access-confirmation-modal').then((m) => ({
+    default: m.EditAccessConfirmationModal
+  }))
+)
+const EditFolderModal = lazy(
+  () => import('components/edit-folder-modal/EditFolderModal')
+)
+const FinalizeWinnersConfirmationModal = lazy(() =>
+  import(
+    'components/finalize-winners-confirmation-modal/FinalizeWinnersConfirmationModal'
+  ).then((m) => ({ default: m.FinalizeWinnersConfirmationModal }))
+)
+const HideContentConfirmationModal = lazy(() =>
+  import('components/hide-confirmation-modal').then((m) => ({
+    default: m.HideContentConfirmationModal
+  }))
+)
+const HostRemixContestModal = lazy(() =>
+  import('components/host-remix-contest-modal/HostRemixContestModal').then(
+    (m) => ({ default: m.HostRemixContestModal })
+  )
+)
 const InboxSettingsModal = lazy(
   () => import('components/inbox-settings-modal/InboxSettingsModal')
 )
-
-const CommentSettingsModal = lazy(
-  () => import('components/comment-settings-modal/CommentSettingsModal')
+const InboxUnavailableModal = lazy(() =>
+  import('components/inbox-unavailable-modal/InboxUnavailableModal').then(
+    (m) => ({ default: m.InboxUnavailableModal })
+  )
+)
+const LabelAccountModal = lazy(() =>
+  import('components/label-account-modal/LabelAccountModal').then((m) => ({
+    default: m.LabelAccountModal
+  }))
+)
+const LeavingAudiusModal = lazy(() =>
+  import('components/leaving-audius-modal/LeavingAudiusModal').then((m) => ({
+    default: m.LeavingAudiusModal
+  }))
+)
+const LockedContentModal = lazy(() =>
+  import('components/locked-content-modal/LockedContentModal').then((m) => ({
+    default: m.LockedContentModal
+  }))
+)
+const PublishConfirmationModal = lazy(() =>
+  import(
+    'components/publish-confirmation-modal/PublishConfirmationModal'
+  ).then((m) => ({ default: m.PublishConfirmationModal }))
+)
+const ReplaceTrackConfirmationModal = lazy(() =>
+  import(
+    'components/replace-track-confirmation-modal/ReplaceTrackConfirmationModal'
+  ).then((m) => ({ default: m.ReplaceTrackConfirmationModal }))
+)
+const ReplaceTrackProgressModal = lazy(() =>
+  import(
+    'components/replace-track-progress-modal/ReplaceTrackProgressModal'
+  ).then((m) => ({ default: m.ReplaceTrackProgressModal }))
+)
+const ShareModal = lazy(() => import('components/share-modal'))
+const UploadConfirmationModal = lazy(() =>
+  import('components/upload-confirmation-modal').then((m) => ({
+    default: m.UploadConfirmationModal
+  }))
+)
+const WaitForDownloadModal = lazy(() =>
+  import('components/wait-for-download-modal/WaitForDownloadModal').then(
+    (m) => ({ default: m.WaitForDownloadModal })
+  )
+)
+const WelcomeModal = lazy(() =>
+  import('components/welcome-modal/WelcomeModal').then((m) => ({
+    default: m.WelcomeModal
+  }))
 )
 
 const commonModalsMap: { [Modal in ModalTypes]?: ComponentType } = {
@@ -81,7 +191,6 @@ const commonModalsMap: { [Modal in ModalTypes]?: ComponentType } = {
   CreateChatModal,
   ChatBlastModal,
   InboxUnavailableModal,
-  WaitForDownloadModal,
   ArtistPick: ArtistPickModal,
   DownloadTrackArchive: DownloadTrackArchiveModal
 }
@@ -93,30 +202,40 @@ const commonModals = Object.entries(commonModalsMap) as [
 
 const Modals = () => {
   const isMobile = useIsMobile()
+  const { isDev } = useEnvironment()
 
   return (
     <>
+      {/* Top-level modals — these subscribe to their own state and
+          either render their UI or return null. Eagerly imported because
+          (a) they're small or (b) their "is needed?" check requires
+          reading state that's already loaded. */}
       <PasswordResetModal />
       <FirstUploadModal />
       <UnsavedChangesDialog />
+      {/* Modals registered with the common modal slice — lazy-loaded;
+          AppModal returns null until each is opened, so the chunk only
+          loads on first open. */}
       {commonModals.map(([modalName, Modal]) => {
         return <AppModal key={modalName} name={modalName} modal={Modal} />
       })}
-      {isMobile ? (
-        <>
-          <ConnectedMobileOverflowModal />
-          <UnfollowConfirmationModal />
-        </>
-      ) : (
-        <>
-          <EmbedModal />
-          <UserListModal />
-          <AppCTAModal />
-          {/* dev-mode hot-key modals */}
+      {/* User-list (followers/following/reposts/etc.) and unfollow
+          confirmation now render at every viewport — UserListModal uses
+          ResponsiveModal so it becomes a Drawer on mobile, and the
+          unfollow confirmation was migrated to the same primitive in
+          E1. The track-overflow drawer stays mobile-only until E5
+          replaces it with a responsive popup-menu primitive. */}
+      <UserListModal />
+      <UnfollowConfirmationModal />
+      {isMobile ? <ConnectedMobileOverflowModal /> : null}
+      {/* Dev-only modals, hidden behind isProduction so the chunks never
+          ship to production bundles. */}
+      {isDev ? (
+        <Suspense fallback={null}>
           <ConfirmerPreview />
           <FeatureFlagOverrideModal />
-        </>
-      )}
+        </Suspense>
+      ) : null}
     </>
   )
 }

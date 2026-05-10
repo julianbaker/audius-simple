@@ -676,7 +676,6 @@ export const TracksTable = ({
           }
         : {
             includeShare: !isUnlisted || isOwner,
-            includeEmbed: !isUnlisted,
             includeEdit: !disabledTrackEdit,
             includeAddToPlaylist: !isUnlisted || isOwner,
             onRemove: onClickRemoveRef.current,

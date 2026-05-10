@@ -15,12 +15,10 @@ import {
 } from '@audius/common/store'
 
 import SignOnPageState from 'common/store/pages/signon/types'
-import { EmbedModalState } from 'components/embed-modal/store/types'
 import { FirstUploadModalState } from 'components/first-upload-modal/store/slice'
 import { PasswordResetState } from 'components/password-reset/store/types'
 import { UnfollowConfirmationModalState } from 'components/unfollow-confirmation-modal/store/types'
 import VisualizerReducer from 'pages/visualizer/store/slice'
-import AppCTAModalReducer from 'store/application/ui/app-cta-modal/slice'
 import { ErrorState } from 'store/errors/reducers'
 
 import { BackendState } from '../common/store/backend/types'
@@ -49,11 +47,9 @@ export type AppState = CommonState & {
   // Global
   application: {
     ui: {
-      appCTAModal: ReturnType<typeof AppCTAModalReducer>
       averageColor: ReturnType<typeof averageColor>
       cookieBanner: CookieBannerState
       editFolderModal: EditFolderModalState
-      embedModal: EmbedModalState
       firstUploadModal: FirstUploadModalState
       scrollLock: ScrollLockState
       stemsUpload: ReturnType<typeof StemsUploadReducer>

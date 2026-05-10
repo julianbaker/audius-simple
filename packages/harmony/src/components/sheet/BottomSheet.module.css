@@ -1,7 +1,18 @@
 .backdrop {
   position: fixed;
+  /* Explicit edges in addition to `inset` so older WebKits that don't
+     compute the shorthand still cover the full viewport. */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
+  /* Guard against any ancestor inheriting `pointer-events: none` — the
+     backdrop must intercept taps so they don't pass through to content
+     behind it (e.g. nav items in a side drawer that share the viewport). */
+  pointer-events: auto;
+  touch-action: none;
   animation: backdropFadeIn 0.2s ease;
 }
 
@@ -53,16 +64,20 @@
 
 /* Drag region wraps both the visual handle AND any header slot so the
    user can dismiss by dragging anywhere in the top chrome (the natural
-   target). Background matches the header so the handle reads as part of
-   the same surface, not a separate strip floating above. */
+   target). Background + bottom border only paint when a header slot is
+   present — without one, the drag handle sits over the scroll content
+   without an extra divider. */
 .dragRegion {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: var(--harmony-bg-surface-1, var(--harmony-bg-default));
-  border-bottom: 1px solid var(--harmony-border-default, var(--harmony-n-100));
   cursor: grab;
   touch-action: none;
+}
+
+.dragRegionWithHeader {
+  background: var(--harmony-bg-surface-1, var(--harmony-bg-default));
+  border-bottom: 1px solid var(--harmony-border-default, var(--harmony-n-100));
 }
 
 .dragRegion:active {

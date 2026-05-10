@@ -137,3 +137,24 @@
 .mobilePanelDragging {
   transition: none;
 }
+
+/* Compact mobile nav rows. Desktop NavItem has p='s' (8px) on its middle
+   pill and pv='s' (8px) on the inner content. With ~10 nav items plus
+   the AccountDetails header, that overflows the mobile drawer and pushes
+   the AccountSwitcher caret out of reach. Halving vertical padding fits
+   the list without losing legibility.
+
+   Harmony's Flex applies padding via Emotion-generated CSS that's
+   injected at runtime — typically AFTER this CSS Module — so equal-
+   specificity rules lose to source order. `!important` is the most
+   reliable way to override here; coupled to Harmony's current NavItem
+   markup, so refactors there will silently un-couple. */
+.mobilePanel [data-left-nav-item] > * > * {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+.mobilePanel [data-left-nav-item] > * > * > * {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+}

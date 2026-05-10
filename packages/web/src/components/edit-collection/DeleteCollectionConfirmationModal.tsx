@@ -8,31 +8,29 @@ import {
 } from '@audius/common/api'
 import { ID } from '@audius/common/models'
 import { route } from '@audius/common/utils'
+import { IconTrash } from '@audius/harmony'
 import { useNavigate } from 'react-router'
-import { SetRequired } from 'type-fest'
 
-import { DeleteConfirmationModal } from 'components/delete-confirmation'
-import { DeleteConfirmationModalProps } from 'components/delete-confirmation/DeleteConfirmationModal'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const { profilePage } = route
 
 const messages = {
-  edit: 'Edit',
   delete: 'Delete',
+  cancel: 'Cancel',
+  deleting: 'Deleting',
   title: {
     playlist: 'Playlist',
     album: 'Album'
   },
-  type: {
-    playlist: 'Playlist',
-    album: 'Album'
-  }
+  description: (entity: string) =>
+    `Are you sure you want to delete this ${entity.toLowerCase()}?`
 }
 
-type DeleteCollectionConfirmationModalProps = SetRequired<
-  Partial<DeleteConfirmationModalProps>,
-  'visible' | 'onCancel'
-> & {
+type DeleteCollectionConfirmationModalProps = {
+  visible: boolean
+  onCancel: () => void
+  onDelete?: () => void
   collectionId: ID
 }
 
@@ -61,7 +59,6 @@ export const DeleteCollectionConfirmationModal = (
       navigate(`${profilePage(currentUser?.handle)}/${tab}`, { replace: true })
     } catch (error) {
       console.error('Failed to delete collection:', error)
-      // Error is handled by the mutation's onError callback
     }
   }, [
     deleteCollection,
@@ -72,17 +69,26 @@ export const DeleteCollectionConfirmationModal = (
     navigate
   ])
 
-  const entity = is_album ? messages.type.album : messages.type.playlist
-  const title = `${messages.delete} ${is_album ? messages.title.album : messages.title.playlist}`
+  const entity = is_album ? messages.title.album : messages.title.playlist
+  const title = `${messages.delete} ${entity}`
+  const confirmText = `${messages.delete} ${entity}`
 
   return (
-    <DeleteConfirmationModal
+    <ResponsiveModal
+      isOpen={visible}
+      onClose={onCancel}
       title={title}
-      entity={entity}
-      visible={visible}
-      onCancel={onCancel}
-      onDelete={handleDelete}
-      isDeleting={isDeleting}
+      Icon={IconTrash}
+      size='s'
+      confirmation={{
+        description: messages.description(entity),
+        confirmText,
+        cancelText: messages.cancel,
+        onConfirm: handleDelete,
+        isDestructive: true,
+        isConfirming: isDeleting,
+        confirmingText: messages.deleting
+      }}
     />
   )
 }

@@ -13,7 +13,6 @@ export const messages = {
   directMessage: 'Direct Message',
   x: 'Share to X',
   copyLink: 'Copy Link',
-  embed: 'Embed',
   toast: (asset: ShareType) => `Copied Link to ${shareTypeMap[asset]}`,
   trackShareText: (title: string, handle: string) =>
     `Check out ${title} by ${handle} on @audius $AUDIO`,

@@ -440,7 +440,6 @@ export const CollectionTile = ({
       playlistName: collection.playlist_name,
       isPublic: !collection.is_private,
       isOwner,
-      includeEmbed: !collection.is_private && !collection.is_stream_gated,
       includeShare: true,
       includeRepost: hasStreamAccess,
       includeFavorite: hasStreamAccess,

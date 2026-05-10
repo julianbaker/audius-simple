@@ -20,7 +20,7 @@ import {
   IconHeart,
   IconKebabHorizontal,
   IconQuestionCircle,
-  PopupMenu,
+  ResponsivePopupMenu,
   Text,
   TextLink
 } from '@audius/harmony'
@@ -351,7 +351,7 @@ export const CommentActionBar = ({
         {messages.reply}
       </TextLink>
 
-      <PopupMenu
+      <ResponsivePopupMenu
         items={popupMenuItems}
         anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}

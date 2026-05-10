@@ -1,6 +1,10 @@
 import { forwardRef } from 'react'
 
-import { PopupMenu, PopupMenuItem, PopupMenuProps } from '@audius/harmony'
+import {
+  PopupMenuItem,
+  PopupMenuProps,
+  ResponsivePopupMenu
+} from '@audius/harmony'
 
 import { useMainContentRef } from 'pages/MainContentContext'
 import appZIndex from 'utils/zIndex'
@@ -21,13 +25,19 @@ type MenuProps = {
   menu: MenuOptionType
 } & Omit<PopupMenuProps, 'renderTrigger' | 'items'>
 
+/**
+ * Wrapper around `ResponsivePopupMenu` that builds the items list from a
+ * `menu` descriptor (track/collection/user) and forwards the standard
+ * PopupMenu options. Anchored popup on desktop, bottom-sheet on mobile
+ * (≤480px) — same trigger, same items, viewport-appropriate surface.
+ */
 const Menu = forwardRef<HTMLDivElement, MenuProps>((props, ref) => {
   const { menu, onClose, zIndex: popupZIndexProp, children, ...other } = props
   const mainContentRef = useMainContentRef()
   const popupZIndex = popupZIndexProp ?? appZIndex.PROFILE_EDITABLE_COMPONENTS
 
   const renderMenu = (items: PopupMenuItem[]) => (
-    <PopupMenu
+    <ResponsivePopupMenu
       items={items}
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}

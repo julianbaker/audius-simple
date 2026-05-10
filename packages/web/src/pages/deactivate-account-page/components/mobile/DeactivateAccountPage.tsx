@@ -2,9 +2,9 @@ import { useContext, useEffect } from 'react'
 
 import { route } from '@audius/common/utils'
 
-import ActionDrawer from 'components/action-drawer/ActionDrawer'
 import { useMobileHeader } from 'components/header/mobile/hooks'
 import MobilePageContainer from 'components/mobile-page-container/MobilePageContainer'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 import NavContext, {
   LeftPreset,
   RightPreset
@@ -16,9 +16,12 @@ import {
   DeactivateAccountPageProps
 } from '../../DeactivateAccountPage'
 
-import styles from './DeactivateAccountPage.module.css'
-
 const { DEACTIVATE_PAGE } = route
+
+// ActionDrawer's `didSelectRow` callback maps action indices to handlers.
+// Preserve the original ordering: 0 = Deactivate (destructive), 1 = Go Back.
+const ACTION_DEACTIVATE = 0
+const ACTION_GO_BACK = 1
 
 const useMobileNavContext = () => {
   useMobileHeader({ title: messages.title })
@@ -28,13 +31,6 @@ const useMobileNavContext = () => {
     setRight(RightPreset.KEBAB)
   }, [setLeft, setRight])
 }
-
-const DrawerTitle = () => (
-  <div className={styles.drawerTitle}>
-    <div className={styles.drawerTitleHeader}>{messages.confirmTitle}</div>
-    <div className={styles.drawerTitleWarning}>{messages.confirm}</div>
-  </div>
-)
 
 export const DeactivateAccountPageMobile = ({
   children,
@@ -51,15 +47,19 @@ export const DeactivateAccountPageMobile = ({
       hasDefaultHeader
     >
       {children}
-      <ActionDrawer
+      <ResponsiveModal
         isOpen={isConfirmationVisible}
         onClose={closeConfirmation}
-        actions={[
-          { text: messages.buttonDeactivate, isDestructive: true },
-          { text: messages.buttonGoBack }
-        ]}
-        didSelectRow={onDrawerSelection}
-        renderTitle={DrawerTitle}
+        title={messages.confirmTitle}
+        size='s'
+        confirmation={{
+          description: messages.confirm,
+          confirmText: messages.buttonDeactivate,
+          cancelText: messages.buttonGoBack,
+          onConfirm: () => onDrawerSelection(ACTION_DEACTIVATE),
+          onCancel: () => onDrawerSelection(ACTION_GO_BACK),
+          isDestructive: true
+        }}
       />
     </MobilePageContainer>
   )

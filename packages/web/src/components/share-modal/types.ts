@@ -5,7 +5,6 @@ export type ShareProps = {
   onShareToDirectMessage?: () => void
   onShareToX: () => void
   onCopyLink: () => void
-  onEmbed?: () => void
   isOpen: boolean
   onClose: () => void
   onClosed: () => void

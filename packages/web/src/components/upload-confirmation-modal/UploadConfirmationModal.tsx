@@ -1,17 +1,9 @@
 import { useCallback } from 'react'
 
 import { useUploadConfirmationModal } from '@audius/common/store'
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalTitle,
-  ModalFooter,
-  IconCloudUpload as IconUpload,
-  Button,
-  Text,
-  Flex
-} from '@audius/harmony'
+import { IconCloudUpload } from '@audius/harmony'
+
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const messages = {
   title: 'Confirm Upload',
@@ -32,27 +24,20 @@ export const UploadConfirmationModal = () => {
   }, [confirmCallback, onClose])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='small'>
-      <ModalHeader>
-        <ModalTitle icon={<IconUpload />} title={messages.title} />
-      </ModalHeader>
-      <ModalContent>
-        <Flex justifyContent='center'>
-          <Text variant='body' size='l' textAlign='center'>
-            {hasPublicTracks
-              ? messages.publicDescription
-              : messages.hiddenDescription}
-          </Text>
-        </Flex>
-      </ModalContent>
-      <ModalFooter>
-        <Button variant='secondary' fullWidth onClick={onClose}>
-          {messages.cancel}
-        </Button>
-        <Button variant='primary' fullWidth onClick={handleConfirm}>
-          {messages.upload}
-        </Button>
-      </ModalFooter>
-    </Modal>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={messages.title}
+      Icon={IconCloudUpload}
+      size='s'
+      confirmation={{
+        description: hasPublicTracks
+          ? messages.publicDescription
+          : messages.hiddenDescription,
+        confirmText: messages.upload,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm
+      }}
+    />
   )
 }

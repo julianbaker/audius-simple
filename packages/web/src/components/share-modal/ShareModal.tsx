@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect } from 'react'
 
 import { useCurrentUserId } from '@audius/common/api'
 import { useIsManagedAccount, useShareAction } from '@audius/common/hooks'
-import { Name, PlayableType } from '@audius/common/models'
+import { Name } from '@audius/common/models'
 import {
   collectionsSocialActions,
   tracksSocialActions,
@@ -14,7 +14,6 @@ import {
 import { useDispatch } from 'react-redux'
 
 import { make, useRecord } from 'common/store/analytics/actions'
-import * as embedModalActions from 'components/embed-modal/store/actions'
 import { ToastContext } from 'components/toast/ToastContext'
 import { useIsMobile } from 'hooks/useIsMobile'
 import { useModalState } from 'pages/modals/useModalState'
@@ -96,27 +95,6 @@ export const ShareModal = () => {
     onClose()
   }, [dispatch, toast, content, source, onClose])
 
-  const handleEmbed = useCallback(() => {
-    if (content?.type === 'track') {
-      dispatch(
-        embedModalActions.open(content.track.track_id, PlayableType.TRACK)
-      )
-      onClose()
-    } else if (content?.type === 'playlist') {
-      dispatch(
-        embedModalActions.open(
-          content.playlist.playlist_id,
-          PlayableType.PLAYLIST
-        )
-      )
-      onClose()
-    } else if (content?.type === 'album') {
-      dispatch(
-        embedModalActions.open(content.album.playlist_id, PlayableType.ALBUM)
-      )
-      onClose()
-    }
-  }, [content, dispatch, onClose])
 
   // Trigger share action on mount with new content
   useEffect(() => {
@@ -142,9 +120,6 @@ export const ShareModal = () => {
       : handleShareToDirectMessage,
     onShareToX: handleShareToX,
     onCopyLink: handleCopyLink,
-    onEmbed: ['playlist', 'album', 'track'].includes(content?.type ?? '')
-      ? handleEmbed
-      : undefined,
     onClose,
     onClosed,
     shareType: content?.type ?? 'track',

@@ -5,7 +5,6 @@ import {
   ShareSource,
   RepostSource,
   FavoriteSource,
-  PlayableType,
   ID
 } from '@audius/common/models'
 import {
@@ -21,7 +20,6 @@ import { connect, useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import { Dispatch } from 'redux'
 
-import * as embedModalActions from 'components/embed-modal/store/actions'
 import { ToastContext } from 'components/toast/ToastContext'
 import { AppState } from 'store/types'
 import { push } from 'utils/navigation'
@@ -36,7 +34,6 @@ export type OwnProps = {
   extraMenuItems?: PopupMenuItem[]
   handle: string
   includeEdit?: boolean
-  includeEmbed?: boolean
   includeFavorite?: boolean
   includeRepost?: boolean
   includeShare?: boolean
@@ -63,7 +60,6 @@ export type CollectionMenuProps = OwnProps &
   ReturnType<typeof mapDispatchToProps>
 
 const messages = {
-  embed: 'Embed',
   playNext: 'Play Next',
   addToQueue: 'Add to Queue',
   willPlayNext: (count: number) =>
@@ -91,12 +87,10 @@ const CollectionMenu = ({
     includeEdit,
     includeShare,
     includeRepost,
-    includeEmbed,
     includeVisitArtistPage = true,
     isPublic,
     onShare,
     goToRoute,
-    openEmbedModal,
     permalink,
     shareCollection,
     saveCollection,
@@ -174,15 +168,6 @@ const CollectionMenu = ({
       onClick: () => navigate(`${permalink}/edit`)
     }
 
-    const embedMenuItem = {
-      text: messages.embed,
-      onClick: () =>
-        openEmbedModal(
-          playlistId,
-          type === 'album' ? PlayableType.ALBUM : PlayableType.PLAYLIST
-        )
-    }
-
     const collectionTracks = (collectionTrackIds ?? []).map((trackId) => ({
       trackId,
       source: QueueSource.COLLECTION_TRACKS
@@ -244,9 +229,6 @@ const CollectionMenu = ({
     if (extraMenuItems && extraMenuItems.length > 0) {
       menu.items = menu.items.concat(extraMenuItems)
     }
-    if (includeEmbed && isPublic) {
-      menu.items.push(embedMenuItem)
-    }
     if (includeEdit && isOwner && !ddexApp) {
       menu.items.push(editCollectionMenuItem)
     }
@@ -289,9 +271,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
     undoRepostCollection: (playlistId: PlaylistId) =>
       dispatch(
         socialActions.undoRepostCollection(playlistId, RepostSource.OVERFLOW)
-      ),
-    openEmbedModal: (playlistId: ID, kind: PlayableType) =>
-      dispatch(embedModalActions.open(playlistId, kind))
+      )
   }
 }
 

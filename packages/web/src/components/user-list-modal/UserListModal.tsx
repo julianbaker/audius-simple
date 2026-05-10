@@ -2,15 +2,12 @@ import { useCallback, useEffect } from 'react'
 
 import { notificationsUserListSelectors } from '@audius/common/store'
 import {
-  Modal,
   Scrollbar,
   IconUser,
   IconUserGroup,
   IconTrophy,
   IconUserFollowing as IconFollowing,
-  IconRemix,
-  ModalHeader,
-  ModalTitle
+  IconRemix
 } from '@audius/harmony'
 import { ChatBlastAudience } from '@audius/sdk'
 import { useDispatch, useSelector } from 'react-redux'
@@ -30,6 +27,8 @@ import {
 } from 'store/application/ui/userListModal/selectors'
 import { setVisibility } from 'store/application/ui/userListModal/slice'
 import { UserListType } from 'store/application/ui/userListModal/types'
+
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 import { FollowersUserList } from '../user-list/lists/FollowersUserList'
 const { getPageTitle } = notificationsUserListSelectors
@@ -125,10 +124,13 @@ export const UserListModal = () => {
   const { component, title, Icon } = getUserList()
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} css={{ width: 560 }}>
-      <ModalHeader>
-        <ModalTitle title={title} Icon={Icon} />
-      </ModalHeader>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={title}
+      Icon={Icon}
+      size='m'
+    >
       <Scrollbar>{component}</Scrollbar>
       {!isChatBlastPath && userListType === UserListType.FOLLOWER ? (
         <ChatBlastWithAudienceCTA
@@ -136,6 +138,6 @@ export const UserListModal = () => {
           onClick={onClose}
         />
       ) : null}
-    </Modal>
+    </ResponsiveModal>
   )
 }

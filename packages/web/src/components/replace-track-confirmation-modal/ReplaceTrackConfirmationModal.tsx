@@ -1,17 +1,9 @@
 import { useCallback } from 'react'
 
 import { useReplaceTrackConfirmationModal } from '@audius/common/store'
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  Button,
-  Text,
-  Flex,
-  Hint,
-  IconError
-} from '@audius/harmony'
+import { Flex, Hint, IconError, Text } from '@audius/harmony'
+
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const messages = {
   title: 'Are You Sure?',
@@ -37,32 +29,27 @@ export const ReplaceTrackConfirmationModal = () => {
   }, [cancelCallback, onClose])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='small'>
-      <ModalHeader>
-        <Flex alignSelf='center' gap='s'>
-          <Text variant='label' size='xl' strength='strong'>
-            {messages.title}
-          </Text>
-        </Flex>
-      </ModalHeader>
-      <ModalContent>
-        <Flex justifyContent='center' direction='column' gap='xl'>
-          <Text variant='body' size='l'>
-            {messages.description}
-          </Text>
-          <Hint pv='s' icon={IconError}>
-            {messages.hintText}
-          </Hint>
-        </Flex>
-      </ModalContent>
-      <ModalFooter>
-        <Button variant='secondary' fullWidth onClick={handleCancel}>
-          {messages.cancel}
-        </Button>
-        <Button variant='primary' fullWidth onClick={handleConfirm}>
-          {messages.confirm}
-        </Button>
-      </ModalFooter>
-    </Modal>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={handleCancel}
+      title={messages.title}
+      size='s'
+      confirmation={{
+        description: (
+          <Flex column gap='xl'>
+            <Text variant='body' size='m'>
+              {messages.description}
+            </Text>
+            <Hint pv='s' icon={IconError}>
+              {messages.hintText}
+            </Hint>
+          </Flex>
+        ),
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm,
+        onCancel: handleCancel
+      }}
+    />
   )
 }

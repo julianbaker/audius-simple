@@ -3,7 +3,6 @@ import {
   ModalContent,
   ModalHeader,
   ModalTitle,
-  IconEmbed,
   IconLink,
   IconMessage,
   IconShare,
@@ -42,7 +41,6 @@ export const ShareDialog = ({
   onShareToDirectMessage,
   onShareToX,
   onCopyLink,
-  onEmbed,
   isOpen,
   onClose,
   onClosed,
@@ -86,11 +84,6 @@ export const ShareDialog = ({
             <ShareActionListItem iconLeft={IconLink} onClick={onCopyLink}>
               {messages.copyLink}
             </ShareActionListItem>
-            {onEmbed ? (
-              <ShareActionListItem iconLeft={IconEmbed} onClick={onEmbed}>
-                {messages.embed}
-              </ShareActionListItem>
-            ) : null}
           </ul>
         </div>
       </ModalContent>

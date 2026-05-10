@@ -74,11 +74,17 @@ export const AccountListContent = ({
     },
     [currentUserId, onAccountSelected]
   )
+  // When `fullWidth` is set, this list is embedded in another surface
+  // (BottomSheet on mobile). Skip the white background so the parent's
+  // surface color shows through — otherwise we get a visible color seam
+  // between the sheet's drag region and the list.
+  const transparent = fullWidth
+
   return (
     <Flex
       direction='column'
       w={fullWidth ? '100%' : 360}
-      backgroundColor='white'
+      backgroundColor={transparent ? undefined : 'white'}
       css={{
         overflow: 'hidden',
         maxHeight:
@@ -88,8 +94,8 @@ export const AccountListContent = ({
       }}
     >
       <Flex
-        backgroundColor='white'
-        borderBottom='default'
+        backgroundColor={transparent ? undefined : 'white'}
+        borderBottom={transparent ? undefined : 'default'}
         alignItems='center'
         justifyContent='space-between'
         ph='l'

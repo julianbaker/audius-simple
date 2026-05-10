@@ -6,20 +6,12 @@ import {
   duplicateAddConfirmationModalUISelectors
 } from '@audius/common/store'
 import { fillString, route } from '@audius/common/utils'
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalContentText,
-  ModalHeader,
-  ModalTitle,
-  ModalFooter
-} from '@audius/harmony'
 import { capitalize, pick } from 'lodash'
 import { useDispatch } from 'react-redux'
 
 import { useModalState } from 'common/hooks/useModalState'
 import { useSelector } from 'common/hooks/useSelector'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 import { ToastContext } from 'components/toast/ToastContext'
 import ToastLinkContent from 'components/toast/mobile/ToastLinkContent'
 
@@ -38,6 +30,17 @@ const messages = {
   view: 'View'
 }
 
+/**
+ * Inverted button hierarchy: the safe action ("Don't Add") is primary,
+ * the user's prior intent ("Add Anyway") is secondary. ResponsiveModal's
+ * confirmation variant renders confirm on the right (primary) and cancel
+ * on the left (secondary), which matches the original UX when we map:
+ *
+ *   confirmText: "Don't Add"   → onConfirm = onClose
+ *   cancelText:  "Add Anyway"  → onCancel  = handleAdd
+ *
+ * Backdrop tap / ESC still dismiss without adding.
+ */
 export const DuplicateAddConfirmationModal = () => {
   const dispatch = useDispatch()
   const { toast } = useContext(ToastContext)
@@ -94,26 +97,21 @@ export const DuplicateAddConfirmationModal = () => {
   ])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='small'>
-      <ModalHeader>
-        <ModalTitle title={messages.title} />
-      </ModalHeader>
-      <ModalContent>
-        <ModalContentText>
-          {fillString(
-            messages.description(collectionType),
-            playlist_name ? ` "${playlist_name}"` : ''
-          )}
-        </ModalContentText>
-      </ModalContent>
-      <ModalFooter>
-        <Button variant='secondary' fullWidth onClick={handleAdd}>
-          {messages.add}
-        </Button>
-        <Button fullWidth variant='primary' onClick={onClose}>
-          {messages.cancel}
-        </Button>
-      </ModalFooter>
-    </Modal>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={messages.title}
+      size='s'
+      confirmation={{
+        description: fillString(
+          messages.description(collectionType),
+          playlist_name ? ` "${playlist_name}"` : ''
+        ),
+        confirmText: messages.cancel, // "Don't Add" — visually primary
+        onConfirm: onClose,
+        cancelText: messages.add, // "Add Anyway" — visually secondary
+        onCancel: handleAdd
+      }}
+    />
   )
 }

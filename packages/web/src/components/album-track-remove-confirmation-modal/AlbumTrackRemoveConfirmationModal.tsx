@@ -4,16 +4,10 @@ import {
   useAlbumTrackRemoveConfirmationModal,
   cacheCollectionsActions
 } from '@audius/common/store'
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalContentText,
-  ModalHeader,
-  ModalTitle,
-  ModalFooter
-} from '@audius/harmony'
+import { Flex, Text } from '@audius/harmony'
 import { useDispatch } from 'react-redux'
+
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const messages = {
   title: 'Remove Track',
@@ -21,7 +15,7 @@ const messages = {
   description2:
     'This removes the track from the album listing, but the standalone track remains available wherever it is already published.',
   cancel: 'Cancel',
-  release: 'Remove Track From Album'
+  confirm: 'Remove Track From Album'
 }
 
 export const AlbumTrackRemoveConfirmationModal = () => {
@@ -47,22 +41,27 @@ export const AlbumTrackRemoveConfirmationModal = () => {
   }, [dispatch, onClose, playlistId, timestamp, trackId])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='medium'>
-      <ModalHeader>
-        <ModalTitle title={messages.title} />
-      </ModalHeader>
-      <ModalContent css={{ textAlign: 'center' }}>
-        <ModalContentText>{messages.description1}</ModalContentText>
-        <ModalContentText>{messages.description2}</ModalContentText>
-      </ModalContent>
-      <ModalFooter>
-        <Button fullWidth variant='secondary' onClick={onClose}>
-          {messages.cancel}
-        </Button>
-        <Button variant='destructive' fullWidth onClick={handleConfirm}>
-          {messages.release}
-        </Button>
-      </ModalFooter>
-    </Modal>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={messages.title}
+      size='m'
+      confirmation={{
+        description: (
+          <Flex column gap='m'>
+            <Text variant='body' size='m'>
+              {messages.description1}
+            </Text>
+            <Text variant='body' size='m'>
+              {messages.description2}
+            </Text>
+          </Flex>
+        ),
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm,
+        isDestructive: true
+      }}
+    />
   )
 }

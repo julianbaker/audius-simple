@@ -1,6 +1,5 @@
 import { OverflowAction, OverflowActionCallbacks } from '@audius/common/store'
-
-import ActionSheetModal from 'components/action-drawer/ActionDrawer'
+import { BottomSheet, Flex, Text, useTheme } from '@audius/harmony'
 
 type MobileOverflowModalProps = {
   // Actions to show in the modal
@@ -112,25 +111,77 @@ const MobileOverflowModal = ({
     [OverflowAction.MARK_AS_UNPLAYED]: () => {}
   }
 
-  const didSelectRow = (index: number) => {
-    const action = actions[index]
+  const handleSelect = (action: OverflowAction) => {
     const callback = rowCallbacks[action] || (() => {})
     if (callbacks && callbacks[action]) {
       callbacks[action]!()
     }
-    // Eventually: will need some special casing for onAddToCollection, which returns
-    // a function accepting playlistId
     callback()
     onClose()
   }
 
   return (
-    <ActionSheetModal
+    <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      actions={actions ? actions.map((r) => ({ text: rowMessageMap[r] })) : []}
-      didSelectRow={didSelectRow}
-    />
+      ariaLabel='Track options'
+    >
+      <MobileOverflowList
+        actions={actions ?? []}
+        onSelect={handleSelect}
+      />
+    </BottomSheet>
+  )
+}
+
+const MobileOverflowList = ({
+  actions,
+  onSelect
+}: {
+  actions: OverflowAction[]
+  onSelect: (action: OverflowAction) => void
+}) => {
+  const { color, spacing, typography } = useTheme()
+
+  return (
+    <Flex column pv='m'>
+      {actions.map((action) => (
+        <Flex
+          key={action}
+          role='button'
+          tabIndex={0}
+          onClick={() => onSelect(action)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              onSelect(action)
+            }
+          }}
+          alignItems='center'
+          ph='l'
+          css={{
+            minHeight: 56,
+            cursor: 'pointer',
+            borderRadius: spacing.s,
+            '&:active': { background: color.background.surface2 },
+            '&:focus-visible': {
+              outline:
+                '2px solid var(--harmony-focus, var(--harmony-secondary))',
+              outlineOffset: '2px'
+            }
+          }}
+        >
+          <Text
+            variant='title'
+            size='m'
+            strength='strong'
+            css={{ fontWeight: typography.weight.demiBold }}
+          >
+            {rowMessageMap[action]}
+          </Text>
+        </Flex>
+      ))}
+    </Flex>
   )
 }
 

@@ -1,16 +1,9 @@
 import { useCallback } from 'react'
 
 import { useEarlyReleaseConfirmationModal } from '@audius/common/store'
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  Button,
-  Text,
-  Flex,
-  IconRocket
-} from '@audius/harmony'
+import { IconRocket } from '@audius/harmony'
+
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const getMessages = (contentType: 'track' | 'album') => ({
   title: 'Confirm Early Release',
@@ -36,30 +29,19 @@ export const EarlyReleaseConfirmationModal = () => {
   }, [cancelCallback, onClose])
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size='small'>
-      <ModalHeader>
-        <Flex alignSelf='center' gap='s'>
-          <IconRocket color='default' size='l' />
-          <Text variant='label' size='xl' strength='strong'>
-            {messages.title}
-          </Text>
-        </Flex>
-      </ModalHeader>
-      <ModalContent>
-        <Flex justifyContent='center'>
-          <Text variant='body' size='l' textAlign='center'>
-            {messages.description}
-          </Text>
-        </Flex>
-      </ModalContent>
-      <ModalFooter>
-        <Button variant='secondary' fullWidth onClick={handleCancel}>
-          {messages.cancel}
-        </Button>
-        <Button variant='primary' fullWidth onClick={handleConfirm}>
-          {messages.confirm}
-        </Button>
-      </ModalFooter>
-    </Modal>
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={handleCancel}
+      title={messages.title}
+      Icon={IconRocket}
+      size='s'
+      confirmation={{
+        description: messages.description,
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm,
+        onCancel: handleCancel
+      }}
+    />
   )
 }

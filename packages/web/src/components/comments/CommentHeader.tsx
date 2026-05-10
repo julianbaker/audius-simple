@@ -14,7 +14,7 @@ import {
   IconMessage,
   IconRefresh,
   PlainButton,
-  PopupMenu,
+  ResponsivePopupMenu,
   PopupMenuItem,
   Text
 } from '@audius/harmony'
@@ -98,7 +98,7 @@ export const CommentHeader = (props: CommentHeaderProps) => {
         ) : null}
       </Flex>
       {isEntityOwner && !isLoading ? (
-        <PopupMenu
+        <ResponsivePopupMenu
           items={popupMenuItems}
           anchorOrigin={{ vertical: 'center', horizontal: 'left' }}
           transformOrigin={{ vertical: 'center', horizontal: 'right' }}

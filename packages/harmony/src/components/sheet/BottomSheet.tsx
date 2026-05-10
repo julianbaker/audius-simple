@@ -95,11 +95,23 @@ export const BottomSheet = ({
 
   if (!isOpen) return null
 
+  // React synthetic events bubble through the React tree, not the DOM tree.
+  // Since BottomSheet portals to document.body, its touch/mouse events would
+  // otherwise propagate to whatever React parent the consumer rendered us
+  // inside (e.g. a side-drawer panel with its own swipe-to-dismiss). Halt
+  // them at the sheet boundary so the consumer's gesture handlers don't see
+  // touches that visually occurred over the sheet/backdrop.
+  const stopReactTreeBubble = (e: React.SyntheticEvent) => e.stopPropagation()
+
   const sheet = (
     <>
       <div
         className={styles.backdrop}
         onClick={onClose}
+        onTouchStart={stopReactTreeBubble}
+        onTouchMove={stopReactTreeBubble}
+        onTouchEnd={stopReactTreeBubble}
+        onMouseDown={stopReactTreeBubble}
         aria-hidden
         style={{ zIndex: zIndex - 1 }}
       />
@@ -109,6 +121,10 @@ export const BottomSheet = ({
         role='dialog'
         aria-modal='true'
         aria-label={ariaLabel}
+        onTouchStart={stopReactTreeBubble}
+        onTouchMove={stopReactTreeBubble}
+        onTouchEnd={stopReactTreeBubble}
+        onMouseDown={stopReactTreeBubble}
         style={{
           zIndex,
           transform: isDragging ? `translateY(${offset}px)` : undefined,
@@ -127,7 +143,14 @@ export const BottomSheet = ({
           />
         )}
 
-        <div ref={dragRegionRef} className={styles.dragRegion}>
+        <div
+          ref={dragRegionRef}
+          className={
+            header
+              ? `${styles.dragRegion} ${styles.dragRegionWithHeader}`
+              : styles.dragRegion
+          }
+        >
           <div className={styles.dragHandleArea}>
             <div className={styles.dragHandle} aria-hidden />
           </div>

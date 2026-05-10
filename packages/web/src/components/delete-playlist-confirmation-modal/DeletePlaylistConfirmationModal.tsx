@@ -1,26 +1,25 @@
-import { useCallback, useContext, useMemo } from 'react'
+import { useCallback, useContext } from 'react'
 
 import { useDeleteCollection } from '@audius/common/api'
 import { deletePlaylistConfirmationModalUISelectors } from '@audius/common/store'
 import { route } from '@audius/common/utils'
+import { IconTrash } from '@audius/harmony'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { useModalState } from 'common/hooks/useModalState'
-import ActionSheetModal from 'components/action-drawer/ActionDrawer'
 import { RouterContext } from 'components/animated-switch/RouterContextProvider'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 import { push } from 'utils/navigation'
+
 const { TRENDING_PAGE } = route
 const { getPlaylistId } = deletePlaylistConfirmationModalUISelectors
 
 const messages = {
-  delete: 'Delete',
+  title: 'Delete Playlist',
+  description: 'Are you sure you want to delete this playlist?',
+  confirm: 'Delete',
   cancel: 'Cancel'
 }
-
-const actions = [
-  { text: messages.delete, isDestructive: true },
-  { text: messages.cancel }
-]
 
 const DeletePlaylistConfirmationModal = () => {
   const [isOpen, setIsOpen] = useModalState('DeletePlaylistConfirmation')
@@ -37,30 +36,27 @@ const DeletePlaylistConfirmationModal = () => {
     try {
       await deleteCollection({ collectionId: playlistId })
       setStackReset(true)
-      // Navigate to trending page after successful deletion
       dispatch(push(TRENDING_PAGE))
       handleClose()
     } catch (error) {
       console.error('Failed to delete playlist:', error)
-      // Error is handled by the mutation's onError callback
     }
   }, [deleteCollection, dispatch, setStackReset, playlistId, handleClose])
 
-  const actionCallbacks = useMemo(
-    () => [handleDelete, handleClose],
-    [handleDelete, handleClose]
-  )
-
-  const didSelectRow = (row: number) => {
-    actionCallbacks[row]()
-  }
-
   return (
-    <ActionSheetModal
+    <ResponsiveModal
       isOpen={isOpen}
       onClose={handleClose}
-      actions={actions}
-      didSelectRow={didSelectRow}
+      title={messages.title}
+      Icon={IconTrash}
+      size='s'
+      confirmation={{
+        description: messages.description,
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleDelete,
+        isDestructive: true
+      }}
     />
   )
 }

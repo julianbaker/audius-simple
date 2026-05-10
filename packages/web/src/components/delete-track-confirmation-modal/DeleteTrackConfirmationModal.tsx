@@ -2,12 +2,15 @@ import { useCallback } from 'react'
 
 import { useDeleteTrack } from '@audius/common/api'
 import { useDeleteTrackConfirmationModal } from '@audius/common/store'
+import { IconTrash } from '@audius/harmony'
 
-import { DeleteConfirmationModal } from 'components/delete-confirmation'
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 const messages = {
-  delete: 'Delete Track',
-  track: 'Track'
+  title: 'Delete Track',
+  description: 'Are you sure you want to delete this track?',
+  confirm: 'Delete Track',
+  cancel: 'Cancel'
 }
 
 export const DeleteTrackConfirmationModal = () => {
@@ -21,17 +24,20 @@ export const DeleteTrackConfirmationModal = () => {
     onClose()
   }, [trackId, deleteTrack, onClose])
 
-  const handleCancel = useCallback(() => {
-    onClose()
-  }, [onClose])
-
   return (
-    <DeleteConfirmationModal
-      title={messages.delete}
-      entity={messages.track}
-      visible={isOpen}
-      onCancel={handleCancel}
-      onDelete={handleConfirm}
+    <ResponsiveModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={messages.title}
+      Icon={IconTrash}
+      size='s'
+      confirmation={{
+        description: messages.description,
+        confirmText: messages.confirm,
+        cancelText: messages.cancel,
+        onConfirm: handleConfirm,
+        isDestructive: true
+      }}
     />
   )
 }

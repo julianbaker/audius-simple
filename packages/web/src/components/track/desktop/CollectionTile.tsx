@@ -308,7 +308,6 @@ export const CollectionTile = ({
       playlistName: title,
       isPublic: !isUnlisted,
       isOwner,
-      includeEmbed: !isUnlisted && !isStreamGated,
       includeShare: true,
       includeRepost: hasStreamAccess,
       includeFavorite: hasStreamAccess,
