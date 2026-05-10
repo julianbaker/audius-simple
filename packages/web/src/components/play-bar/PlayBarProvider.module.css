@@ -12,7 +12,7 @@
   z-index: 14;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .playBarWrapper {
     z-index: 14;
   }

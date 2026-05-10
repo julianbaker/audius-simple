@@ -26,7 +26,7 @@
    applied to the bottom too. The bottom-chrome height is published by
    PlayBarProvider via --mobile-bottom-chrome (49px when no track, ~96px
    while a track is playing) so the composer & list adapt automatically. */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   /* The chat route disables main-page scrolling. In that layout #mainContent is
      already offset below the fixed mobile app bar and becomes the sticky
      scrollport, so using --mobile-nav-height here double-offsets the header. */

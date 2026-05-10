@@ -107,8 +107,10 @@
   margin-top: env(safe-area-inset-top, 0px);
 }
 
-/* CSS-first mobile layout — fires before JS hydration to prevent flicker */
-@media (max-width: 768px) {
+/* CSS-first mobile layout — fires before JS hydration to prevent flicker.
+   Mobile = phones in portrait (≤480px); tablets and landscape phones use
+   the responsive desktop layout. */
+@media (max-width: 480px) {
   .mainContentWrapper {
     margin-left: 0;
   }

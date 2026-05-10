@@ -1,10 +1,14 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
+import { RefObject, useEffect, useRef, useState } from 'react'
 
 type Args = {
   /** Sheet element used to size the dismiss threshold against. */
   sheetRef: RefObject<HTMLElement | null>
-  /** The drag region (handle / header) — gesture always engages here. */
-  dragRegionRef: RefObject<HTMLElement | null>
+  /**
+   * The drag region (handle / header) — gesture always engages here.
+   * Optional: a sheet without a static drag region can still dismiss via
+   * pull-from-top in the scroll area.
+   */
+  dragRegionRef?: RefObject<HTMLElement | null>
   /**
    * Inner scroll container — the gesture engages from here only while
    * scrollTop === 0. Required for iOS-style pull-to-dismiss; without it,
@@ -12,9 +16,12 @@ type Args = {
    */
   scrollRef?: RefObject<HTMLElement | null>
   /**
-   * Whether the sheet is currently open / mounted. The effect re-runs
-   * when this flips true so listeners get attached to the actual DOM
-   * elements (refs aren't a useEffect dependency on their own).
+   * Whether the sheet is currently mounted with its DOM populated. Required
+   * because ref objects are stable across renders — useEffect won't
+   * re-fire just because `ref.current` changed. Flipping this triggers
+   * the effect to re-run *after* the sheet's elements exist in the DOM.
+   *
+   * Tie this to whatever prop controls mounting (typically `isOpen`).
    */
   enabled: boolean
   /** Minimum downward distance (px) to commit the dismiss on release. */
@@ -27,12 +34,12 @@ type Args = {
 
 // Pixels of movement required before we engage the drag. Below this, the
 // touch is treated as a tap and click handlers on interactive children
-// (notification rows, links, the close button) fire normally without us
-// fighting them. The browser already cancels click events when movement
-// exceeds its own threshold, so this just keeps our state machine clean.
+// (rows, links, the close button) fire normally without us fighting them.
+// The browser already cancels click events when movement exceeds its own
+// threshold, so this just keeps our state machine clean.
 const ENGAGE_THRESHOLD_PX = 6
 // Explicit opt-out for any element that should never start a drag (e.g.
-// the close button if it ever lives inside a gesture target).
+// a close button living inside a gesture target).
 const NO_DRAG_SELECTOR = '[data-no-drag]'
 
 /**
@@ -69,6 +76,13 @@ export const useBottomSheetDismiss = ({
   const [offset, setOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
 
+  useEffect(() => {
+    if (!enabled) {
+      setOffset(0)
+      setIsDragging(false)
+    }
+  }, [enabled])
+
   // Stable refs for the latest callback values — the touch listeners are
   // bound once in useEffect and shouldn't re-attach on every render.
   const onDismissRef = useRef(onDismiss)
@@ -82,7 +96,8 @@ export const useBottomSheetDismiss = ({
 
   useEffect(() => {
     if (!enabled) return
-    const dragRegion = dragRegionRef.current
+
+    const dragRegion = dragRegionRef?.current
     const scrollArea = scrollRef?.current
     if (!dragRegion && !scrollArea) return
 
@@ -143,7 +158,7 @@ export const useBottomSheetDismiss = ({
       lastY = touch.clientY
 
       // Below the engage threshold this looks like a tap — let click
-      // handlers on interactive children (notification rows, etc.) fire.
+      // handlers on interactive children fire.
       if (!engaged && Math.abs(delta) < ENGAGE_THRESHOLD_PX) return
 
       if (delta > 0) {

@@ -60,7 +60,7 @@
 }
 
 /* Prevent the desktop sidebar from flashing before React hydration on mobile */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .leftNavWrapper {
     display: none;
   }

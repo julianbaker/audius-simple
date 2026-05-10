@@ -21,7 +21,7 @@
   border-right: 1px solid var(--harmony-n-150);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .windowScroll {
     height: auto;
     margin-top: calc(

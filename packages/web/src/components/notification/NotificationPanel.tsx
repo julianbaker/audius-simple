@@ -1,5 +1,4 @@
 import { RefObject, useCallback, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 
 import {
   useMarkNotificationsAsViewed,
@@ -7,9 +6,8 @@ import {
 } from '@audius/common/api'
 import { Nullable } from '@audius/common/utils'
 import {
+  BottomSheet,
   Flex,
-  IconButton,
-  IconClose,
   IconNotificationOn as IconNotification,
   LoadingSpinner,
   Paper,
@@ -22,16 +20,11 @@ import {
 import InfiniteScroll from 'react-infinite-scroller'
 import { useSelector } from 'react-redux'
 
-import {
-  useBottomSheetDismiss,
-  useSheetA11y
-} from 'hooks/useBottomSheetDismiss'
 import { getIsOpen as getIsUserListOpen } from 'store/application/ui/userListModal/selectors'
 import zIndex from 'utils/zIndex'
 
 import { EmptyNotifications } from './EmptyNotifications'
 import { Notification } from './Notification'
-import sheetStyles from './NotificationSheet.module.css'
 
 const messages = {
   title: 'Notifications',
@@ -156,13 +149,17 @@ const PanelHeader = ({ bare = false }: { bare?: boolean }) => (
 
 /**
  * Shared scrollable notifications list. Both the desktop popup and the
- * mobile sheet wrap this in their own scroll container; the only thing
- * that differs is how `getScrollParent` resolves.
+ * mobile sheet wrap this in their own scroll container.
+ *
+ * - Desktop passes an explicit `getScrollParent` (the Scrollbar element
+ *   has a stable id, easier to look up than walking the DOM).
+ * - Mobile omits it; InfiniteScroll auto-detects the nearest scrollable
+ *   ancestor when `useWindow={false}` and no override is provided.
  */
 const NotificationsList = ({
   getScrollParent
 }: {
-  getScrollParent: () => HTMLElement | null
+  getScrollParent?: () => HTMLElement | null
 }) => {
   const { spacing } = useTheme()
   const {
@@ -218,9 +215,14 @@ const NotificationsList = ({
 }
 
 /**
- * Mobile bottom-sheet drawer: rounded top corners, drag handle, drag-down
- * to dismiss, Escape to close, body-scroll lock. Portaled to body so it
- * escapes the navigator's stacking context.
+ * Mobile bottom-sheet rendering of the notifications panel. Hands the
+ * gesture / portal / scroll-area / close-button mechanics to Harmony's
+ * `<BottomSheet>` and just provides the header + list content.
+ *
+ * No explicit getScrollParent — when InfiniteScroll runs with
+ * `useWindow={false}` and no scroll parent override, it walks up from
+ * the <ul> to find the nearest scrollable ancestor. That's the sheet's
+ * internal scroll area.
  */
 const MobileNotificationSheet = ({
   isOpen,
@@ -228,79 +230,14 @@ const MobileNotificationSheet = ({
 }: {
   isOpen: boolean
   onClose: () => void
-}) => {
-  const sheetRef = useRef<HTMLDivElement>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const dragRegionRef = useRef<HTMLDivElement>(null)
-  const getScrollParent = useCallback(() => scrollRef.current, [])
-
-  useSheetA11y({ isOpen, onClose })
-
-  // iOS-style dismiss: gesture is bound (via native touch listeners with
-  // passive: false) to both the drag region (always engages) and the
-  // scroll area (engages only while scrollTop === 0). `enabled: isOpen`
-  // makes the effect re-run when the sheet mounts so listeners attach to
-  // the actual DOM elements (refs aren't a useEffect dependency).
-  const { offset, isDragging } = useBottomSheetDismiss({
-    sheetRef,
-    dragRegionRef,
-    scrollRef,
-    enabled: isOpen,
-    onDismiss: onClose
-  })
-
-  if (!isOpen) return null
-
-  const sheet = (
-    <>
-      <div
-        className={sheetStyles.backdrop}
-        onClick={onClose}
-        aria-hidden
-        style={{ zIndex: zIndex.MOBILE_SHEET_BACKDROP }}
-      />
-      <div
-        ref={sheetRef}
-        className={sheetStyles.sheet}
-        role='dialog'
-        aria-modal='true'
-        aria-label={messages.title}
-        style={{
-          zIndex: zIndex.MOBILE_SHEET,
-          transform: isDragging ? `translateY(${offset}px)` : undefined,
-          transition: isDragging ? 'none' : undefined
-        }}
-      >
-        {/* Close: pinned to the absolute top-right corner of the sheet so
-            its position doesn't shift with the drag handle's whitespace.
-            data-no-drag tells useBottomSheetDismiss to skip the drag
-            gesture when the press lands inside this button. */}
-        <IconButton
-          aria-label={messages.closeLabel}
-          icon={IconClose}
-          color='subdued'
-          size='s'
-          onClick={onClose}
-          className={sheetStyles.closeButton}
-          data-no-drag
-        />
-
-        {/* Drag region: handle + header are one surface. The hook
-            attaches native touch listeners (with passive: false) to
-            this ref AND to scrollRef so iOS-style pull-to-dismiss
-            works from the list when scrolled to the top. */}
-        <div ref={dragRegionRef} className={sheetStyles.dragRegion}>
-          <div className={sheetStyles.dragHandleArea}>
-            <div className={sheetStyles.dragHandle} aria-hidden />
-          </div>
-          <PanelHeader bare />
-        </div>
-        <div ref={scrollRef} className={sheetStyles.scrollArea}>
-          <NotificationsList getScrollParent={getScrollParent} />
-        </div>
-      </div>
-    </>
-  )
-
-  return createPortal(sheet, document.body)
-}
+}) => (
+  <BottomSheet
+    isOpen={isOpen}
+    onClose={onClose}
+    ariaLabel={messages.title}
+    closeAriaLabel={messages.closeLabel}
+    header={<PanelHeader bare />}
+  >
+    <NotificationsList />
+  </BottomSheet>
+)

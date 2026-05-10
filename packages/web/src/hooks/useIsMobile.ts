@@ -1,11 +1,12 @@
 import { useMedia as useMediaQuery } from 'react-use'
 
 /**
- * Returns true if the current viewport is mobile-sized (≤768px wide).
+ * Returns true if the current viewport is mobile-sized (≤480px wide).
  *
- * Previously this was UA-based (via SsrContext). Now it's viewport-based so
- * a desktop browser narrowed to mobile width behaves identically to a real
- * mobile device.
+ * 480px = phones in portrait. Tablets (768px iPad mini portrait) and
+ * phones in landscape (~640–926px) get the desktop layout, which we have
+ * confirmed handles narrow desktop widths well via container queries and
+ * the existing 328px MIN_DESKTOP_CONTENT_WIDTH_PX floor.
  *
  * Implementation note: this calls react-use's useMedia directly rather than
  * Harmony's MediaProvider-backed useMedia hook. That's deliberate — this
@@ -20,5 +21,5 @@ import { useMedia as useMediaQuery } from 'react-use'
  * possible.
  */
 export const useIsMobile = () => {
-  return useMediaQuery('(max-width: 768px)')
+  return useMediaQuery('(max-width: 480px)')
 }

@@ -20,7 +20,7 @@ export type MediaContextType = {
   isAboveExtraLarge: boolean // > 1440px
 
   // Common device categories
-  isMobile: boolean // <= 768px
+  isMobile: boolean // <= 480px (phones in portrait)
   isTablet: boolean // > 768px and <= 1024px
   isDesktop: boolean // > 1024px
 
@@ -53,7 +53,9 @@ export const MediaProvider = ({ children }: MediaProviderProps) => {
   const isAboveExtraLarge = useMediaQuery(breakpoints.up.xl)
 
   // Derived properties
-  const isMobile = isSmall // <= 768px
+  // isMobile = phones only (≤480px). Tablets and landscape phones use the
+  // desktop layout, which is responsive via container queries below 768px.
+  const isMobile = isExtraSmall // <= 480px
   const isTablet = !isSmall && !isAboveMedium // > 768px and <= 1024px
   const isDesktop = isAboveMedium // > 1024px
 

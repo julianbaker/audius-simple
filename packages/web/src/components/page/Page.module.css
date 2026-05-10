@@ -13,7 +13,7 @@
   padding: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .pageContainer .mobileContentTopOverlap {
     margin-top: calc(-1 * var(--mobile-content-top-overlap, 0px));
     padding-top: calc(

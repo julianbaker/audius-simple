@@ -10,8 +10,8 @@
    cutout / status bar) so the drag handle is always visible.
 
    - `height` (not `max-height`): keeps the sheet at a consistent size as
-     the notifications list loads in, so it doesn't pop from "header only"
-     to "full" once the data arrives.
+     content loads, so it doesn't pop from "header only" to "full" once
+     the data arrives.
    - `100dvh`: dynamic viewport height — excludes the iOS Safari
      URL-bar chrome that `100vh` includes. Falls back to `100vh` on older
      browsers via the prior declaration.
@@ -51,7 +51,7 @@
   z-index: 1;
 }
 
-/* Drag region wraps both the visual handle AND the panel header so the
+/* Drag region wraps both the visual handle AND any header slot so the
    user can dismiss by dragging anywhere in the top chrome (the natural
    target). Background matches the header so the handle reads as part of
    the same surface, not a separate strip floating above. */
