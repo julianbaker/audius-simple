@@ -16,7 +16,6 @@ import { FilterButton, Flex, IconFeed } from '@audius/harmony'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { make, useRecord } from 'common/store/analytics/actions'
-import { MIN_DESKTOP_CONTENT_WIDTH_PX } from 'common/utils/layout'
 import { Header } from 'components/header/desktop/Header'
 import EndOfLineup from 'components/lineup/EndOfLineup'
 import { TrackLineup } from 'components/lineup/TrackLineup'
@@ -122,7 +121,7 @@ const FeedPageContent = ({ containerRef }: FeedPageContentProps) => {
       size='large'
       header={header}
     >
-      <Flex w='100%' css={{ minWidth: MIN_DESKTOP_CONTENT_WIDTH_PX }}>
+      <Flex w='100%'>
         <TrackLineup
           key={`feed-${feedFilter}`}
           aria-label='feed'

@@ -18,6 +18,7 @@
   --nav-shift: 0px;
   --mobile-min-width: 280px;
   --play-bar-height: 88px;
+  --page-padding-inline: 32px;
   --frosted-surface-backdrop-filter: blur(10px);
   --frosted-surface-background-color: var(--harmony-n-25);
   --frosted-surface-opacity: 65%;
@@ -84,12 +85,12 @@
 }
 
 .mainContentWrapperMobile {
-  min-height: calc(100vh - calc(env(safe-area-inset-top, 0px) + 40px));
+  min-height: calc(100vh - calc(env(safe-area-inset-top, 0px) + 44px));
   position: relative;
   margin-left: 0px;
   overflow-y: visible;
   overflow-x: visible;
-  margin-top: calc(env(safe-area-inset-top, 0px) + 40px);
+  margin-top: calc(env(safe-area-inset-top, 0px) + 44px);
   margin-bottom: 0;
   /* Avoid creating a containing block for the fixed mobile Header */
   transform: none;
@@ -98,10 +99,20 @@
 
 /* Applied alongside .mainContentWrapperMobile on routes that hide the
    global mobile top nav (e.g. the contest page, whose hero owns the
-   top of the viewport). Removes the reserved 40px nav gutter so the
+   top of the viewport). Removes the reserved 44px nav gutter so the
    hero sits flush under the safe-area inset instead of leaving a
    blank strip where the nav used to be. */
 .mainContentWrapperMobile.noMobileNav {
   min-height: calc(100vh - env(safe-area-inset-top, 0px));
   margin-top: env(safe-area-inset-top, 0px);
+}
+
+/* CSS-first mobile layout — fires before JS hydration to prevent flicker */
+@media (max-width: 768px) {
+  .mainContentWrapper {
+    margin-left: 0;
+  }
+  :global(#webPlayer) {
+    --page-padding-inline: 12px;
+  }
 }

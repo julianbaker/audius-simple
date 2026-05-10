@@ -56,7 +56,11 @@ const HeaderContainer = (props: HeaderContainerProps) => {
           {headerElement}
         </Frosted>
       )}
-      {subHeader}
+      {subHeader && (
+        <div className={styles.subHeaderContainer}>
+          <div className={styles.subHeaderInner}>{subHeader}</div>
+        </div>
+      )}
       {/* We attach the box shadow as a separate element to
           avoid overlapping the scroll bar.
       */}
@@ -107,7 +111,7 @@ export const Page = (props: PageProps) => {
     fromOpacity = 0.2,
     header,
     subHeader,
-    headerContentPaddingInline = 'var(--harmony-unit-8)',
+    headerContentPaddingInline = 'var(--page-padding-inline, var(--harmony-unit-8))',
     disableHeaderFrosted = false,
     frostedHeaderContainer = false,
     image,

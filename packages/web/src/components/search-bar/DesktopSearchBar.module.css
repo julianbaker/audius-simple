@@ -5,6 +5,12 @@
   display: inline-block;
 }
 
+@media (max-width: 768px) {
+  .searchBar {
+    display: none;
+  }
+}
+
 .loadingAnimation {
   pointer-events: none;
   opacity: 0;

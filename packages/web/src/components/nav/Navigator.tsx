@@ -7,17 +7,16 @@ import {
 } from 'react'
 
 import { Client } from '@audius/common/models'
-import { createKeyboardActivationHandler } from '@audius/harmony'
+import { createKeyboardActivationHandler, useMedia } from '@audius/harmony'
 import cn from 'classnames'
 import { useLocation } from 'react-router'
 
-import { useIsMobile } from 'hooks/useIsMobile'
 import { getClient } from 'utils/clientUtil'
 
 import styles from './Navigator.module.css'
 import { LeftNav } from './desktop/LeftNav'
+import { NavHeader } from './desktop/NavHeader'
 import { NavSidebarContext } from './desktop/NavSidebarContext'
-import ConnectedNavBar from './mobile/ConnectedNavBar'
 
 interface OwnProps {
   className?: string
@@ -29,15 +28,18 @@ const COLLAPSED_WIDTH = 64
 const SNAP_DELTA = 15
 const STORAGE_KEY = 'nav-sidebar-collapsed'
 
+
 const Navigator = ({ className }: OwnProps) => {
   const client = getClient()
-  const isMobile = useIsMobile()
+  const { isMobile } = useMedia()
   const isElectron = client === Client.ELECTRON
   const location = useLocation()
   // Mobile-web pages that render their own full-bleed hero + back
   // control (contest page) opt out of the global top nav so the hero
   // can own the top of the viewport. Desktop is unaffected.
   const hideMobileNav = isMobile && /\/contest(\/|$)/.test(location.pathname)
+
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
 
   const [isCollapsed, setIsCollapsedState] = useState<boolean>(() => {
     try {
@@ -68,6 +70,16 @@ const Navigator = ({ className }: OwnProps) => {
   useLayoutEffect(() => {
     const appEl = document.getElementById('webPlayer')
     if (!appEl) return
+
+    if (isMobile) {
+      appEl.style.setProperty('--nav-width', '0px')
+      appEl.style.setProperty('--nav-width-minus-border', '0px')
+      appEl.style.setProperty('--nav-shift', '0px')
+      appEl.style.setProperty('--mobile-nav-height', '44px')
+      previousNavWidth.current = 0
+      return
+    }
+    appEl.style.setProperty('--mobile-nav-height', '0px')
 
     const previousWidth = previousNavWidth.current
     const didWidthChange = previousWidth !== navWidth
@@ -134,20 +146,84 @@ const Navigator = ({ className }: OwnProps) => {
     }
   }, [isDragging, setIsCollapsed])
 
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileOpen(false)
+  }, [location.pathname])
+
+  // Track scroll direction to hide on scroll-down, reveal on scroll-up
+  useEffect(() => {
+    if (!isMobile) return
+    let lastY = window.scrollY
+    const THRESHOLD = 6
+    const handleScroll = () => {
+      const currentY = window.scrollY
+      const delta = currentY - lastY
+      lastY = currentY
+      if (currentY <= 10 || delta < -THRESHOLD) {
+        document.body.classList.remove('mobile-nav-scrolled')
+      } else if (delta > THRESHOLD) {
+        document.body.classList.add('mobile-nav-scrolled')
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      document.body.classList.remove('mobile-nav-scrolled')
+    }
+  }, [isMobile])
+
+  // Lock body scroll and mark nav open when mobile drawer is open
+  useEffect(() => {
+    if (!isMobile) return
+    document.body.classList.toggle('mobile-nav-open', isMobileOpen)
+    document.body.style.overflow = isMobileOpen ? 'hidden' : ''
+    return () => {
+      document.body.classList.remove('mobile-nav-open')
+      document.body.style.overflow = ''
+    }
+  }, [isMobile, isMobileOpen])
+
   if (hideMobileNav) return null
 
   return (
-    <NavSidebarContext.Provider value={{ isCollapsed, setIsCollapsed }}>
+    <NavSidebarContext.Provider
+      value={{
+        isCollapsed: isMobile ? false : isCollapsed,
+        setIsCollapsed,
+        isMobileOpen,
+        setIsMobileOpen
+      }}
+    >
       <div
         className={cn(styles.navWrapper, className, {
           [styles.leftNavWrapper]: !isMobile,
+          [styles.mobileNavWrapper]: isMobile,
           [styles.isElectron]: isElectron,
           [styles.isDragging]: isDragging
         })}
         style={!isMobile ? { width: navWidth } : undefined}
       >
         {isMobile ? (
-          <ConnectedNavBar />
+          <>
+            <div className={styles.mobileAppBar}>
+              <NavHeader />
+            </div>
+            {isMobileOpen ? (
+              <div
+                className={styles.mobileBackdrop}
+                onClick={() => setIsMobileOpen(false)}
+                aria-hidden
+              />
+            ) : null}
+            <div
+              className={cn(styles.mobilePanel, {
+                [styles.mobilePanelOpen]: isMobileOpen
+              })}
+            >
+              <LeftNav isElectron={isElectron} showNavHeader={false} />
+            </div>
+          </>
         ) : (
           <>
             <LeftNav isElectron={isElectron} />

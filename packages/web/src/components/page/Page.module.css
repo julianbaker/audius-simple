@@ -4,7 +4,7 @@
 }
 
 .pageContainer .inset {
-  padding: 0px var(--harmony-unit-8) var(--harmony-unit-15);
+  padding: 0px var(--page-padding-inline, var(--harmony-unit-8)) var(--harmony-unit-15);
 }
 
 .pageContainer .flush {
@@ -26,7 +26,7 @@
 
 .headerContainer {
   position: sticky;
-  top: 0;
+  top: var(--mobile-nav-height, 0px);
   left: 0;
   right: 0;
   z-index: 13;
@@ -59,6 +59,24 @@
   top: -5px;
   margin-bottom: -5px;
   pointer-events: none;
+}
+
+.subHeaderContainer {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.28s ease-out, opacity 0.22s ease-out;
+  opacity: 1;
+}
+
+.subHeaderInner {
+  overflow: hidden;
+}
+
+:global(body.mobile-nav-scrolled) .subHeaderContainer {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  pointer-events: none;
+  transition: grid-template-rows 0.22s ease-in, opacity 0.18s ease-in;
 }
 
 .searchWrapper {

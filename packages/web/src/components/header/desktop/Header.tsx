@@ -64,7 +64,12 @@ export const Header = (props: HeaderProps) => {
           gap='l'
           mt='2xl'
           mb='l'
-          css={{ maxWidth: 1080, marginLeft: 'auto', marginRight: 'auto' }}
+          className={styles.innerContent}
+          css={{
+            maxWidth: 1080,
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }}
         >
           {topLeftElement || null}
           <Flex

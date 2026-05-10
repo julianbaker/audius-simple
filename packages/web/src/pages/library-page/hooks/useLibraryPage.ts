@@ -434,8 +434,8 @@ export const useLibraryPage = () => {
   )
 
   const fetchMoreTracks = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) return
-    fetchNextPage().catch(() => undefined)
+    if (!hasNextPage || isFetchingNextPage) return undefined
+    return fetchNextPage().catch(() => undefined)
   }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   useEffect(() => {

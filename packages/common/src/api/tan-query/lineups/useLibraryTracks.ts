@@ -1,5 +1,6 @@
 import {
   Id,
+  OptionalId,
   EntityType,
   GetUserLibraryTracksSortMethodEnum,
   GetUserLibraryTracksSortDirectionEnum
@@ -32,6 +33,8 @@ export type UseLibraryTracksArgs = {
   pageSize?: number
 }
 
+type LibraryTracksPage = { items: LineupData[]; rawCount: number }
+
 export const getLibraryTracksQueryKey = ({
   currentUserId,
   category,
@@ -50,7 +53,7 @@ export const getLibraryTracksQueryKey = ({
       query,
       pageSize
     }
-  ] as unknown as QueryKey<InfiniteData<LineupData[]>>
+  ] as unknown as QueryKey<InfiniteData<LibraryTracksPage>>
 
 export const useLibraryTracks = (
   {
@@ -77,11 +80,12 @@ export const useLibraryTracks = (
 
   const queryData = useInfiniteQuery({
     queryKey,
-    queryFn: async ({ pageParam = 0 }) => {
-      if (!currentUserId) return [] as LineupData[]
+    queryFn: async ({ pageParam = 0 }): Promise<LibraryTracksPage> => {
+      if (!currentUserId) return { items: [], rawCount: 0 }
       const sdk = await audiusSdk()
       const response = await sdk.users.getUserLibraryTracks({
         id: Id.parse(currentUserId),
+        userId: OptionalId.parse(currentUserId),
         offset: pageParam,
         limit: pageSize,
         type: category,
@@ -107,17 +111,19 @@ export const useLibraryTracks = (
         queryClient
       })
 
-      return entries.map((e) => ({
+      const items = entries.map((e) => ({
         id: e.track.track_id,
         type: EntityType.TRACK,
         timestamp: e.timestamp
       })) as LineupData[]
+
+      return { items, rawCount: data.length }
     },
-    getNextPageParam: (lastPage: LineupData[], allPages) => {
-      if (lastPage.length < pageSize) return undefined
+    getNextPageParam: (lastPage: LibraryTracksPage, allPages) => {
+      if (lastPage.rawCount < pageSize) return undefined
       return allPages.length * pageSize
     },
-    select: (data) => data.pages.flat(),
+    select: (data) => data.pages.flatMap((p) => p.items),
     initialPageParam: 0,
     staleTime: config?.staleTime ?? Infinity,
     gcTime: Infinity,

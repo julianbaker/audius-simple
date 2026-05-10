@@ -1,8 +1,6 @@
-import { useIsMobile } from 'hooks/useIsMobile'
 import { getExploreInfo } from 'ssr/metaTags'
 
-import DesktopSearchExplorePage from './components/desktop/SearchExplorePage'
-import MobileSearchExplorePage from './components/mobile/SearchExplorePage'
+import SearchExplorePage from './components/desktop/SearchExplorePage'
 
 const exploreInfo = getExploreInfo()
 const messages = {
@@ -12,16 +10,11 @@ const messages = {
 }
 
 export const ExplorePage = () => {
-  const isMobile = useIsMobile()
-
-  const props = {
-    title: messages.title,
-    pageTitle: messages.pageTitle,
-    description: messages.description
-  }
-
-  const Component = isMobile
-    ? MobileSearchExplorePage
-    : DesktopSearchExplorePage
-  return <Component {...props} />
+  return (
+    <SearchExplorePage
+      title={messages.title}
+      pageTitle={messages.pageTitle}
+      description={messages.description}
+    />
+  )
 }

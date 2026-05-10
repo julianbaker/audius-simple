@@ -14,6 +14,8 @@ import {
   IconNote,
   IconAlbum,
   IconPlaylists,
+  IconCloseAlt,
+  SelectablePill,
   TextInput,
   TextInputSize,
   IconSearch,
@@ -23,7 +25,6 @@ import { capitalize } from 'lodash'
 import { useSearchParams } from 'react-router'
 import { useDebounce, useEffectOnce, usePrevious } from 'react-use'
 
-import { MIN_DESKTOP_CONTENT_WIDTH_PX } from 'common/utils/layout'
 import { Header } from 'components/header/desktop/Header'
 import Page from 'components/page/Page'
 import { Tab, TabList } from 'components/tabs'
@@ -96,6 +97,7 @@ const SearchExplorePage = ({
   const { data: currentUserId, isLoading: isCurrentUserIdLoading } =
     useCurrentUserId()
   const isNarrowLayout = useIsContainerNarrow(pageContentRef, 760)
+  const isMobileLayout = useIsContainerNarrow(pageContentRef, 600)
   const shouldHideTabText = useIsContainerNarrow(tabContainerRef, 552)
   const handleSearchTab = useCallback(
     (newTab: string) => {
@@ -241,14 +243,23 @@ const SearchExplorePage = ({
     }
   ]
 
+  const mobileCategoryKeys = [
+    CategoryView.PROFILES,
+    CategoryView.TRACKS,
+    CategoryView.ALBUMS,
+    CategoryView.PLAYLISTS
+  ]
+
   const header = (
     <Header
       primary={messages.explore}
       icon={IconSearch}
       bottomBar={
-        <Flex ref={tabContainerRef} alignSelf='stretch' css={{ minWidth: 0 }}>
-          <Flex alignSelf='flex-start'>{tabs}</Flex>
-        </Flex>
+        isMobileLayout ? undefined : (
+          <Flex ref={tabContainerRef} alignSelf='stretch' css={{ minWidth: 0 }}>
+            <Flex alignSelf='flex-start'>{tabs}</Flex>
+          </Flex>
+        )
       }
     />
   )
@@ -257,8 +268,7 @@ const SearchExplorePage = ({
     <Flex
       column
       w='100%'
-      ph='2xl'
-      pv='m'
+      css={{ paddingInline: 'var(--page-padding-inline, var(--harmony-unit-8))', paddingBlock: 'var(--harmony-spacing-m)' }}
       css={{
         borderTop: '1px solid var(--harmony-n-100)',
         background: 'color-mix(in srgb, var(--harmony-n-950) 3%, transparent)',
@@ -279,7 +289,51 @@ const SearchExplorePage = ({
           onChange={handleSearch}
           onClear={handleClearSearch}
         />
-        {filterKeys.length ? (
+        {isMobileLayout ? (
+          /* Mobile: category pills + filter buttons in a scrollable row */
+          <Flex
+            direction='row'
+            gap='s'
+            css={{
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+              '&::-webkit-scrollbar': { display: 'none' },
+              paddingBottom: 2
+            }}
+          >
+            {categoryKey === CategoryView.ALL
+              ? mobileCategoryKeys.map((key) => (
+                  <SelectablePill
+                    key={key}
+                    type='button'
+                    size='large'
+                    label={capitalize(key)}
+                    isSelected={false}
+                    onClick={() => setCategory(key)}
+                  />
+                ))
+              : /* Selected: show only the active pill with an X to clear */
+                <SelectablePill
+                  type='button'
+                  size='large'
+                  icon={IconCloseAlt}
+                  label={capitalize(categoryKey)}
+                  isSelected={true}
+                  onClick={() => setCategory(CategoryView.ALL)}
+                />
+            }
+            {(!!inputValue || categoryKey !== CategoryView.ALL) &&
+              filterKeys.map((filterKey) => {
+                const FilterComponent =
+                  filters[filterKey as keyof typeof filters]
+                return FilterComponent ? (
+                  <FilterComponent key={filterKey} />
+                ) : null
+              })}
+          </Flex>
+        ) : (!!inputValue || categoryKey !== CategoryView.ALL) &&
+          filterKeys.length ? (
+          /* Desktop: filter buttons only when searching or in a subtab */
           <Flex
             direction='row'
             justifyContent={isNarrowLayout ? undefined : 'space-between'}
@@ -319,7 +373,7 @@ const SearchExplorePage = ({
         direction='column'
         gap='3xl'
         alignItems='stretch'
-        css={{ minWidth: MIN_DESKTOP_CONTENT_WIDTH_PX, width: '100%' }}
+        css={{ width: '100%' }}
       >
         {/* Content Section */}
         {inputValue || showSearchResults ? (
@@ -329,7 +383,6 @@ const SearchExplorePage = ({
           direction='column'
           gap='3xl'
           css={{
-            minWidth: MIN_DESKTOP_CONTENT_WIDTH_PX,
             overflowX: 'clip',
             overflowY: 'visible',
             display: showSearchResults ? 'none' : undefined

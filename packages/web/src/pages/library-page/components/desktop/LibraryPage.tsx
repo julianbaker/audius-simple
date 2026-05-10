@@ -21,6 +21,7 @@ import {
   IconPlay,
   Button,
   IconLibrary,
+  useMedia,
   useTheme
 } from '@audius/harmony'
 import { useSelector } from 'react-redux'
@@ -94,6 +95,7 @@ const LibraryPage = () => {
     onSortTracks
   } = useLibraryPage()
   const mainContentRef = useMainContentRef()
+  const { isMobile } = useMedia()
   const localTrackAdds = useSelector(getSelectedCategoryLocalTrackAdds)
   const expectedTrackCount = useMemo(
     () => entries.length + Object.keys(localTrackAdds).length,
@@ -234,7 +236,7 @@ const LibraryPage = () => {
         activeIndex={activeIndex}
         showArtistInTrackNameColumn
         responsiveColumns={RESPONSIVE_TABLE_POLICIES.libraryTracks}
-        scrollRef={mainContentRef}
+        scrollRef={isMobile ? undefined : mainContentRef}
         useLocalSort={allTracksFetched}
         fetchBatchSize={50}
         userId={currentUserId}

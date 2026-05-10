@@ -2,7 +2,7 @@ import { Flex, FlexProps } from '@audius/harmony'
 
 import {
   MAX_PAGE_WIDTH_PX,
-  MIN_PAGE_WIDTH_PX,
+  MIN_DESKTOP_CONTENT_WIDTH_PX,
   PAGE_GUTTER_PX
 } from 'common/utils/layout'
 
@@ -13,7 +13,7 @@ type FlushPageContainerProps = FlexProps & {
 export const FlushPageContainer = (props: FlushPageContainerProps) => {
   const {
     children,
-    contentMinWidthPx = MIN_PAGE_WIDTH_PX,
+    contentMinWidthPx = MIN_DESKTOP_CONTENT_WIDTH_PX,
     ...flexProps
   } = props
   return (
@@ -22,6 +22,8 @@ export const FlushPageContainer = (props: FlushPageContainerProps) => {
         flex='1'
         w='100%'
         css={{
+          containerType: 'inline-size',
+          containerName: 'page',
           maxWidth: MAX_PAGE_WIDTH_PX,
           minWidth: contentMinWidthPx,
           // Center content when viewport is wider than max content width

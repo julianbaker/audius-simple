@@ -7,14 +7,25 @@
   padding-right: var(--harmony-unit-3);
   position: fixed;
   width: 100%;
-  top: 40px;
-  top: calc(40px + env(safe-area-inset-top, 0px));
+  top: calc(44px + env(safe-area-inset-top, 0px));
   height: 52px;
   display: flex;
   align-items: center;
   background-color: var(--harmony-white);
   z-index: 10;
   min-width: var(--mobile-min-width);
+  transition: transform 0.2s ease;
+}
+
+/* Slide the page header up (behind the nav bar) when user has scrolled */
+:global(body.mobile-nav-scrolled) .container {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Hide behind nav drawer when it's open */
+:global(body.mobile-nav-open) .container {
+  visibility: hidden;
 }
 
 .container > *:nth-child(2) {

@@ -2,8 +2,9 @@ import { modalsSelectors, playbackSelectors } from '@audius/common/store'
 import cn from 'classnames'
 import { connect } from 'react-redux'
 
+import { useMedia } from '@audius/harmony'
+
 import NowPlayingDrawer from 'components/now-playing/NowPlayingDrawer'
-import { useIsMobile } from 'hooks/useIsMobile'
 import { AppState } from 'store/types'
 
 import styles from './PlayBarProvider.module.css'
@@ -21,7 +22,7 @@ const PlayBarProvider = ({
   hasTrack,
   addToCollectionOpen
 }: PlayBarProviderProps) => {
-  const isMobile = useIsMobile()
+  const { isMobile } = useMedia()
 
   return (
     <div

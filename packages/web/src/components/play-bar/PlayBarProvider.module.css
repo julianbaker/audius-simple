@@ -12,6 +12,12 @@
   z-index: 14;
 }
 
+@media (max-width: 768px) {
+  .playBarWrapper {
+    z-index: 14;
+  }
+}
+
 .customHr {
   position: absolute;
   left: var(--nav-width-minus-border);

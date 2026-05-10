@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 
 import { useAccountStatus } from '@audius/common/api'
 import { Status } from '@audius/common/models'
-import { Box, Divider, Flex, Scrollbar } from '@audius/harmony'
+import { Box, Divider, Flex, Scrollbar, useMedia } from '@audius/harmony'
 import { ResizeObserver } from '@juggle/resize-observer'
 import useMeasure from 'react-use-measure'
 
@@ -33,11 +33,13 @@ export const LEFT_NAV_COLLAPSED_WIDTH = 64
 
 type OwnProps = {
   isElectron: boolean
+  showNavHeader?: boolean
 }
 
 export const LeftNav = (props: OwnProps) => {
-  const { isElectron } = props
+  const { isElectron, showNavHeader = true } = props
   const { isCollapsed } = useNavSidebar()
+  const { isMobile } = useMedia()
   const { data: accountStatus } = useAccountStatus()
   const [navBodyContainerMeasureRef, navBodyContainerBoundaries] = useMeasure({
     polyfill: ResizeObserver,
@@ -88,7 +90,7 @@ export const LeftNav = (props: OwnProps) => {
       }}
     >
       {isElectron ? <RouteNav /> : null}
-      <NavHeader />
+      {showNavHeader ? <NavHeader /> : null}
 
       <Flex
         direction='column'
@@ -135,7 +137,7 @@ export const LeftNav = (props: OwnProps) => {
               <DashboardNavItem />
               <UploadNavItem />
               <DevToolsNavItem />
-              {!isCollapsed ? (
+              {!isCollapsed && !isMobile ? (
                 <>
                   <Box mv='s'>
                     <Divider />
