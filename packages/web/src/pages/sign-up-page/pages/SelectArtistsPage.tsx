@@ -10,7 +10,14 @@ import {
   convertGenreLabelToValue,
   route
 } from '@audius/common/utils'
-import { Flex, Paper, SelectablePill, Text, useTheme } from '@audius/harmony'
+import {
+  Flex,
+  Paper,
+  SelectablePill,
+  Text,
+  useTheme,
+  useMedia
+} from '@audius/harmony'
 import { animated, useSpring } from '@react-spring/web'
 import { Form, Formik, useFormikContext } from 'formik'
 import { range } from 'lodash'
@@ -24,7 +31,6 @@ import {
   FollowArtistTileSkeleton
 } from 'components/follow-artist-card/FollowArtistCard'
 import { SelectArtistsPreviewContextProvider } from 'components/follow-artist-card/selectArtistsPreviewContext'
-import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 import { env } from 'services/env'
 import { useSelector } from 'utils/reducer'

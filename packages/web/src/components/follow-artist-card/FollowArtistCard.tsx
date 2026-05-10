@@ -15,7 +15,8 @@ import {
   Paper,
   SoundwaveCircle,
   Text,
-  useTheme
+  useTheme,
+  useMedia
 } from '@audius/harmony'
 import { useField } from 'formik'
 import Lottie from 'lottie-react'
@@ -26,7 +27,6 @@ import { make } from 'common/store/analytics/actions'
 import { Avatar } from 'components/avatar/Avatar'
 import Skeleton from 'components/skeleton/Skeleton'
 import { useCoverPhoto } from 'hooks/useCoverPhoto'
-import { useMedia } from '@audius/harmony'
 
 import { SelectArtistsPreviewContext } from './selectArtistsPreviewContext'
 

@@ -157,7 +157,11 @@ export const NavHeader = () => {
             )}
           </button>
           <Link to={HOME_PAGE} aria-label={messages.homeLink}>
-            <IconAudiusLogoHorizontalNew color='subdued' size='m' width='auto' />
+            <IconAudiusLogoHorizontalNew
+              color='subdued'
+              size='m'
+              width='auto'
+            />
           </Link>
         </Flex>
         <Flex justifyContent='center' alignItems='center'>

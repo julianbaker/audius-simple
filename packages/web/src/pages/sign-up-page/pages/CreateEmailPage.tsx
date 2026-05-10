@@ -10,7 +10,8 @@ import {
   IconAudiusLogoHorizontal,
   IconArrowRight,
   Text,
-  TextLink
+  TextLink,
+  useMedia
 } from '@audius/harmony'
 import { useQueryClient } from '@tanstack/react-query'
 import { Form, Formik } from 'formik'
@@ -20,7 +21,6 @@ import { toFormikValidationSchema } from 'zod-formik-adapter'
 
 import { setValueField, startSignUp } from 'common/store/pages/signon/actions'
 import { getEmailField } from 'common/store/pages/signon/selectors'
-import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 import { identify } from 'services/analytics'
 

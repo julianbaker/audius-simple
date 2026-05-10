@@ -13,7 +13,8 @@ import {
   Text,
   IconCloudUpload,
   Avatar,
-  Box
+  Box,
+  useMedia
 } from '@audius/harmony'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
@@ -25,7 +26,6 @@ import {
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
 import Drawer from 'components/drawer/Drawer'
-import { useMedia } from '@audius/harmony'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 import { CoverPhotoBanner } from 'pages/sign-up-page/components/CoverPhotoBanner'
 import { useSelector } from 'utils/reducer'

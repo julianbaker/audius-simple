@@ -14,13 +14,7 @@
   background-color: var(--harmony-white);
   z-index: 10;
   min-width: var(--mobile-min-width);
-  transition: transform 0.25s ease;
-}
-
-/* Slide the page header up (behind the nav bar) when user has scrolled */
-:global(body.mobile-nav-scrolled) .container {
-  transform: translateY(-100%);
-  pointer-events: none;
+  transform: translateY(calc(-1 * var(--mobile-chrome-collapse, 0) * 52px));
 }
 
 /* Hide behind nav drawer when it's open */

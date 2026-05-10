@@ -16,13 +16,12 @@ import {
   Flex,
   FlexProps,
   IconArrowRight,
-  Text
+  Text,
+  useMedia
 } from '@audius/harmony'
 import styled, { CSSObject } from '@emotion/styled'
 import { animated, useSpring } from '@react-spring/web'
 import { useFormikContext } from 'formik'
-
-import { useMedia } from '@audius/harmony'
 
 import { RouteContext } from '../utils/RouteContext'
 

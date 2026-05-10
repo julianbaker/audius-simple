@@ -28,7 +28,6 @@ const COLLAPSED_WIDTH = 64
 const SNAP_DELTA = 15
 const STORAGE_KEY = 'nav-sidebar-collapsed'
 
-
 const Navigator = ({ className }: OwnProps) => {
   const client = getClient()
   const { isMobile } = useMedia()
@@ -182,72 +181,171 @@ const Navigator = ({ className }: OwnProps) => {
     setIsMobileOpen(false)
   }, [location.pathname])
 
-  // Track scroll direction to hide on scroll-down, reveal on scroll-up.
-  // rAF-throttled with hysteresis so the class doesn't flicker mid-frame
-  // and re-trigger the chrome shrink/expand transitions before they
-  // complete (which is what the user saw as "flakey").
+  // Target collapse follows scroll *direction* (down hides, up reveals anywhere).
+  // Absolute scrollY only seeds hydration / route entry and clamps full chrome at top.
   useEffect(() => {
-    if (!isMobile) return
+    if (!isMobile || hideMobileNav) {
+      document.documentElement.style.removeProperty('--mobile-chrome-collapse')
+      document.documentElement.style.removeProperty(
+        '--mobile-chrome-page-subheader-px'
+      )
+      document.documentElement.style.removeProperty(
+        '--mobile-chrome-header-bottom-bar-px'
+      )
+      return
+    }
 
-    let lastY = window.scrollY
-    let accumDown = 0
-    let accumUp = 0
-    let isScrolled = false
-    let frameQueued = false
+    const TOP_THRESHOLD_PX = 8
+    const COLLAPSE_SCROLL_RANGE_PX = 172
+    const COLLAPSE_PER_PX_DOWN = 0.01
+    const REVEAL_PER_PX_UP = 0.01
+    const LERP_COLLAPSE_DOWN = 0.55
+    const LERP_EXPAND_UP = 0.42
+    const SNAP_EPSILON = 0.004
 
-    // Larger downward distance to engage the shrink, smaller upward to
-    // un-engage. Avoids the "stuck mid-transition" state from rapid
-    // toggling within a single momentum scroll.
-    const ENGAGE_PX = 24
-    const DISENGAGE_PX = 8
-    const TOP_REGION_PX = 10
+    const smoothstep01 = (x: number) => {
+      const s = Math.min(1, Math.max(0, x))
+      return s * s * (3 - 2 * s)
+    }
 
-    const apply = (next: boolean) => {
-      if (next === isScrolled) return
-      isScrolled = next
-      if (next) {
-        document.body.classList.add('mobile-nav-scrolled')
+    const initialCollapseHint = (y: number) => {
+      if (y <= TOP_THRESHOLD_PX) return 0
+      const linearT = Math.min(
+        1,
+        (y - TOP_THRESHOLD_PX) / COLLAPSE_SCROLL_RANGE_PX
+      )
+      return smoothstep01(linearT)
+    }
+
+    const syncMeasurements = () => {
+      const sub = document.querySelector(
+        '[data-mobile-chrome-expanded="page-subheader"]'
+      )
+      const bar = document.querySelector(
+        '[data-mobile-chrome-expanded="header-bottom-bar"]'
+      )
+
+      if (sub instanceof HTMLElement) {
+        document.documentElement.style.setProperty(
+          '--mobile-chrome-page-subheader-px',
+          `${Math.max(1, Math.ceil(sub.scrollHeight))}px`
+        )
       } else {
-        document.body.classList.remove('mobile-nav-scrolled')
+        document.documentElement.style.removeProperty(
+          '--mobile-chrome-page-subheader-px'
+        )
+      }
+
+      if (bar instanceof HTMLElement) {
+        document.documentElement.style.setProperty(
+          '--mobile-chrome-header-bottom-bar-px',
+          `${Math.max(1, Math.ceil(bar.scrollHeight))}px`
+        )
+      } else {
+        document.documentElement.style.removeProperty(
+          '--mobile-chrome-header-bottom-bar-px'
+        )
+      }
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      syncMeasurements()
+    })
+
+    const attachObservers = () => {
+      resizeObserver.disconnect()
+      document
+        .querySelectorAll('[data-mobile-chrome-expanded]')
+        .forEach((el) => {
+          resizeObserver.observe(el)
+        })
+      syncMeasurements()
+    }
+
+    let lastScrollY = window.scrollY
+    let targetCollapse = initialCollapseHint(lastScrollY)
+    let shownCollapse = targetCollapse
+    let pumpRaf: number | null = null
+    let lastCollapseSerialized = ''
+
+    const applyCollapseCss = (t: number) => {
+      const serialized = t.toFixed(3)
+      if (serialized === lastCollapseSerialized) return
+      lastCollapseSerialized = serialized
+      document.documentElement.style.setProperty(
+        '--mobile-chrome-collapse',
+        serialized
+      )
+    }
+
+    applyCollapseCss(shownCollapse)
+
+    const pump = () => {
+      const diff = targetCollapse - shownCollapse
+      if (Math.abs(diff) <= SNAP_EPSILON) {
+        shownCollapse = targetCollapse
+        applyCollapseCss(shownCollapse)
+        pumpRaf = null
+        return
+      }
+      const k = diff > 0 ? LERP_COLLAPSE_DOWN : LERP_EXPAND_UP
+      shownCollapse += diff * k
+      applyCollapseCss(shownCollapse)
+      pumpRaf = requestAnimationFrame(pump)
+    }
+
+    const kickPump = () => {
+      if (pumpRaf === null) {
+        pumpRaf = requestAnimationFrame(pump)
       }
     }
 
     const handleScroll = () => {
-      if (frameQueued) return
-      frameQueued = true
-      requestAnimationFrame(() => {
-        frameQueued = false
-        const currentY = window.scrollY
-        const delta = currentY - lastY
-        lastY = currentY
+      const y = window.scrollY
+      const delta = y - lastScrollY
+      lastScrollY = y
 
-        if (currentY <= TOP_REGION_PX) {
-          accumDown = 0
-          accumUp = 0
-          apply(false)
-          return
-        }
+      if (y <= TOP_THRESHOLD_PX) {
+        targetCollapse = 0
+      } else if (delta > 0) {
+        targetCollapse = Math.min(
+          1,
+          targetCollapse + delta * COLLAPSE_PER_PX_DOWN
+        )
+      } else if (delta < 0) {
+        targetCollapse = Math.max(0, targetCollapse + delta * REVEAL_PER_PX_UP)
+      }
 
-        if (delta > 0) {
-          // Scrolling down: build up engage budget, reset disengage.
-          accumDown += delta
-          accumUp = 0
-          if (!isScrolled && accumDown >= ENGAGE_PX) apply(true)
-        } else if (delta < 0) {
-          // Scrolling up: build up disengage budget, reset engage.
-          accumUp += -delta
-          accumDown = 0
-          if (isScrolled && accumUp >= DISENGAGE_PX) apply(false)
-        }
-      })
+      kickPump()
     }
+
+    attachObservers()
+    requestAnimationFrame(() => {
+      attachObservers()
+      lastScrollY = window.scrollY
+      targetCollapse = initialCollapseHint(lastScrollY)
+      kickPump()
+    })
 
     window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', attachObservers)
+
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      document.body.classList.remove('mobile-nav-scrolled')
+      window.removeEventListener('resize', attachObservers)
+      resizeObserver.disconnect()
+      if (pumpRaf !== null) {
+        cancelAnimationFrame(pumpRaf)
+      }
+      document.documentElement.style.removeProperty('--mobile-chrome-collapse')
+      document.documentElement.style.removeProperty(
+        '--mobile-chrome-page-subheader-px'
+      )
+      document.documentElement.style.removeProperty(
+        '--mobile-chrome-header-bottom-bar-px'
+      )
     }
-  }, [isMobile])
+  }, [isMobile, hideMobileNav, location.pathname])
 
   // Lock body scroll and mark nav open when mobile drawer is open
   useEffect(() => {

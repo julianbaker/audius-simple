@@ -53,9 +53,7 @@ export const useDevToggle = (
         window.localStorage.setItem(key, String(next))
       } catch {}
       setValue(next)
-      window.dispatchEvent(
-        new CustomEvent(CHANGE_EVENT, { detail: { key } })
-      )
+      window.dispatchEvent(new CustomEvent(CHANGE_EVENT, { detail: { key } }))
     },
     [key]
   )

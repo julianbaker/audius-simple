@@ -66,7 +66,12 @@ const HeaderContainer = (props: HeaderContainerProps) => {
       )}
       {subHeader && (
         <div className={styles.subHeaderContainer}>
-          <div className={styles.subHeaderInner}>{subHeader}</div>
+          <div
+            className={styles.subHeaderInner}
+            data-mobile-chrome-expanded='page-subheader'
+          >
+            {subHeader}
+          </div>
         </div>
       )}
       {/* We attach the box shadow as a separate element to

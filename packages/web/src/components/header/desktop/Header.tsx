@@ -117,7 +117,10 @@ export const Header = (props: HeaderProps) => {
       {children}
       {bottomBar && (
         <div className={styles.bottomBarContainer}>
-          <div className={cn(styles.bottomBar, styles.contentGlow)}>
+          <div
+            className={cn(styles.bottomBar, styles.contentGlow)}
+            data-mobile-chrome-expanded='header-bottom-bar'
+          >
             {bottomBar}
           </div>
         </div>

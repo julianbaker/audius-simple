@@ -97,10 +97,7 @@ export const ChatHeader = forwardRef<HTMLDivElement, ChatHeaderProps>(
         gap='m'
         w='100%'
       >
-        <IconMessages
-          size={isMobile ? 'l' : '2xl'}
-          color='heading'
-        />
+        <IconMessages size={isMobile ? 'l' : '2xl'} color='heading' />
         <Text
           variant='heading'
           strength='default'

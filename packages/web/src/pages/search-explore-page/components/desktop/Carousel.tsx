@@ -250,8 +250,12 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
 
               // On mobile: bleed to the screen edge by negating page padding.
               // On desktop: use a fixed inset so arrow-button scroll math stays simple.
-              marginLeft: isMobile ? 'calc(-1 * var(--page-padding-inline))' : -railInset,
-              marginRight: isMobile ? 'calc(-1 * var(--page-padding-inline))' : -railInset,
+              marginLeft: isMobile
+                ? 'calc(-1 * var(--page-padding-inline))'
+                : -railInset,
+              marginRight: isMobile
+                ? 'calc(-1 * var(--page-padding-inline))'
+                : -railInset,
               paddingLeft: isMobile ? 'var(--page-padding-inline)' : railInset,
               paddingRight: isMobile ? 'var(--page-padding-inline)' : railInset,
               paddingTop: railShadowPaddingTop,

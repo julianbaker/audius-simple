@@ -9,9 +9,8 @@ import useMeasure from 'react-use-measure'
 
 import { DragAutoscroller } from 'components/drag-autoscroller/DragAutoscroller'
 
-import styles from './LeftNav.module.css'
-
 import { AccountDetails } from './AccountDetails'
+import styles from './LeftNav.module.css'
 import { LeftNavCTA } from './LeftNavCTA'
 import { NavHeader } from './NavHeader'
 import { useNavSidebar } from './NavSidebarContext'

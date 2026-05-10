@@ -18,10 +18,7 @@ import { useNavigate } from 'react-router'
 
 import { Header } from 'components/header/desktop/Header'
 import { Page } from 'components/page/Page'
-import {
-  REACT_QUERY_DEVTOOLS_KEY,
-  useDevToggle
-} from 'hooks/useDevToggle'
+import { REACT_QUERY_DEVTOOLS_KEY, useDevToggle } from 'hooks/useDevToggle'
 import { env } from 'services/env'
 
 import { messages } from './messages'

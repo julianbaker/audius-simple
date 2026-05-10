@@ -22,11 +22,9 @@
   --frosted-surface-backdrop-filter: blur(10px);
   --frosted-surface-background-color: var(--harmony-n-25);
   --frosted-surface-opacity: 65%;
-  --frosted-surface-background: color-mix(
-    in srgb,
-    var(--frosted-surface-background-color) var(--frosted-surface-opacity),
-    transparent
-  );
+  --frosted-surface-background: color-mix(in srgb,
+      var(--frosted-surface-background-color) var(--frosted-surface-opacity),
+      transparent);
   position: relative;
   width: 100%;
   height: 100%;
@@ -114,6 +112,7 @@
   .mainContentWrapper {
     margin-left: 0;
   }
+
   :global(#webPlayer) {
     --page-padding-inline: 12px;
   }

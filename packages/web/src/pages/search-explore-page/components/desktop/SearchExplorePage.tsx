@@ -300,31 +300,33 @@ const SearchExplorePage = ({
               scrollbarWidth: 'none',
               '&::-webkit-scrollbar': { display: 'none' },
               paddingBottom: 2,
-              marginInline: 'calc(-1 * var(--page-padding-inline, var(--harmony-unit-8)))',
+              marginInline:
+                'calc(-1 * var(--page-padding-inline, var(--harmony-unit-8)))',
               paddingInline: 'var(--page-padding-inline, var(--harmony-unit-8))'
             }}
           >
-            {categoryKey === CategoryView.ALL
-              ? mobileCategoryKeys.map((key) => (
-                  <SelectablePill
-                    key={key}
-                    type='button'
-                    size='large'
-                    label={capitalize(key)}
-                    isSelected={false}
-                    onClick={() => setCategory(key)}
-                  />
-                ))
-              : /* Selected: show only the active pill with an X to clear */
+            {categoryKey === CategoryView.ALL ? (
+              mobileCategoryKeys.map((key) => (
                 <SelectablePill
+                  key={key}
                   type='button'
                   size='large'
-                  icon={IconCloseAlt}
-                  label={capitalize(categoryKey)}
-                  isSelected={true}
-                  onClick={() => setCategory(CategoryView.ALL)}
+                  label={capitalize(key)}
+                  isSelected={false}
+                  onClick={() => setCategory(key)}
                 />
-            }
+              ))
+            ) : (
+              /* Selected: show only the active pill with an X to clear */
+              <SelectablePill
+                type='button'
+                size='large'
+                icon={IconCloseAlt}
+                label={capitalize(categoryKey)}
+                isSelected={true}
+                onClick={() => setCategory(CategoryView.ALL)}
+              />
+            )}
             {(!!inputValue || categoryKey !== CategoryView.ALL) &&
               filterKeys.map((filterKey) => {
                 const FilterComponent =

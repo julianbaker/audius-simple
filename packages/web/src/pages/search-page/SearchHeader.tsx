@@ -70,9 +70,7 @@ export const SearchHeader = ({ isNarrow, ...props }: SearchHeaderProps) => {
                 label={capitalize(key)}
                 isSelected={categoryKey === key}
                 onClick={() =>
-                  setCategory(
-                    categoryKey === key ? CategoryView.ALL : key
-                  )
+                  setCategory(categoryKey === key ? CategoryView.ALL : key)
                 }
               />
             ))}
@@ -118,11 +116,7 @@ export const SearchHeader = ({ isNarrow, ...props }: SearchHeaderProps) => {
       primary='Search'
       secondary={secondary}
       bottomBar={
-        <Flex
-          direction='row'
-          gap='s'
-          mv={filterKeys.length ? 'm' : undefined}
-        >
+        <Flex direction='row' gap='s' mv={filterKeys.length ? 'm' : undefined}>
           {filterKeys.map((filterKey) => {
             const FilterComponent = filters[filterKey as keyof typeof filters]
             return <FilterComponent key={filterKey} />

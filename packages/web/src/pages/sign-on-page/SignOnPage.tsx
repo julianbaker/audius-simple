@@ -4,6 +4,7 @@ import { SystemAppearance } from '@audius/common/models'
 import { FEED_PAGE } from '@audius/common/src/utils/route'
 import { themeSelectors } from '@audius/common/store'
 import { route } from '@audius/common/utils'
+import type { Theme } from '@audius/harmony'
 import {
   Box,
   Flex,
@@ -11,9 +12,9 @@ import {
   IconCloseAlt,
   Paper,
   ThemeProvider as HarmonyThemeProvider,
-  useTheme
+  useTheme,
+  useMedia
 } from '@audius/harmony'
-import type { Theme } from '@audius/harmony'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   Link,
@@ -41,7 +42,6 @@ import {
   getWelcomeModalShown
 } from 'common/store/pages/signon/selectors'
 import { EditingStatus } from 'common/store/pages/signon/types'
-import { useMedia } from '@audius/harmony'
 import { SignInPage } from 'pages/sign-in-page'
 import SignUpPage from 'pages/sign-up-page'
 import { NavHeader } from 'pages/sign-up-page/components/NavHeader'

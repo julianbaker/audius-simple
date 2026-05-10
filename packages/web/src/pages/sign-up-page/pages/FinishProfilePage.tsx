@@ -8,7 +8,7 @@ import {
 } from '@audius/common/schemas'
 import { MAX_DISPLAY_NAME_LENGTH } from '@audius/common/services'
 import { route } from '@audius/common/utils'
-import { Flex, Paper, Text, useTheme } from '@audius/harmony'
+import { Flex, Paper, Text, useTheme, useMedia } from '@audius/harmony'
 import { Formik, Form, useFormikContext } from 'formik'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -29,7 +29,6 @@ import {
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
 import { HarmonyTextField } from 'components/form-fields/HarmonyTextField'
-import { useMedia } from '@audius/harmony'
 
 import { AccountHeader } from '../components/AccountHeader'
 import { ImageFieldValue } from '../components/ImageField'

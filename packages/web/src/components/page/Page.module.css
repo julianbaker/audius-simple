@@ -31,6 +31,7 @@
 .inset.medium > .pageContent {
   max-width: 1080px;
 }
+
 .inset.large > .pageContent {
   max-width: 1080px;
 }
@@ -72,26 +73,20 @@
   pointer-events: none;
 }
 
+/* Scroll-linked via Navigator `--mobile-chrome-collapse` (0–1 on :root).
+   Expanded height is measured (`--mobile-chrome-page-subheader-px`) so max-height
+   tracks scroll from the first pixel instead of lagging behind opacity. */
 .subHeaderContainer {
-  display: grid;
-  grid-template-rows: 1fr;
-  transition:
-    grid-template-rows 0.25s ease,
-    opacity 0.25s ease;
-  opacity: 1;
+  overflow: hidden;
+  max-height: calc(
+    (1 - var(--mobile-chrome-collapse, 0)) *
+      var(--mobile-chrome-page-subheader-px, 240px)
+  );
+  opacity: calc(1 - var(--mobile-chrome-collapse, 0));
 }
 
 .subHeaderInner {
   overflow: hidden;
-}
-
-:global(body.mobile-nav-scrolled) .subHeaderContainer {
-  grid-template-rows: 0fr;
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    grid-template-rows 0.25s ease,
-    opacity 0.25s ease;
 }
 
 .searchWrapper {

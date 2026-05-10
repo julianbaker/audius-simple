@@ -11,7 +11,8 @@ import {
   IconVerified,
   PlainButton,
   Text,
-  useTheme
+  useTheme,
+  useMedia
 } from '@audius/harmony'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -23,7 +24,6 @@ import {
   getNameField,
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
-import { useMedia } from '@audius/harmony'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 import { useSelector } from 'utils/reducer'
 

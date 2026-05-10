@@ -12,10 +12,7 @@ import {
 } from 'react-router'
 import { PersistGate } from 'redux-persist/integration/react'
 
-import {
-  REACT_QUERY_DEVTOOLS_KEY,
-  useDevToggle
-} from 'hooks/useDevToggle'
+import { REACT_QUERY_DEVTOOLS_KEY, useDevToggle } from 'hooks/useDevToggle'
 import { useIsMobile } from 'hooks/useIsMobile'
 import { env } from 'services/env'
 import { queryClient } from 'services/query-client'

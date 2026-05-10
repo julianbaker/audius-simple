@@ -1,10 +1,9 @@
 import { useEffect } from 'react'
 
 import { modalsSelectors, playbackSelectors } from '@audius/common/store'
+import { useMedia } from '@audius/harmony'
 import cn from 'classnames'
 import { connect } from 'react-redux'
-
-import { useMedia } from '@audius/harmony'
 
 import NowPlayingDrawer from 'components/now-playing/NowPlayingDrawer'
 import { AppState } from 'store/types'

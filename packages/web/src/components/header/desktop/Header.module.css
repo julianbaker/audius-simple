@@ -34,18 +34,11 @@
      below the container without creating a scroll container */
   overflow: clip;
   overflow-clip-margin: 4px;
-  max-height: 200px;
-  transition:
-    max-height 0.25s ease,
-    opacity 0.25s ease;
-  opacity: 1;
-}
-
-/* On mobile: hide the per-page controls (tabs, filters) when scrolled */
-:global(body.mobile-nav-scrolled) .bottomBarContainer {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
+  max-height: calc(
+    (1 - var(--mobile-chrome-collapse, 0)) *
+      var(--mobile-chrome-header-bottom-bar-px, 120px)
+  );
+  opacity: calc(1 - var(--mobile-chrome-collapse, 0));
 }
 
 .bottomBar {
@@ -67,15 +60,11 @@
 /* Compact spacing on narrow (mobile) containers */
 @container (max-width: 600px) {
   .innerContent {
-    margin-top: 12px !important;
-    margin-bottom: 8px !important;
+    margin-top: calc(12px - var(--mobile-chrome-collapse, 0) * 4px) !important;
+    margin-bottom: calc(
+      8px - var(--mobile-chrome-collapse, 0) * 2px
+    ) !important;
     gap: 8px !important;
-    /* Match the bottomBarContainer / subHeaderContainer transitions so
-       all the shrink animations resolve in lockstep instead of one
-       snapping while the others animate. */
-    transition:
-      margin-top 0.25s ease,
-      margin-bottom 0.25s ease;
   }
 
   .pageTitle {
@@ -86,10 +75,4 @@
   .rightDecorator {
     display: none;
   }
-}
-
-/* When user has scrolled: compress the title area further */
-:global(body.mobile-nav-scrolled) .innerContent {
-  margin-top: 8px !important;
-  margin-bottom: 6px !important;
 }

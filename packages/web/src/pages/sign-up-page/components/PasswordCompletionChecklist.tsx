@@ -3,11 +3,9 @@ import {
   CompletionChecklistType
 } from '@audius/common/messages'
 import { passwordSchema } from '@audius/common/schemas'
-import { CompletionCheck, Flex, Text } from '@audius/harmony'
+import { CompletionCheck, Flex, Text, useMedia } from '@audius/harmony'
 import { useField } from 'formik'
 import { useAsync } from 'react-use'
-
-import { useMedia } from '@audius/harmony'
 
 const messages: Record<CompletionChecklistType, string> =
   createPasswordPageMessages.completionChecklist

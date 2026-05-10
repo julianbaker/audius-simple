@@ -7,10 +7,10 @@ import {
   useHasAccount
 } from '@audius/common/api'
 import { Client, FrostedSurfaceIntensity, Status } from '@audius/common/models'
-import { useMedia } from '@audius/harmony'
 import { StringKeys } from '@audius/common/services'
 import { themeSelectors } from '@audius/common/store'
 import { route } from '@audius/common/utils'
+import { useMedia } from '@audius/harmony'
 import cn from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -398,7 +398,7 @@ const WebPlayer = (props: WebPlayerProps) => {
     })
   })
   const hasAccount = useHasAccount()
-  const { userHandle, isGuestAccount = false } = accountUserData ?? {}
+  const { isGuestAccount = false } = accountUserData ?? {}
   const { data: accountStatus } = useAccountStatus()
   const showCookieBanner = useSelector(getShowCookieBanner)
   const frostedSurfaceIntensity =
