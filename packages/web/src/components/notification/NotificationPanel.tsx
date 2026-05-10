@@ -1,11 +1,4 @@
-import {
-  useRef,
-  useCallback,
-  useEffect,
-  useState,
-  RefObject,
-  TouchEvent
-} from 'react'
+import { RefObject, useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import {
@@ -14,20 +7,25 @@ import {
 } from '@audius/common/api'
 import { Nullable } from '@audius/common/utils'
 import {
-  Scrollbar,
-  IconNotificationOn as IconNotification,
-  IconClose,
-  IconButton,
-  Popup,
   Flex,
-  Text,
+  IconButton,
+  IconClose,
+  IconNotificationOn as IconNotification,
   LoadingSpinner,
+  Paper,
+  Popup,
+  Scrollbar,
+  Text,
   useMedia,
   useTheme
 } from '@audius/harmony'
 import InfiniteScroll from 'react-infinite-scroller'
 import { useSelector } from 'react-redux'
 
+import {
+  useBottomSheetDismiss,
+  useSheetA11y
+} from 'hooks/useBottomSheetDismiss'
 import { getIsOpen as getIsUserListOpen } from 'store/application/ui/userListModal/selectors'
 import zIndex from 'utils/zIndex'
 
@@ -40,32 +38,33 @@ const messages = {
   closeLabel: 'Close notifications'
 }
 
+const DESKTOP_PANEL_WIDTH_PX = 428
+const DESKTOP_SCROLL_ID = 'notificationsPanelScroll'
+// react-infinite-scroller uses an element ID to find the scroll parent on
+// desktop; the mobile sheet passes a ref-based getScrollParent instead.
+const getDesktopScrollParent = () =>
+  window.document.getElementById(DESKTOP_SCROLL_ID)
+
+// Distance from the bottom of the scroll container at which we request the
+// next page of notifications.
+const SCROLL_THRESHOLD = 1000
+
 type NotificationPanelProps = {
   /**
-   * Optional anchor for the desktop popup. When omitted (e.g. opened from a
-   * bottom-bar button), the panel falls back to a non-anchored bottom sheet
-   * on mobile.
+   * Anchor for the desktop popup. Optional because the panel can be opened
+   * from the mobile bottom-bar (no anchor needed — the mobile branch
+   * renders a full-width sheet).
    */
   anchorRef?: RefObject<HTMLButtonElement | null>
   isOpen: boolean
   onClose: () => void
 }
 
-const desktopScrollbarId = 'notificationsPanelScroll'
-
-const getDesktopScrollParent = () => {
-  const scrollbarElement = window.document.getElementById(desktopScrollbarId)
-  return scrollbarElement || null
-}
-
-// The threshold of distance from the bottom of the scroll container in the
-// notification panel before requesting `loadMore` for more notifications
-const SCROLL_THRESHOLD = 1000
-
 /**
- * The notification panel displays the list of notifications. Adapts to
- * viewport: a popup anchored to the bell on desktop, a bottom-sheet drawer
- * on mobile.
+ * Notifications panel. Adapts to viewport: an anchored popup on desktop, a
+ * portaled bottom-sheet drawer on mobile. Both surfaces share the same
+ * header + scrollable list body (`NotificationsBody`) so styling and
+ * loading behavior never diverge.
  */
 export const NotificationPanel = ({
   anchorRef,
@@ -75,28 +74,23 @@ export const NotificationPanel = ({
   const { isMobile } = useMedia()
   const isUserListOpen = useSelector(getIsUserListOpen)
   const { mutate: markAsViewed } = useMarkNotificationsAsViewed()
-
   const panelRef = useRef<Nullable<HTMLDivElement>>(null)
+
+  useEffect(() => {
+    if (isOpen) markAsViewed()
+  }, [isOpen, markAsViewed])
 
   const handleCheckClickInside = useCallback(
     (target: EventTarget) => {
       if (isUserListOpen) return true
-      if (target instanceof Element) {
-        return !!(
-          panelRef.current?.contains(target) ||
-          anchorRef?.current?.contains(target)
-        )
-      }
-      return false
+      if (!(target instanceof Element)) return false
+      return !!(
+        panelRef.current?.contains(target) ||
+        anchorRef?.current?.contains(target)
+      )
     },
     [anchorRef, isUserListOpen]
   )
-
-  useEffect(() => {
-    if (isOpen) {
-      markAsViewed()
-    }
-  }, [isOpen, markAsViewed])
 
   if (isMobile) {
     return <MobileNotificationSheet isOpen={isOpen} onClose={onClose} />
@@ -112,20 +106,63 @@ export const NotificationPanel = ({
       shadow='far'
       zIndex={zIndex.NAVIGATOR_POPUP}
     >
-      <DesktopNotificationsContent panelRef={panelRef} />
+      <Paper
+        ref={panelRef}
+        column
+        backgroundColor='surface1'
+        borderRadius='m'
+        shadow='mid'
+        css={{ width: DESKTOP_PANEL_WIDTH_PX, overflow: 'hidden' }}
+      >
+        <PanelHeader bare={false} />
+        <Scrollbar
+          css={{ maxHeight: 'calc(100vh - 200px)' }}
+          id={DESKTOP_SCROLL_ID}
+        >
+          <NotificationsList getScrollParent={getDesktopScrollParent} />
+        </Scrollbar>
+      </Paper>
     </Popup>
   )
 }
 
 /**
- * Desktop: panel anchored to the bell. Uses Harmony's Scrollbar for the
- * styled scroll affordance, with a fixed maxHeight so the popup doesn't grow
- * past the viewport.
+ * Standard, restrained header — single bar with the bell icon and a
+ * heading-style title. Replaces the loud accent-purple bar that didn't
+ * match the rest of the app.
+ *
+ * `bare` skips the background/border (used inside the mobile dragRegion,
+ * which paints those itself so the drag handle and header read as a
+ * single surface). On mobile the close button is rendered separately
+ * (absolute top-right of the sheet) so it doesn't get pushed off-center
+ * by the drag handle's whitespace.
  */
-const DesktopNotificationsContent = ({
-  panelRef
+const PanelHeader = ({ bare = false }: { bare?: boolean }) => (
+  <Flex
+    alignItems='center'
+    ph='m'
+    pv={bare ? 's' : 'm'}
+    borderBottom={bare ? undefined : 'default'}
+    backgroundColor={bare ? undefined : 'surface1'}
+    gap='s'
+    css={{ flexShrink: 0 }}
+  >
+    <IconNotification size='l' color='default' />
+    <Text variant='heading' size='s' color='default'>
+      {messages.title}
+    </Text>
+  </Flex>
+)
+
+/**
+ * Shared scrollable notifications list. Both the desktop popup and the
+ * mobile sheet wrap this in their own scroll container; the only thing
+ * that differs is how `getScrollParent` resolves.
+ */
+const NotificationsList = ({
+  getScrollParent
 }: {
-  panelRef: RefObject<HTMLDivElement | null>
+  getScrollParent: () => HTMLElement | null
 }) => {
   const { spacing } = useTheme()
   const {
@@ -138,90 +175,52 @@ const DesktopNotificationsContent = ({
   } = useNotifications()
 
   const handleLoadMore = useCallback(() => {
-    if (!isFetchingNextPage) {
-      fetchNextPage()
-    }
+    if (!isFetchingNextPage) fetchNextPage()
   }, [fetchNextPage, isFetchingNextPage])
 
-  const userHasNoNotifications =
-    (!isPending || isError) && notifications.length === 0
+  const isEmpty = (!isPending || isError) && notifications.length === 0
 
   return (
-    <Flex backgroundColor='default' column borderRadius='m' w={428} ref={panelRef}>
-      <Flex
-        inline
-        justifyContent='center'
-        alignItems='center'
-        backgroundColor='accent'
-        borderBottom='default'
-        borderTopLeftRadius='m'
-        borderTopRightRadius='m'
-        p='s'
-        gap='s'
-      >
-        <IconNotification color='white' size='xl' />
-        <Text
-          variant='label'
+    <InfiniteScroll
+      loadMore={handleLoadMore}
+      hasMore={hasNextPage}
+      initialLoad={isPending}
+      useWindow={false}
+      threshold={SCROLL_THRESHOLD}
+      getScrollParent={getScrollParent}
+      loader={
+        <LoadingSpinner
+          key='loading-spinner'
           size='xl'
-          strength='strong'
-          color='white'
-          lineHeight='single'
-        >
-          {messages.title}
-        </Text>
-      </Flex>
-
-      <Scrollbar
-        css={{ maxHeight: 'calc(100vh - 333px)' }}
-        id={desktopScrollbarId}
-      >
-        <InfiniteScroll
-          loadMore={handleLoadMore}
-          hasMore={hasNextPage}
-          initialLoad={isPending}
-          useWindow={false}
-          threshold={SCROLL_THRESHOLD}
-          loader={
-            <LoadingSpinner
-              key='loading-spinner'
-              size='xl'
-              alignSelf='center'
-              mv='xl'
-            />
-          }
-          getScrollParent={getDesktopScrollParent}
-          css={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: spacing.s,
-            padding: spacing.l,
-            paddingTop: spacing.xl,
-            listStyleType: 'none'
-          }}
-          element='ul'
-        >
-          {userHasNoNotifications ? (
-            <EmptyNotifications />
-          ) : (
-            notifications.map((notification) => (
-              <Notification
-                key={notification.id}
-                notification={notification}
-              />
-            ))
-          )}
-        </InfiniteScroll>
-      </Scrollbar>
-    </Flex>
+          alignSelf='center'
+          mv='xl'
+        />
+      }
+      css={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: spacing.s,
+        padding: spacing.l,
+        listStyleType: 'none',
+        margin: 0
+      }}
+      element='ul'
+    >
+      {isEmpty ? (
+        <EmptyNotifications />
+      ) : (
+        notifications.map((notification) => (
+          <Notification key={notification.id} notification={notification} />
+        ))
+      )}
+    </InfiniteScroll>
   )
 }
 
 /**
- * Mobile: bottom-sheet drawer. Slides up from the bottom of the viewport
- * with a drag handle, rounded top corners, and drag-down-to-dismiss. Uses
- * native scrolling on a plain div so InfiniteScroll's `useWindow={false}` /
- * `getScrollParent` machinery works reliably without a custom scrollbar
- * wrapper getting in the way.
+ * Mobile bottom-sheet drawer: rounded top corners, drag handle, drag-down
+ * to dismiss, Escape to close, body-scroll lock. Portaled to body so it
+ * escapes the navigator's stacking context.
  */
 const MobileNotificationSheet = ({
   isOpen,
@@ -230,193 +229,74 @@ const MobileNotificationSheet = ({
   isOpen: boolean
   onClose: () => void
 }) => {
-  const { spacing } = useTheme()
   const sheetRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const dragRegionRef = useRef<HTMLDivElement>(null)
+  const getScrollParent = useCallback(() => scrollRef.current, [])
 
-  const {
-    notifications,
-    fetchNextPage,
-    hasNextPage,
-    isAllPending: isPending,
-    isError,
-    isFetchingNextPage
-  } = useNotifications()
+  useSheetA11y({ isOpen, onClose })
 
-  const handleLoadMore = useCallback(() => {
-    if (!isFetchingNextPage) {
-      fetchNextPage()
-    }
-  }, [fetchNextPage, isFetchingNextPage])
-
-  const userHasNoNotifications =
-    (!isPending || isError) && notifications.length === 0
-
-  const getScrollParent = useCallback(() => scrollContainerRef.current, [])
-
-  // Drag-to-dismiss state. Tracks the vertical offset from the rest position
-  // while a finger is held; on release, snaps closed if the swipe exceeded
-  // the threshold or the velocity is high enough.
-  const dragStartY = useRef<number | null>(null)
-  const dragStartScrollTop = useRef(0)
-  const lastDragY = useRef(0)
-  const lastDragTs = useRef(0)
-  const [dragOffset, setDragOffset] = useState(0)
-  const [isDragging, setIsDragging] = useState(false)
-
-  // Lock body scroll while open so background pages don't scroll under the
-  // sheet on iOS.
-  useEffect(() => {
-    if (!isOpen) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = previous
-    }
-  }, [isOpen])
-
-  const handleTouchStart = useCallback((e: TouchEvent<HTMLDivElement>) => {
-    dragStartY.current = e.touches[0].clientY
-    dragStartScrollTop.current = scrollContainerRef.current?.scrollTop ?? 0
-    lastDragY.current = e.touches[0].clientY
-    lastDragTs.current = Date.now()
-  }, [])
-
-  const handleTouchMove = useCallback((e: TouchEvent<HTMLDivElement>) => {
-    if (dragStartY.current === null) return
-    const currentY = e.touches[0].clientY
-    const delta = currentY - dragStartY.current
-    // Only track downward drags, and only when the inner list is at the top
-    // (otherwise the user is intending to scroll the list, not dismiss).
-    if (delta > 0 && dragStartScrollTop.current === 0) {
-      setDragOffset(delta)
-      setIsDragging(true)
-    }
-    lastDragY.current = currentY
-    lastDragTs.current = Date.now()
-  }, [])
-
-  const handleTouchEnd = useCallback(() => {
-    if (dragStartY.current === null) return
-    const totalDelta = lastDragY.current - dragStartY.current
-    // Snap closed if dragged more than a third of the sheet height, or with
-    // a clearly downward gesture.
-    const sheetHeight = sheetRef.current?.offsetHeight ?? 600
-    const shouldClose = totalDelta > sheetHeight / 3 || totalDelta > 120
-    setIsDragging(false)
-    setDragOffset(0)
-    dragStartY.current = null
-    if (shouldClose) onClose()
-  }, [onClose])
+  // iOS-style dismiss: gesture is bound (via native touch listeners with
+  // passive: false) to both the drag region (always engages) and the
+  // scroll area (engages only while scrollTop === 0). `enabled: isOpen`
+  // makes the effect re-run when the sheet mounts so listeners attach to
+  // the actual DOM elements (refs aren't a useEffect dependency).
+  const { offset, isDragging } = useBottomSheetDismiss({
+    sheetRef,
+    dragRegionRef,
+    scrollRef,
+    enabled: isOpen,
+    onDismiss: onClose
+  })
 
   if (!isOpen) return null
 
-  // Portal to document.body so the sheet escapes the nav drawer's
-  // stacking context (Navigator wrapper has z-index: 14, which would
-  // contain the sheet despite its higher z-index value).
   const sheet = (
     <>
       <div
         className={sheetStyles.backdrop}
         onClick={onClose}
         aria-hidden
-        style={{ zIndex: 99998 }}
+        style={{ zIndex: zIndex.MOBILE_SHEET_BACKDROP }}
       />
       <div
         ref={sheetRef}
         className={sheetStyles.sheet}
         role='dialog'
+        aria-modal='true'
         aria-label={messages.title}
         style={{
-          zIndex: 99999,
-          transform: isDragging
-            ? `translateY(${dragOffset}px)`
-            : undefined,
+          zIndex: zIndex.MOBILE_SHEET,
+          transform: isDragging ? `translateY(${offset}px)` : undefined,
           transition: isDragging ? 'none' : undefined
         }}
       >
-        {/* Drag handle — visual affordance + the swipe-to-dismiss target.
-            Listening on the handle (rather than the whole sheet) keeps the
-            inner list scroll-gestures uncontested. */}
-        <div
-          className={sheetStyles.dragHandleArea}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onTouchCancel={handleTouchEnd}
-        >
-          <div className={sheetStyles.dragHandle} aria-hidden />
+        {/* Close: pinned to the absolute top-right corner of the sheet so
+            its position doesn't shift with the drag handle's whitespace.
+            data-no-drag tells useBottomSheetDismiss to skip the drag
+            gesture when the press lands inside this button. */}
+        <IconButton
+          aria-label={messages.closeLabel}
+          icon={IconClose}
+          color='subdued'
+          size='s'
+          onClick={onClose}
+          className={sheetStyles.closeButton}
+          data-no-drag
+        />
+
+        {/* Drag region: handle + header are one surface. The hook
+            attaches native touch listeners (with passive: false) to
+            this ref AND to scrollRef so iOS-style pull-to-dismiss
+            works from the list when scrolled to the top. */}
+        <div ref={dragRegionRef} className={sheetStyles.dragRegion}>
+          <div className={sheetStyles.dragHandleArea}>
+            <div className={sheetStyles.dragHandle} aria-hidden />
+          </div>
+          <PanelHeader bare />
         </div>
-
-        <Flex
-          inline
-          justifyContent='space-between'
-          alignItems='center'
-          backgroundColor='accent'
-          borderBottom='default'
-          p='s'
-          ph='m'
-          gap='s'
-          css={{ flexShrink: 0 }}
-        >
-          <Flex inline alignItems='center' gap='s'>
-            <IconNotification color='white' size='l' />
-            <Text
-              variant='label'
-              size='l'
-              strength='strong'
-              color='white'
-              lineHeight='single'
-            >
-              {messages.title}
-            </Text>
-          </Flex>
-          <IconButton
-            icon={IconClose}
-            color='white'
-            aria-label={messages.closeLabel}
-            onClick={onClose}
-          />
-        </Flex>
-
-        <div ref={scrollContainerRef} className={sheetStyles.scrollArea}>
-          <InfiniteScroll
-            loadMore={handleLoadMore}
-            hasMore={hasNextPage}
-            initialLoad={isPending}
-            useWindow={false}
-            threshold={SCROLL_THRESHOLD}
-            loader={
-              <LoadingSpinner
-                key='loading-spinner'
-                size='xl'
-                alignSelf='center'
-                style={{ margin: '24px auto' }}
-              />
-            }
-            getScrollParent={getScrollParent}
-            css={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: spacing.s,
-              padding: spacing.l,
-              paddingTop: spacing.xl,
-              listStyleType: 'none',
-              margin: 0
-            }}
-            element='ul'
-          >
-            {userHasNoNotifications ? (
-              <EmptyNotifications />
-            ) : (
-              notifications.map((notification) => (
-                <Notification
-                  key={notification.id}
-                  notification={notification}
-                />
-              ))
-            )}
-          </InfiniteScroll>
+        <div ref={scrollRef} className={sheetStyles.scrollArea}>
+          <NotificationsList getScrollParent={getScrollParent} />
         </div>
       </div>
     </>

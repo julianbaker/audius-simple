@@ -28,5 +28,10 @@ export const messages = {
   userIdParserTitle: 'User ID Parser',
   userIdParserDescription:
     'Parse hash IDs to decode them into numeric user IDs. Useful for debugging and development work with user identifiers.',
-  userIdParserButton: 'Open User ID Parser'
+  userIdParserButton: 'Open User ID Parser',
+  reactQueryDevtoolsTitle: 'React Query Devtools',
+  reactQueryDevtoolsDescription:
+    'Show the floating React Query devtools button in the corner of the app for inspecting queries, mutations, and cache state. Off by default.',
+  reactQueryDevtoolsEnable: 'Show Devtools Button',
+  reactQueryDevtoolsDisable: 'Hide Devtools Button'
 }

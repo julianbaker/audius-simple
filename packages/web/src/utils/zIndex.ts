@@ -28,6 +28,12 @@ export enum zIndex {
   NAVIGATOR_POPUP_OVERFLOW_POPUP = 16,
   FOLLOW_RECOMMENDATIONS_POPUP = 17,
 
+  // Mobile bottom-sheet drawer (notifications, etc). Portal'd to body so it
+  // needs to sit above the persistent nav (z=14) and any in-page chrome,
+  // but below modal-level overlays.
+  MOBILE_SHEET_BACKDROP = 9990,
+  MOBILE_SHEET = 9991,
+
   UPLOAD_SUBMIT_BAR = 50,
 
   NAV_BANNER_POPUP = 101,

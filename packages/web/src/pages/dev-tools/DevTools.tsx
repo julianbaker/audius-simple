@@ -8,6 +8,7 @@ import {
   IconSolana,
   IconDashboard,
   IconUser,
+  IconRefresh,
   Paper,
   Text,
   makeResponsiveStyles
@@ -17,6 +18,10 @@ import { useNavigate } from 'react-router'
 
 import { Header } from 'components/header/desktop/Header'
 import { Page } from 'components/page/Page'
+import {
+  REACT_QUERY_DEVTOOLS_KEY,
+  useDevToggle
+} from 'hooks/useDevToggle'
 import { env } from 'services/env'
 
 import { messages } from './messages'
@@ -90,6 +95,8 @@ const DevToolCard = (props: DevToolCardProps) => {
 export const DevTools = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [reactQueryDevtoolsEnabled, setReactQueryDevtoolsEnabled] =
+    useDevToggle(REACT_QUERY_DEVTOOLS_KEY, false)
 
   const handleOpenFeatureFlags = () => {
     dispatch(
@@ -180,6 +187,20 @@ export const DevTools = () => {
             description={messages.userIdParserDescription}
             buttonText={messages.userIdParserButton}
             onButtonClick={handleOpenUserIdParser}
+          />
+
+          <DevToolCard
+            icon={IconRefresh}
+            title={messages.reactQueryDevtoolsTitle}
+            description={messages.reactQueryDevtoolsDescription}
+            buttonText={
+              reactQueryDevtoolsEnabled
+                ? messages.reactQueryDevtoolsDisable
+                : messages.reactQueryDevtoolsEnable
+            }
+            onButtonClick={() =>
+              setReactQueryDevtoolsEnabled(!reactQueryDevtoolsEnabled)
+            }
           />
         </Flex>
       </Box>

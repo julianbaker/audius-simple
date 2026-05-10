@@ -5,42 +5,82 @@
   animation: backdropFadeIn 0.2s ease;
 }
 
-/* Bottom-sheet drawer. Sits at the bottom of the viewport with a max height
-   so the user can still see context above it; rounded top corners; native
-   vertical scroll inside. */
+/* Bottom-sheet drawer. Anchored to the bottom; locked to a fixed height
+   that leaves at least 64px below the device's safe-area inset (notch /
+   cutout / status bar) so the drag handle is always visible.
+
+   - `height` (not `max-height`): keeps the sheet at a consistent size as
+     the notifications list loads in, so it doesn't pop from "header only"
+     to "full" once the data arrives.
+   - `100dvh`: dynamic viewport height — excludes the iOS Safari
+     URL-bar chrome that `100vh` includes. Falls back to `100vh` on older
+     browsers via the prior declaration.
+   - `env(safe-area-inset-top)`: accounts for notches/cutouts so the
+     sheet top doesn't slide under them.
+
+   Border + shadow provide material elevation; rounded top corners are
+   clipped by overflow:hidden on the sheet. */
 .sheet {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
-  max-height: 85vh;
+  height: calc(100vh - 64px - env(safe-area-inset-top, 0px));
+  height: calc(100dvh - 64px - env(safe-area-inset-top, 0px));
   display: flex;
   flex-direction: column;
   background: var(--harmony-bg-default, var(--harmony-n-25));
   border-top-left-radius: 16px;
   border-top-right-radius: 16px;
+  border: 1px solid var(--harmony-border-default, var(--harmony-n-100));
+  border-bottom: none;
   box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.22);
   animation: sheetSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
   overflow: hidden;
-  /* Clip rounded corners on the inner header */
+  /* Clip rounded corners on inner header */
   isolation: isolate;
 }
 
-.dragHandleArea {
+/* Absolute-positioned close button — sits in the top-right corner of the
+   drawer regardless of header padding. Pinned ABOVE the dragRegion so its
+   visual placement doesn't shift with the handle's whitespace. */
+.closeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+}
+
+/* Drag region wraps both the visual handle AND the panel header so the
+   user can dismiss by dragging anywhere in the top chrome (the natural
+   target). Background matches the header so the handle reads as part of
+   the same surface, not a separate strip floating above. */
+.dragRegion {
   flex-shrink: 0;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px 0 4px;
+  flex-direction: column;
+  background: var(--harmony-bg-surface-1, var(--harmony-bg-default));
+  border-bottom: 1px solid var(--harmony-border-default, var(--harmony-n-100));
   cursor: grab;
   touch-action: none;
 }
 
+.dragRegion:active {
+  cursor: grabbing;
+}
+
+.dragHandleArea {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 4px;
+}
+
 .dragHandle {
-  width: 40px;
+  width: 36px;
   height: 4px;
   border-radius: 999px;
-  background: var(--harmony-n-200);
+  background: var(--harmony-n-200, rgba(0, 0, 0, 0.2));
 }
 
 .scrollArea {
@@ -49,6 +89,10 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* Prevent the browser from running native overscroll bounce while we
+     own the at-top pull-down-to-dismiss gesture — without this, iOS would
+     also rubber-band, fighting our transform. */
+  overscroll-behavior-y: contain;
 }
 
 @keyframes backdropFadeIn {
