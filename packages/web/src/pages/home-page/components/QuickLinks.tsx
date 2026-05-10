@@ -235,13 +235,18 @@ export const QuickLinks = () => {
         minWidth: 0,
         msOverflowStyle: 'none',
         scrollbarWidth: 'none',
-        '&::-webkit-scrollbar': { display: 'none' }
+        '&::-webkit-scrollbar': { display: 'none' },
+        ...(isMobile && {
+          marginInline: 'calc(-1 * var(--page-padding-inline))'
+        })
       }}
     >
       <Flex
         gap='s'
-        ph={isMobile ? 'l' : undefined}
-        css={{ minWidth: 'max-content' }}
+        css={{
+          minWidth: 'max-content',
+          ...(isMobile && { paddingInline: 'var(--page-padding-inline)' })
+        }}
       >
         {pills.map((pill) => (
           <PillItem key={pill.key} pill={pill} />

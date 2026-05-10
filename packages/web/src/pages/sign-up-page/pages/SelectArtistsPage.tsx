@@ -24,7 +24,7 @@ import {
   FollowArtistTileSkeleton
 } from 'components/follow-artist-card/FollowArtistCard'
 import { SelectArtistsPreviewContextProvider } from 'components/follow-artist-card/selectArtistsPreviewContext'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 import { env } from 'services/env'
 import { useSelector } from 'utils/reducer'

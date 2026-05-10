@@ -4,9 +4,12 @@ import { useAccountStatus } from '@audius/common/api'
 import { Status } from '@audius/common/models'
 import { Box, Divider, Flex, Scrollbar, useMedia } from '@audius/harmony'
 import { ResizeObserver } from '@juggle/resize-observer'
+import cn from 'classnames'
 import useMeasure from 'react-use-measure'
 
 import { DragAutoscroller } from 'components/drag-autoscroller/DragAutoscroller'
+
+import styles from './LeftNav.module.css'
 
 import { AccountDetails } from './AccountDetails'
 import { LeftNavCTA } from './LeftNavCTA'
@@ -67,17 +70,26 @@ export const LeftNav = (props: OwnProps) => {
   const navLoaded =
     accountStatus === Status.SUCCESS || accountStatus === Status.ERROR
 
+  // On mobile, fill the drawer (parent panel sets the takeover width).
+  // On desktop, snap to expanded/collapsed widths.
+  const navWidth = isMobile
+    ? '100%'
+    : isCollapsed
+      ? LEFT_NAV_COLLAPSED_WIDTH
+      : LEFT_NAV_WIDTH
+
   return (
     <Flex
-      borderRight='default'
+      borderRight={isMobile ? undefined : 'default'}
       as='nav'
       aria-label='Primary navigation'
       id='leftNav'
       direction='column'
       h='100%'
+      className={cn({ [styles.mobileScale]: isMobile })}
       css={{
-        width: isCollapsed ? LEFT_NAV_COLLAPSED_WIDTH : LEFT_NAV_WIDTH,
-        transition: 'width 0.2s ease',
+        width: navWidth,
+        transition: isMobile ? undefined : 'width 0.2s ease',
         userSelect: 'none',
         overflowX: 'clip',
         overflowY: 'visible',
@@ -149,7 +161,7 @@ export const LeftNav = (props: OwnProps) => {
           </DragAutoscroller>
         </Scrollbar>
       </Flex>
-      {navLoaded ? (
+      {navLoaded && !isMobile ? (
         <Flex
           direction='column'
           alignItems='center'

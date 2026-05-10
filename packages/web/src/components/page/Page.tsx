@@ -1,4 +1,10 @@
-import { ReactNode, cloneElement, useRef, MutableRefObject } from 'react'
+import {
+  ReactNode,
+  cloneElement,
+  useRef,
+  MutableRefObject,
+  CSSProperties
+} from 'react'
 
 import { Box, Flex } from '@audius/harmony'
 import { animated, useSpring } from '@react-spring/web'
@@ -22,6 +28,7 @@ type HeaderContainerProps = Pick<
   | 'subHeader'
   | 'disableHeaderFrosted'
   | 'frostedHeaderContainer'
+  | 'headerContainerClassName'
 >
 
 const HeaderContainer = (props: HeaderContainerProps) => {
@@ -31,7 +38,8 @@ const HeaderContainer = (props: HeaderContainerProps) => {
     headerContentPaddingInline,
     subHeader,
     disableHeaderFrosted,
-    frostedHeaderContainer
+    frostedHeaderContainer,
+    headerContainerClassName
   } = props
 
   const headerContainerRef = useRef<HTMLDivElement>(null)
@@ -43,7 +51,7 @@ const HeaderContainer = (props: HeaderContainerProps) => {
   return (
     <div
       ref={headerContainerRef}
-      className={cn(styles.headerContainer, {
+      className={cn(styles.headerContainer, headerContainerClassName, {
         [styles.headerContainerFrosted]: frostedHeaderContainer
       })}
     >
@@ -79,11 +87,14 @@ type PageProps = {
   containerClassName?: string
   fromOpacity?: number
   fadeDuration?: number
+  fullHeight?: boolean
   header?: ReactNode
   subHeader?: ReactNode
   headerContentPaddingInline?: string
+  headerContainerClassName?: string
   disableHeaderFrosted?: boolean
   frostedHeaderContainer?: boolean
+  mobileContentTopOverlap?: number
 
   // There are some pages which don't have a fixed header but still display
   // a search bar that scrolls with the page.
@@ -110,6 +121,7 @@ export const Page = (props: PageProps) => {
     fadeDuration = 200,
     fromOpacity = 0.2,
     header,
+    headerContainerClassName,
     subHeader,
     headerContentPaddingInline = 'var(--page-padding-inline, var(--harmony-unit-8))',
     disableHeaderFrosted = false,
@@ -124,7 +136,8 @@ export const Page = (props: PageProps) => {
     structuredData,
     title,
     variant = 'inset',
-    headerPadding = HEADER_MARGIN_PX
+    headerPadding = HEADER_MARGIN_PX,
+    mobileContentTopOverlap = 0
   } = props
 
   const metaTagsProps = {
@@ -162,6 +175,7 @@ export const Page = (props: PageProps) => {
             subHeader={subHeader}
             showSearch={showSearch}
             headerContentPaddingInline={headerContentPaddingInline}
+            headerContainerClassName={headerContainerClassName}
             disableHeaderFrosted={disableHeaderFrosted}
             frostedHeaderContainer={frostedHeaderContainer}
           />
@@ -172,10 +186,17 @@ export const Page = (props: PageProps) => {
             [styles.flush]: variant === 'flush',
             [styles.medium]: size === 'medium',
             [styles.large]: size === 'large',
+            [styles.mobileContentTopOverlap]: mobileContentTopOverlap > 0,
             [containerClassName ?? '']: !!containerClassName
           })}
           style={
-            variant === 'inset' ? { paddingTop: headerPadding } : undefined
+            variant === 'inset'
+              ? ({
+                  '--mobile-content-top-overlap': `${mobileContentTopOverlap}px`,
+                  '--page-header-padding-top': `${headerPadding}px`,
+                  paddingTop: headerPadding
+                } as CSSProperties)
+              : undefined
           }
         >
           {/* Set an id so that nested components can mount in relation to page if needed, e.g. fixed menu popups. */}

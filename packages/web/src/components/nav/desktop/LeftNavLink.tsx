@@ -128,6 +128,7 @@ export const LeftNavLink = (props: LeftNavLinkProps) => {
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={styles.navLink}
+        data-left-nav-item
         draggable={false}
         tabIndex={disabled ? -1 : 0}
         aria-label={accessibleLabel}
@@ -153,6 +154,7 @@ export const LeftNavLink = (props: LeftNavLinkProps) => {
       onFocus={handleFocus}
       onBlur={handleBlur}
       className={styles.navLink}
+      data-left-nav-item
       draggable={false}
       tabIndex={disabled ? -1 : 0}
       aria-current={isSelected ? 'page' : undefined}

@@ -23,7 +23,7 @@ import {
   getNameField,
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 import { useSelector } from 'utils/reducer'
 

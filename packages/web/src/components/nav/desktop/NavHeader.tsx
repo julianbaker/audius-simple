@@ -5,6 +5,7 @@ import {
   useCurrentAccountUser,
   useHasAccount
 } from '@audius/common/api'
+import { useNotificationModal } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import {
   Flex,
@@ -15,6 +16,7 @@ import {
 } from '@audius/harmony'
 import { Link, useLocation } from 'react-router'
 
+import { NotificationPanel } from 'components/notification'
 import { RestrictionType, useRequiresAccountFn } from 'hooks/useRequiresAccount'
 
 import { NavHeaderButton } from './NavHeaderButton'
@@ -78,8 +80,15 @@ export const NavHeader = () => {
   const { isCollapsed, isMobileOpen, setIsMobileOpen } = useNavSidebar()
   const { isMobile } = useMedia()
   const { pathname } = useLocation()
+  // The mobile NavHeader doesn't expose a bell (the bottom-bar owns that
+  // entry point), but it still needs to mount the panel so the bottom-bar
+  // tap has somewhere to render.
+  const { isOpen: isNotificationsOpen, onClose: closeNotifications } =
+    useNotificationModal()
 
-  // Mobile: compact persistent nav bar — [hamburger/X] [Logo] [Settings] [Bell]
+  // Mobile: compact persistent nav bar — [hamburger/X] [Logo] [Settings].
+  // Notifications are reached from the bottom-bar bell on mobile to avoid two
+  // entry points for the same panel.
   if (isMobile) {
     return (
       <Flex
@@ -159,8 +168,13 @@ export const NavHeader = () => {
               isActive={pathname === SETTINGS_PAGE}
             />
           </RestrictedLink>
-          <NotificationsButton />
         </Flex>
+        {/* Panel mount — no anchor needed on mobile, the panel renders as
+            a full-screen sheet keyed off Redux state. */}
+        <NotificationPanel
+          isOpen={isNotificationsOpen}
+          onClose={closeNotifications}
+        />
       </Flex>
     )
   }

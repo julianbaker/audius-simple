@@ -13,7 +13,7 @@ import { make } from 'common/store/analytics/actions'
 import { setField } from 'common/store/pages/signon/actions'
 import { getGenres } from 'common/store/pages/signon/selectors'
 import { SelectablePillField } from 'components/form-fields/SelectablePillField'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 
 import { SkipButton } from '../components/SkipButton'

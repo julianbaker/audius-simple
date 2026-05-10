@@ -12,7 +12,7 @@ import { toFormikValidationSchema } from 'zod-formik-adapter'
 
 import { setValueField } from 'common/store/pages/signon/actions'
 import { getHandleField } from 'common/store/pages/signon/selectors'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 import { restrictedHandles } from 'utils/restrictedHandles'
 

@@ -87,9 +87,11 @@
   pointer-events: auto;
 }
 
-/* Darkens content behind the open sidebar */
+/* Darkens content behind the open sidebar. Covers the entire viewport
+   below the persistent app bar so the visible sliver of underlying
+   content is dimmed and tappable to close. */
 .mobileBackdrop {
-  position: absolute;
+  position: fixed;
   top: 44px;
   left: 0;
   right: 0;
@@ -97,22 +99,41 @@
   background: rgba(0, 0, 0, 0.45);
   pointer-events: auto;
   z-index: 1;
+  animation: mobileBackdropFadeIn 0.2s ease;
 }
 
-/* Sliding panel — full-width on mobile, below the nav bar */
+@keyframes mobileBackdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Sliding panel — ~90vw drawer on mobile, leaves a sliver of backdrop on
+   the right to make "tap outside" obvious. Width capped so very wide
+   tablets don't get an over-large drawer. */
 .mobilePanel {
   position: absolute;
   top: 44px;
   left: 0;
   bottom: 0;
-  width: 100%;
+  width: min(320px, 90vw);
   transform: translateX(-100%);
   transition: transform 0.25s ease;
   pointer-events: auto;
   z-index: 2;
   overflow: hidden;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.15);
 }
 
 .mobilePanelOpen {
   transform: translateX(0);
+}
+
+/* While dragging, suppress the slide transition so the panel tracks
+   the finger 1:1. */
+.mobilePanelDragging {
+  transition: none;
 }

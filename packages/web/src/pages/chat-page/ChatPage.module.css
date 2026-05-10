@@ -14,6 +14,59 @@
   font-weight: var(--harmony-font-medium);
 }
 
+/* Mobile: shrink --chat-header-height to match the compact ChatHeader, and
+   give the per-chat pane header more room (avatar + name + handle stack
+   needs ~68px). */
+.singlePane {
+  --chat-header-height: 64px;
+  --chat-row-height: 68px;
+}
+
+/* Mobile: same scroll-behind-frosted-chrome pattern desktop pages use,
+   applied to the bottom too. The bottom-chrome height is published by
+   PlayBarProvider via --mobile-bottom-chrome (49px when no track, ~96px
+   while a track is playing) so the composer & list adapt automatically. */
+@media (max-width: 768px) {
+  /* The chat route disables main-page scrolling. In that layout #mainContent is
+     already offset below the fixed mobile app bar and becomes the sticky
+     scrollport, so using --mobile-nav-height here double-offsets the header. */
+  .chatPageHeaderContainer {
+    top: 0;
+  }
+
+  /* Negate the parent .mainContentWrapper's static 88px play-bar padding so
+     the chat surface can claim the full viewport area. */
+  .singlePane {
+    margin-bottom: calc(-1 * var(--play-bar-height, 88px));
+  }
+
+  /* Composer: position fixed above the live bottom-chrome so it doesn't
+     ride the chat-area scroll, and shifts up when a track starts playing. */
+  .singlePane .composer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--mobile-bottom-chrome, 49px);
+    z-index: 11;
+    transition: bottom 0.2s ease;
+  }
+
+  /* Reserve scroll padding so the message list's last messages sit above
+     the now-fixed composer rather than under it. */
+  .singlePane .messageList {
+    padding-bottom: calc(var(--chat-composer-height, 88px) + 16px);
+  }
+
+  /* Chat list: extend the scroll container behind the bottom chrome, the
+     same way ChatList.module.css already extends behind the top chat
+     header. Items at the bottom scroll past the bottom-bar / play-bar
+     under the frosted blur instead of clipping early. */
+  .singlePane .chatList {
+    margin-bottom: calc(-1 * var(--mobile-bottom-chrome, 49px));
+    padding-bottom: var(--mobile-bottom-chrome, 49px);
+  }
+}
+
 .page :global(#page) {
   width: 100% !important;
   max-width: none !important;
@@ -59,6 +112,12 @@
 
 .chatListCompact {
   width: 96px;
+}
+
+/* Single-pane mobile mode: list takes the full width when no chat is
+   selected. The chat area replaces the list entirely when a chat is open. */
+.chatListSinglePane {
+  width: 100%;
 }
 
 .chatArea {

@@ -303,6 +303,7 @@ const LibraryPage = () => {
       description={description}
       contentClassName={styles.libraryPageWrapper}
       header={header}
+      mobileContentTopOverlap={32}
     >
       <div className={styles.bodyWrapper}>{body}</div>
     </Page>

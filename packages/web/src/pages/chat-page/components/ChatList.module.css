@@ -21,6 +21,22 @@
   border-right: 1px solid var(--harmony-n-150);
 }
 
+@media (max-width: 768px) {
+  .windowScroll {
+    height: auto;
+    margin-top: calc(
+      -1 * var(--mobile-nav-height, 44px) - var(--chat-header-height, 64px)
+    );
+    padding-top: calc(
+      var(--mobile-nav-height, 44px) + var(--chat-header-height, 64px)
+    );
+    scroll-padding-top: calc(
+      var(--mobile-nav-height, 44px) + var(--chat-header-height, 64px)
+    );
+    overflow-y: visible;
+  }
+}
+
 .empty {
   display: flex;
   flex-direction: column;

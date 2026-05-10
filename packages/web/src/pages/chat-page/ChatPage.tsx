@@ -3,13 +3,13 @@ import { useCallback, useEffect, useRef } from 'react'
 import { useCanSendMessage } from '@audius/common/hooks'
 import { Status } from '@audius/common/models'
 import { chatActions, chatSelectors } from '@audius/common/store'
+import { useMedia } from '@audius/harmony'
 import cn from 'classnames'
 import { useDispatch } from 'react-redux'
 import { useParams, useLocation, useNavigate } from 'react-router'
 
 import Page from 'components/page/Page'
 import { useIsContainerNarrow } from 'hooks/useIsContainerNarrow'
-import { useIsMobile } from 'hooks/useIsMobile'
 import { useManagedAccountNotAllowedRedirect } from 'hooks/useManagedAccountNotAllowedRedirect'
 import { push } from 'utils/navigation'
 import { useSelector } from 'utils/reducer'
@@ -22,7 +22,6 @@ import { ChatList } from './components/ChatList'
 import { ChatMessageList } from './components/ChatMessageList'
 import { ChatPaneHeader } from './components/ChatPaneHeader'
 import { CreateChatPrompt } from './components/CreateChatPrompt'
-import { SkeletonChatPage as MobileChatPage } from './components/mobile/SkeletonChatPage'
 
 const { fetchPermissions } = chatActions
 const { getChat, getChats, getChatsStatus } = chatSelectors
@@ -31,15 +30,21 @@ const messages = {
   messages: 'Messages'
 }
 
-const NARROW_LAYOUT_THRESHOLD_PX = 1080
+// At ≤720px we drop to a single-pane mobile layout: the list takes the full
+// area when no chat is selected; the chat takes the full area (with a back
+// button) when one is. Above 720px we keep the two-pane experience, with the
+// list collapsing to a 96px rail at narrower desktop widths.
+const SINGLE_PANE_THRESHOLD_PX = 720
+const COMPACT_LIST_THRESHOLD_PX = 1080
+const CHATS_PAGE = '/messages'
 
 export const ChatPage = () => {
   useManagedAccountNotAllowedRedirect()
   const params = useParams<{ id?: string }>()
   const location = useLocation()
   const navigate = useNavigate()
-  const isMobile = useIsMobile()
   const currentChatId = params.id
+  const { isMobile } = useMedia()
   const presetMessage = (
     location.state as { presetMessage?: string } | undefined
   )?.presetMessage
@@ -50,10 +55,17 @@ export const ChatPage = () => {
   const chat = useSelector((state) => getChat(state, currentChatId ?? ''))
 
   const layoutRef = useRef<HTMLDivElement>(null)
-  const isNarrowLayout = useIsContainerNarrow(
+  const isCompactList = useIsContainerNarrow(
     layoutRef,
-    NARROW_LAYOUT_THRESHOLD_PX
+    COMPACT_LIST_THRESHOLD_PX
   )
+  const isSinglePane = useIsContainerNarrow(layoutRef, SINGLE_PANE_THRESHOLD_PX)
+  // In single-pane mode, the user is either viewing the list or a chat — never
+  // both. Above the single-pane threshold we still benefit from the compact
+  // list rail at narrower desktop widths (1080–720px).
+  const showChatList = !isSinglePane || !currentChatId
+  const showChatPane = !isSinglePane || !!currentChatId
+  const usePageScrollForChatList = isMobile && !currentChatId
   const messagesRef = useRef<HTMLDivElement>(null)
 
   const chats = useSelector(getChats)
@@ -65,8 +77,13 @@ export const ChatPage = () => {
     chatsStatus === Status.SUCCESS && (chats?.length ?? 0) === 0
 
   const chatListClassName = cn(styles.chatList, {
-    [styles.chatListCompact]: isNarrowLayout
+    [styles.chatListCompact]: isCompactList && !isSinglePane,
+    [styles.chatListSinglePane]: isSinglePane
   })
+
+  const handleBackToList = useCallback(() => {
+    dispatch(push(CHATS_PAGE))
+  }, [dispatch])
 
   // Navigate to new chats
   // Scroll to bottom if active chat is clicked again
@@ -105,14 +122,10 @@ export const ChatPage = () => {
   }, [navigate, location.pathname, presetMessage])
 
   useEffect(() => {
-    if (firstOtherUser && !isMobile) {
+    if (firstOtherUser) {
       dispatch(fetchPermissions({ userIds: [firstOtherUser.user_id] }))
     }
-  }, [dispatch, firstOtherUser, isMobile])
-
-  if (isMobile) {
-    return <MobileChatPage />
-  }
+  }, [dispatch, firstOtherUser])
 
   return (
     <Page
@@ -120,65 +133,80 @@ export const ChatPage = () => {
         messages.messages
       }`}
       containerClassName={cn(styles.page, {
-        [styles.narrowActiveChat]: isNarrowLayout && !!currentChatId
+        [styles.narrowActiveChat]: isCompactList && !!currentChatId,
+        [styles.singlePane]: isSinglePane
       })}
       contentClassName={styles.pageContent}
       showSearch={false}
       headerPadding={0}
       headerContentPaddingInline='0px'
+      headerContainerClassName={
+        usePageScrollForChatList ? undefined : styles.chatPageHeaderContainer
+      }
       disableHeaderFrosted
       header={
-        <ChatHeader
-          currentChatId={currentChatId}
-          isNarrowLayout={isNarrowLayout}
-        />
+        // In single-pane mode with a chat open we're in chat-detail view —
+        // the per-chat ChatPaneHeader (with back button + the other user's
+        // info) is the only header that should show. The "Messages" inbox
+        // header is meaningless here and was visually stacking with the
+        // pane header.
+        isSinglePane && currentChatId ? null : (
+          <ChatHeader
+            currentChatId={currentChatId}
+            isNarrowLayout={isCompactList || isSinglePane}
+          />
+        )
       }
     >
       <div className={styles.layout} ref={layoutRef}>
-        {hideChatList ? null : (
+        {hideChatList || !showChatList ? null : (
           <div className={chatListClassName}>
             <ChatList
               className={chatListClassName}
               currentChatId={currentChatId}
-              isCompact={isNarrowLayout}
+              isCompact={isCompactList && !isSinglePane}
+              useWindowScroll={usePageScrollForChatList}
               onChatClicked={handleChatClicked}
             />
           </div>
         )}
-        <div
-          className={cn(styles.chatArea, {
-            [styles.chatAreaNarrow]: isNarrowLayout
-          })}
-        >
-          {currentChatId ? (
-            <>
-              {isNarrowLayout ? (
-                <ChatPaneHeader
-                  className={styles.chatPaneHeader}
-                  isNarrowLayout
+        {showChatPane ? (
+          <div
+            className={cn(styles.chatArea, {
+              [styles.chatAreaNarrow]: isCompactList || isSinglePane
+            })}
+          >
+            {currentChatId ? (
+              <>
+                {isCompactList || isSinglePane ? (
+                  <ChatPaneHeader
+                    className={styles.chatPaneHeader}
+                    isNarrowLayout
+                    chatId={currentChatId}
+                    onBack={isSinglePane ? handleBackToList : undefined}
+                  />
+                ) : null}
+                <ChatMessageList
+                  ref={messagesRef}
+                  className={styles.messageList}
                   chatId={currentChatId}
                 />
-              ) : null}
-              <ChatMessageList
-                ref={messagesRef}
-                className={styles.messageList}
-                chatId={currentChatId}
-              />
-              {chat?.is_blast || (canSendMessage && chat) ? (
-                <ChatComposer
-                  className={styles.composer}
-                  chatId={currentChatId}
-                  onMessageSent={handleMessageSent}
-                  presetMessage={presetMessage}
-                />
-              ) : null}
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              <CreateChatPrompt hasChats={!hideChatList} />
-            </div>
-          )}
-        </div>
+                {chat?.is_blast || (canSendMessage && chat) ? (
+                  <ChatComposer
+                    className={styles.composer}
+                    chatId={currentChatId}
+                    onMessageSent={handleMessageSent}
+                    presetMessage={presetMessage}
+                  />
+                ) : null}
+              </>
+            ) : (
+              <div className={styles.emptyState}>
+                <CreateChatPrompt hasChats={!hideChatList} />
+              </div>
+            )}
+          </div>
+        ) : null}
       </div>
     </Page>
   )

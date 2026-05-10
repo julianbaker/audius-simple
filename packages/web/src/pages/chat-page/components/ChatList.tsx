@@ -30,10 +30,11 @@ type ChatListProps = {
   currentChatId?: string
   onChatClicked: (chatId: string) => void
   isCompact?: boolean
+  useWindowScroll?: boolean
 } & ComponentPropsWithoutRef<'div'>
 
 export const ChatList = (props: ChatListProps) => {
-  const { currentChatId, onChatClicked, isCompact } = props
+  const { currentChatId, onChatClicked, isCompact, useWindowScroll } = props
   const dispatch = useDispatch()
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
   const chats = useSelector(getChats)
@@ -53,7 +54,8 @@ export const ChatList = (props: ChatListProps) => {
   return (
     <div
       className={cn(styles.root, props.className, {
-        [styles.compact]: isCompact
+        [styles.compact]: isCompact,
+        [styles.windowScroll]: useWindowScroll
       })}
     >
       <InfiniteScroll
@@ -61,7 +63,7 @@ export const ChatList = (props: ChatListProps) => {
         initialLoad={true}
         loadMore={handleLoadMoreChats}
         hasMore={hasMore}
-        useWindow={false}
+        useWindow={useWindowScroll}
         loader={
           hasLoadedOnce ? (
             <div key='loading-skeletons'>

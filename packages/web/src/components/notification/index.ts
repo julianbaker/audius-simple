@@ -1,2 +1,2 @@
 export * from './NotificationPanel'
-export * from './NotificationPage'
+export * from './NotificationRedirect'

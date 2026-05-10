@@ -35,7 +35,9 @@
   overflow: clip;
   overflow-clip-margin: 4px;
   max-height: 200px;
-  transition: max-height 0.25s ease, opacity 0.2s ease;
+  transition:
+    max-height 0.25s ease,
+    opacity 0.25s ease;
   opacity: 1;
 }
 
@@ -68,6 +70,12 @@
     margin-top: 12px !important;
     margin-bottom: 8px !important;
     gap: 8px !important;
+    /* Match the bottomBarContainer / subHeaderContainer transitions so
+       all the shrink animations resolve in lockstep instead of one
+       snapping while the others animate. */
+    transition:
+      margin-top 0.25s ease,
+      margin-bottom 0.25s ease;
   }
 
   .pageTitle {

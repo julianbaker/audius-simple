@@ -15,7 +15,8 @@ import {
   IconMessages,
   IconCheck,
   IconKebabHorizontal,
-  PopupMenu
+  PopupMenu,
+  useMedia
 } from '@audius/harmony'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -34,6 +35,7 @@ const messages = {
 }
 
 const CHAT_HEADER_PADDING_PX = 20
+const CHAT_HEADER_PADDING_MOBILE_PX = 12
 const CHAT_LIST_WIDTH_PX = 400
 
 type ChatHeaderProps = {
@@ -46,6 +48,7 @@ type ChatHeaderProps = {
 export const ChatHeader = forwardRef<HTMLDivElement, ChatHeaderProps>(
   ({ currentChatId, isNarrowLayout }, ref) => {
     const dispatch = useDispatch()
+    const { isMobile } = useMedia()
     const { onOpen: openCreateChatModal } = useCreateChatModal()
     const [, setInboxSettingsVisible] = useModalState('InboxSettings')
     const chat = useSelector((state: CommonState) =>
@@ -87,15 +90,35 @@ export const ChatHeader = forwardRef<HTMLDivElement, ChatHeaderProps>(
     ]
 
     const headerContent = (
-      <Flex p='l' alignItems='center' gap='m'>
-        <IconMessages size='2xl' color='heading' />
-        <Text variant='heading' strength='default' size='l' color='heading'>
+      <Flex
+        pv={isMobile ? 's' : 'l'}
+        ph={isMobile ? '0' : 'l'}
+        alignItems='center'
+        gap='m'
+        w='100%'
+      >
+        <IconMessages
+          size={isMobile ? 'l' : '2xl'}
+          color='heading'
+        />
+        <Text
+          variant='heading'
+          strength='default'
+          size={isMobile ? 's' : 'l'}
+          color='heading'
+        >
           {messages.header}
         </Text>
-        <Flex gap='m' css={{ marginLeft: 'auto' }}>
+        <Flex
+          gap='m'
+          alignItems='center'
+          justifyContent='flex-end'
+          css={{ marginLeft: 'auto', flexShrink: 0 }}
+        >
           <IconButton
             aria-label={messages.compose}
             icon={IconCompose}
+            size='m'
             onClick={handleComposeClicked}
           />
           <PopupMenu
@@ -107,6 +130,7 @@ export const ChatHeader = forwardRef<HTMLDivElement, ChatHeaderProps>(
                 ref={ref}
                 aria-label={messages.inboxOptions}
                 icon={IconKebabHorizontal}
+                size='m'
                 onClick={() => trigger()}
               />
             )}
@@ -115,27 +139,35 @@ export const ChatHeader = forwardRef<HTMLDivElement, ChatHeaderProps>(
       </Flex>
     )
 
+    // At narrow widths, drop the fixed 112px height and let the header size
+    // to its content like the standard adaptive Header does. The
+    // --chat-header-height var still drives the page-internal layout
+    // calculations, but a smaller value matches the compact mobile header.
+    const narrow = isNarrowLayout || isMobile
+    const headerHeight = narrow ? 64 : 112
+
     return (
       <Frosted
         w='100%'
-        h='var(--chat-header-height, 112px)'
+        h={headerHeight}
         contentPaddingInline='0px'
         borderBottom='default'
+        css={{ '--chat-header-height': `${headerHeight}px` } as any}
       >
         <Flex
           ref={ref}
           w='100%'
-          h='var(--chat-header-height, 112px)'
-          ph={CHAT_HEADER_PADDING_PX}
+          h={headerHeight}
+          ph={isMobile ? CHAT_HEADER_PADDING_MOBILE_PX : CHAT_HEADER_PADDING_PX}
           css={{ minWidth: 0, borderRadius: 0 }}
         >
           <Flex
-            w={isNarrowLayout ? '100%' : CHAT_LIST_WIDTH_PX}
+            w={narrow ? '100%' : CHAT_LIST_WIDTH_PX}
             css={{ flexShrink: 0 }}
           >
             {headerContent}
           </Flex>
-          {isNarrowLayout ? null : (
+          {narrow ? null : (
             <Flex p='l' flex={1} alignItems='center' css={{ minWidth: 0 }}>
               {chat ? (
                 isBlast ? (

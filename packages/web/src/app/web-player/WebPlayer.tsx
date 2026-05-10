@@ -1,11 +1,4 @@
-import {
-  lazy,
-  Suspense,
-  useState,
-  useEffect,
-  useRef,
-  useCallback
-} from 'react'
+import { lazy, Suspense, useState, useEffect, useRef, useCallback } from 'react'
 
 import {
   selectIsGuestAccount,
@@ -48,7 +41,7 @@ import { HeaderContextConsumer } from 'components/header/mobile/HeaderContextPro
 import Navigator from 'components/nav/Navigator'
 import TopLevelPage from 'components/nav/mobile/TopLevelPage'
 import Notice from 'components/notice/Notice'
-import { NotificationPage } from 'components/notification'
+import { NotificationRedirect } from 'components/notification'
 import PlayBarProvider from 'components/play-bar/PlayBarProvider'
 import { useEnvironment } from 'hooks/useEnvironment'
 import { MAIN_CONTENT_ID, MainContentContext } from 'pages/MainContentContext'
@@ -648,7 +641,10 @@ const WebPlayer = (props: WebPlayerProps) => {
   if (showRequiresWebUpdate)
     return <RequiresUpdate isUpdating={isUpdating} onUpdate={acceptWebUpdate} />
 
-  const noScroll = !!matchPath(CHAT_PAGE, currentRoute)
+  const chatPageMatch = matchPath(CHAT_PAGE, currentRoute)
+  const isMobileChatList =
+    isMobile && !!chatPageMatch && !chatPageMatch.params.id
+  const noScroll = !!chatPageMatch && !isMobileChatList
 
   return (
     <div className={styles.root}>
@@ -692,300 +688,282 @@ const WebPlayer = (props: WebPlayerProps) => {
 
           <Suspense fallback={null}>
             <Routes>
-                {publicSiteRoutes.map((route) => (
-                  <Route
-                    key={route}
-                    path={route}
-                    element={<Navigate to='/' replace />}
+              {publicSiteRoutes.map((route) => (
+                <Route
+                  key={route}
+                  path={route}
+                  element={<Navigate to='/' replace />}
+                />
+              ))}
+              <Route path='/fb/share' element={<FbSharePage />} />
+              <Route
+                path={FEED_PAGE}
+                element={<FeedPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={NOTIFICATION_USERS_PAGE}
+                element={<NotificationUsersPage />}
+              />
+              <Route
+                path={NOTIFICATION_PAGE}
+                element={<NotificationRedirect />}
+              />
+              <Route
+                path={TRENDING_GENRES}
+                element={<TrendingGenreSelectionPage />}
+              />
+              <Route
+                path={TRENDING_PAGE}
+                element={<TrendingPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={TRENDING_PLAYLISTS_PAGE_LEGACY}
+                element={<Navigate to={EXPLORE_PAGE} replace />}
+              />
+              <Route
+                path={TRENDING_PLAYLISTS_PAGE}
+                element={<Navigate to={EXPLORE_PAGE} replace />}
+              />
+              <Route
+                path={TRENDING_UNDERGROUND_PAGE}
+                element={<Navigate to={TRENDING_PAGE} replace />}
+              />
+              <Route path={EXPLORE_PAGE} element={<ExplorePage />} />
+              <Route path={CONTESTS_PAGE} element={<ContestsPage />} />
+              <Route
+                path={SEARCH_CATEGORY_PAGE_LEGACY}
+                element={<SearchCategoryLegacyRedirect />}
+              />
+              <Route
+                path={SEARCH_PAGE}
+                element={
+                  <SearchPageRoute
+                    validSearchCategories={validSearchCategories}
                   />
-                ))}
-                <Route path='/fb/share' element={<FbSharePage />} />
+                }
+              />
+              <Route
+                path={UPLOAD_ALBUM_PAGE}
+                element={<UploadPage scrollToTop={scrollToTop} />}
+              />
+              <Route
+                path={UPLOAD_PLAYLIST_PAGE}
+                element={<UploadPage scrollToTop={scrollToTop} />}
+              />
+              <Route
+                path={UPLOAD_PAGE}
+                element={<UploadPage scrollToTop={scrollToTop} />}
+              />
+              <Route
+                path={SAVED_PAGE}
+                element={<Navigate to={LIBRARY_TRACKS_PAGE} replace />}
+              />
+              <Route
+                path={LIBRARY_PAGE}
+                element={<Navigate to={LIBRARY_TRACKS_PAGE} replace />}
+              />
+              <Route path={LIBRARY_TRACKS_PAGE} element={<LibraryPage />} />
+              <Route path={LIBRARY_ALBUMS_PAGE} element={<LibraryPage />} />
+              <Route path={LIBRARY_PLAYLISTS_PAGE} element={<LibraryPage />} />
+              <Route path={HISTORY_PAGE} element={<HistoryPage />} />
+              {!isProduction ? (
+                <Route path={DEV_TOOLS_PAGE} element={<DevTools />} />
+              ) : null}
+              {!isProduction ? (
+                <Route path={SOLANA_TOOLS_PAGE} element={<SolanaToolsPage />} />
+              ) : null}
+              {!isProduction ? (
                 <Route
-                  path={FEED_PAGE}
-                  element={<FeedPage containerRef={mainContentRef} />}
+                  path={USER_ID_PARSER_PAGE}
+                  element={<UserIdParserPage />}
                 />
-                <Route
-                  path={NOTIFICATION_USERS_PAGE}
-                  element={<NotificationUsersPage />}
-                />
-                <Route
-                  path={NOTIFICATION_PAGE}
-                  element={<NotificationPage />}
-                />
-                <Route
-                  path={TRENDING_GENRES}
-                  element={<TrendingGenreSelectionPage />}
-                />
-                <Route
-                  path={TRENDING_PAGE}
-                  element={<TrendingPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={TRENDING_PLAYLISTS_PAGE_LEGACY}
-                  element={<Navigate to={EXPLORE_PAGE} replace />}
-                />
-                <Route
-                  path={TRENDING_PLAYLISTS_PAGE}
-                  element={<Navigate to={EXPLORE_PAGE} replace />}
-                />
-                <Route
-                  path={TRENDING_UNDERGROUND_PAGE}
-                  element={<Navigate to={TRENDING_PAGE} replace />}
-                />
-                <Route path={EXPLORE_PAGE} element={<ExplorePage />} />
-                <Route path={CONTESTS_PAGE} element={<ContestsPage />} />
-                <Route
-                  path={SEARCH_CATEGORY_PAGE_LEGACY}
-                  element={<SearchCategoryLegacyRedirect />}
-                />
-                <Route
-                  path={SEARCH_PAGE}
-                  element={
-                    <SearchPageRoute
-                      validSearchCategories={validSearchCategories}
-                    />
-                  }
-                />
-                <Route
-                  path={UPLOAD_ALBUM_PAGE}
-                  element={<UploadPage scrollToTop={scrollToTop} />}
-                />
-                <Route
-                  path={UPLOAD_PLAYLIST_PAGE}
-                  element={<UploadPage scrollToTop={scrollToTop} />}
-                />
-                <Route
-                  path={UPLOAD_PAGE}
-                  element={<UploadPage scrollToTop={scrollToTop} />}
-                />
-                <Route
-                  path={SAVED_PAGE}
-                  element={<Navigate to={LIBRARY_TRACKS_PAGE} replace />}
-                />
-                <Route
-                  path={LIBRARY_PAGE}
-                  element={<Navigate to={LIBRARY_TRACKS_PAGE} replace />}
-                />
-                <Route path={LIBRARY_TRACKS_PAGE} element={<LibraryPage />} />
-                <Route path={LIBRARY_ALBUMS_PAGE} element={<LibraryPage />} />
-                <Route
-                  path={LIBRARY_PLAYLISTS_PAGE}
-                  element={<LibraryPage />}
-                />
-                <Route path={HISTORY_PAGE} element={<HistoryPage />} />
-                {!isProduction ? (
-                  <Route path={DEV_TOOLS_PAGE} element={<DevTools />} />
-                ) : null}
-                {!isProduction ? (
-                  <Route
-                    path={SOLANA_TOOLS_PAGE}
-                    element={<SolanaToolsPage />}
+              ) : null}
+
+              <Route path={DASHBOARD_PAGE} element={<DashboardPage />} />
+              {REMOVED_CRYPTO_ROUTES.map((path) => (
+                <Route key={path} path={path} element={<NotFoundPage />} />
+              ))}
+
+              <Route path={CHAT_PAGE} element={<ChatPage />} />
+              <Route
+                path={DEACTIVATE_PAGE}
+                element={<DeactivateAccountPage />}
+              />
+              <Route
+                path={SETTINGS_PAGE}
+                element={<SettingsPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={AUTHORIZED_APPS_SETTINGS_PAGE}
+                element={<SettingsPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE}
+                element={<SettingsPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE}
+                element={<SettingsPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={LABEL_ACCOUNT_SETTINGS_PAGE}
+                element={<SettingsPage containerRef={mainContentRef} />}
+              />
+              <Route path={CHECK_PAGE} element={<CheckPage />} />
+              <Route
+                path={ACCOUNT_SETTINGS_PAGE}
+                element={
+                  <SettingsPage
+                    containerRef={mainContentRef}
+                    subPage={SubPage.ACCOUNT}
                   />
-                ) : null}
-                {!isProduction ? (
-                  <Route
-                    path={USER_ID_PARSER_PAGE}
-                    element={<UserIdParserPage />}
+                }
+              />
+              <Route
+                path={CHANGE_PASSWORD_SETTINGS_PAGE}
+                element={
+                  <SettingsPage
+                    containerRef={mainContentRef}
+                    subPage={SubPage.CHANGE_PASSWORD}
                   />
-                ) : null}
+                }
+              />
+              <Route
+                path={CHANGE_EMAIL_SETTINGS_PAGE}
+                element={
+                  <SettingsPage
+                    containerRef={mainContentRef}
+                    subPage={SubPage.CHANGE_EMAIL}
+                  />
+                }
+              />
+              <Route
+                path={NOTIFICATION_SETTINGS_PAGE}
+                element={
+                  <SettingsPage
+                    containerRef={mainContentRef}
+                    subPage={SubPage.NOTIFICATIONS}
+                  />
+                }
+              />
+              <Route
+                path={ABOUT_SETTINGS_PAGE}
+                element={
+                  <SettingsPage
+                    containerRef={mainContentRef}
+                    subPage={SubPage.ABOUT}
+                  />
+                }
+              />
+              <Route path={APP_REDIRECT} element={<AppRedirectListener />} />
+              <Route path={NOT_FOUND_PAGE} element={<NotFoundPage />} />
+              <Route
+                path={PLAYLIST_PAGE}
+                element={
+                  <CollectionPageRoute
+                    type='playlist'
+                    mainContentRef={mainContentRef}
+                  />
+                }
+              />
+              <Route
+                path={EDIT_PLAYLIST_PAGE}
+                element={<EditCollectionPage />}
+              />
+              <Route path={EDIT_ALBUM_PAGE} element={<EditCollectionPage />} />
+              <Route
+                path={ALBUM_PAGE}
+                element={
+                  <CollectionPageRoute
+                    type='album'
+                    mainContentRef={mainContentRef}
+                  />
+                }
+              />
+              <Route
+                path={USER_ID_PAGE}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route path={TRACK_ID_PAGE} element={<TrackPage />} />
+              <Route
+                path={PLAYLIST_ID_PAGE}
+                element={<CollectionPage type='playlist' />}
+              />
+              <Route
+                path={PROFILE_PAGE_TRACKS}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route
+                path={PROFILE_PAGE_ALBUMS}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route
+                path={PROFILE_PAGE_PLAYLISTS}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route
+                path={PROFILE_PAGE_REPOSTS}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route
+                path={PROFILE_PAGE_CONTESTS}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route
+                path={PROFILE_PAGE_COMMENTS}
+                element={<CommentHistoryPage />}
+              />
+              <Route path={TRACK_PAGE} element={<TrackPage />} />
+              <Route
+                path={TRACK_COMMENTS_PAGE}
+                element={<TrackCommentsPage />}
+              />
+              <Route
+                path={TRACK_EDIT_PAGE}
+                element={<EditTrackPage scrollToTop={scrollToTop} />}
+              />
 
-                <Route path={DASHBOARD_PAGE} element={<DashboardPage />} />
-                {REMOVED_CRYPTO_ROUTES.map((path) => (
-                  <Route key={path} path={path} element={<NotFoundPage />} />
-                ))}
-
-                <Route path={CHAT_PAGE} element={<ChatPage />} />
-                <Route
-                  path={DEACTIVATE_PAGE}
-                  element={<DeactivateAccountPage />}
-                />
-                <Route
-                  path={SETTINGS_PAGE}
-                  element={<SettingsPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={AUTHORIZED_APPS_SETTINGS_PAGE}
-                  element={<SettingsPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE}
-                  element={<SettingsPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE}
-                  element={<SettingsPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={LABEL_ACCOUNT_SETTINGS_PAGE}
-                  element={<SettingsPage containerRef={mainContentRef} />}
-                />
-                <Route path={CHECK_PAGE} element={<CheckPage />} />
-                <Route
-                  path={ACCOUNT_SETTINGS_PAGE}
-                  element={
-                    <SettingsPage
-                      containerRef={mainContentRef}
-                      subPage={SubPage.ACCOUNT}
-                    />
-                  }
-                />
-                <Route
-                  path={CHANGE_PASSWORD_SETTINGS_PAGE}
-                  element={
-                    <SettingsPage
-                      containerRef={mainContentRef}
-                      subPage={SubPage.CHANGE_PASSWORD}
-                    />
-                  }
-                />
-                <Route
-                  path={CHANGE_EMAIL_SETTINGS_PAGE}
-                  element={
-                    <SettingsPage
-                      containerRef={mainContentRef}
-                      subPage={SubPage.CHANGE_EMAIL}
-                    />
-                  }
-                />
-                <Route
-                  path={NOTIFICATION_SETTINGS_PAGE}
-                  element={
-                    <SettingsPage
-                      containerRef={mainContentRef}
-                      subPage={SubPage.NOTIFICATIONS}
-                    />
-                  }
-                />
-                <Route
-                  path={ABOUT_SETTINGS_PAGE}
-                  element={
-                    <SettingsPage
-                      containerRef={mainContentRef}
-                      subPage={SubPage.ABOUT}
-                    />
-                  }
-                />
-                <Route path={APP_REDIRECT} element={<AppRedirectListener />} />
-                <Route path={NOT_FOUND_PAGE} element={<NotFoundPage />} />
-                <Route
-                  path={PLAYLIST_PAGE}
-                  element={
-                    <CollectionPageRoute
-                      type='playlist'
-                      mainContentRef={mainContentRef}
-                    />
-                  }
-                />
-                <Route
-                  path={EDIT_PLAYLIST_PAGE}
-                  element={<EditCollectionPage />}
-                />
-                <Route
-                  path={EDIT_ALBUM_PAGE}
-                  element={<EditCollectionPage />}
-                />
-                <Route
-                  path={ALBUM_PAGE}
-                  element={
-                    <CollectionPageRoute
-                      type='album'
-                      mainContentRef={mainContentRef}
-                    />
-                  }
-                />
-                <Route
-                  path={USER_ID_PAGE}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route path={TRACK_ID_PAGE} element={<TrackPage />} />
-                <Route
-                  path={PLAYLIST_ID_PAGE}
-                  element={<CollectionPage type='playlist' />}
-                />
-                <Route
-                  path={PROFILE_PAGE_TRACKS}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route
-                  path={PROFILE_PAGE_ALBUMS}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route
-                  path={PROFILE_PAGE_PLAYLISTS}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route
-                  path={PROFILE_PAGE_REPOSTS}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route
-                  path={PROFILE_PAGE_CONTESTS}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route
-                  path={PROFILE_PAGE_COMMENTS}
-                  element={<CommentHistoryPage />}
-                />
-                <Route path={TRACK_PAGE} element={<TrackPage />} />
-                <Route
-                  path={TRACK_COMMENTS_PAGE}
-                  element={<TrackCommentsPage />}
-                />
-                <Route
-                  path={TRACK_EDIT_PAGE}
-                  element={<EditTrackPage scrollToTop={scrollToTop} />}
-                />
-
-                <Route
-                  path={TRACK_REMIXES_PAGE}
-                  element={<RemixesPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={CONTEST_PAGE}
-                  element={<ContestPage containerRef={mainContentRef} />}
-                />
-                <Route
-                  path={HOST_REMIX_CONTEST_ROOT_PAGE}
-                  element={<HostRemixContestPage />}
-                />
-                <Route
-                  path={HOST_REMIX_CONTEST_PAGE}
-                  element={<HostRemixContestPage />}
-                />
-                <Route path={PICK_WINNERS_PAGE} element={<PickWinnersPage />} />
-                <Route
-                  path={REPOSTING_USERS_ROUTE}
-                  element={<RepostsPage />}
-                />
-                <Route
-                  path={FAVORITING_USERS_ROUTE}
-                  element={<FavoritesPage />}
-                />
-                <Route
-                  path={FOLLOWING_USERS_ROUTE}
-                  element={<FollowingPage />}
-                />
-                <Route
-                  path={FOLLOWERS_USERS_ROUTE}
-                  element={<FollowersPage />}
-                />
-                <Route path='/leaderboard' element={<NotFoundPage />} />
-                <Route path={EMPTY_PAGE} element={<EmptyPage />} />
-                <Route
-                  path={PROFILE_PAGE}
-                  element={<ProfilePageRoute mainContentRef={mainContentRef} />}
-                />
-                <Route path={HOMEPAGE_PAGE} element={<HomePage />} />
-                <Route
-                  path={HOME_PAGE}
-                  element={
-                    <HomePageRedirect
-                      isGuestAccount={isGuestAccount}
-                      target={HOMEPAGE_PAGE}
-                    />
-                  }
-                />
-              </Routes>
+              <Route
+                path={TRACK_REMIXES_PAGE}
+                element={<RemixesPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={CONTEST_PAGE}
+                element={<ContestPage containerRef={mainContentRef} />}
+              />
+              <Route
+                path={HOST_REMIX_CONTEST_ROOT_PAGE}
+                element={<HostRemixContestPage />}
+              />
+              <Route
+                path={HOST_REMIX_CONTEST_PAGE}
+                element={<HostRemixContestPage />}
+              />
+              <Route path={PICK_WINNERS_PAGE} element={<PickWinnersPage />} />
+              <Route path={REPOSTING_USERS_ROUTE} element={<RepostsPage />} />
+              <Route
+                path={FAVORITING_USERS_ROUTE}
+                element={<FavoritesPage />}
+              />
+              <Route path={FOLLOWING_USERS_ROUTE} element={<FollowingPage />} />
+              <Route path={FOLLOWERS_USERS_ROUTE} element={<FollowersPage />} />
+              <Route path='/leaderboard' element={<NotFoundPage />} />
+              <Route path={EMPTY_PAGE} element={<EmptyPage />} />
+              <Route
+                path={PROFILE_PAGE}
+                element={<ProfilePageRoute mainContentRef={mainContentRef} />}
+              />
+              <Route path={HOMEPAGE_PAGE} element={<HomePage />} />
+              <Route
+                path={HOME_PAGE}
+                element={
+                  <HomePageRedirect
+                    isGuestAccount={isGuestAccount}
+                    target={HOMEPAGE_PAGE}
+                  />
+                }
+              />
+            </Routes>
           </Suspense>
         </div>
         <PlayBarProvider />

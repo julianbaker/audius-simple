@@ -465,10 +465,9 @@ const TrendingPageContent = ({ containerRef }: TrendingPageContentProps) => {
       description={trendingDescription}
       size='large'
       header={header}
+      mobileContentTopOverlap={32}
     >
-      <Flex w='100%'>
-        {pageContent}
-      </Flex>
+      <Flex w='100%'>{pageContent}</Flex>
     </Page>
   )
 }

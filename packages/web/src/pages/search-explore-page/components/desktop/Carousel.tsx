@@ -176,7 +176,6 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
           alignItems='center'
           alignSelf='stretch'
           justifyContent='space-between'
-          ph={isMobile ? 'l' : undefined}
         >
           <Text
             variant={isMobile ? 'title' : 'heading'}
@@ -249,11 +248,12 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
               },
               overscrollBehaviorX: 'contain', // prevents back gesture on chrome
 
-              // Keep edge clipping behavior while preserving room for card shadows.
-              marginLeft: -railInset,
-              marginRight: -railInset,
-              paddingLeft: railInset,
-              paddingRight: railInset,
+              // On mobile: bleed to the screen edge by negating page padding.
+              // On desktop: use a fixed inset so arrow-button scroll math stays simple.
+              marginLeft: isMobile ? 'calc(-1 * var(--page-padding-inline))' : -railInset,
+              marginRight: isMobile ? 'calc(-1 * var(--page-padding-inline))' : -railInset,
+              paddingLeft: isMobile ? 'var(--page-padding-inline)' : railInset,
+              paddingRight: isMobile ? 'var(--page-padding-inline)' : railInset,
               paddingTop: railShadowPaddingTop,
               paddingBottom: railShadowPaddingBottom,
 
@@ -265,7 +265,9 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
               // scroll container's padding box; matching scroll-padding keeps
               // the snapped first card from getting pulled past the visible
               // edge.
-              scrollPaddingLeft: railInset + contentInset
+              scrollPaddingLeft: isMobile
+                ? `calc(var(--page-padding-inline) + ${contentInset}px)`
+                : railInset + contentInset
             }}
           >
             <Flex

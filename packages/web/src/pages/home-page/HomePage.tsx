@@ -1,7 +1,4 @@
-import { useIsMobile } from 'hooks/useIsMobile'
-
 import { DesktopHomePage } from './components/desktop/HomePage'
-import { MobileHomePage } from './components/mobile/HomePage'
 
 const messages = {
   title: 'Home',
@@ -9,11 +6,13 @@ const messages = {
   description: 'Your personalized home on Audius'
 }
 
+// Single entry point — the desktop HomePage adapts to narrow widths via the
+// shared Page shell + container queries (matches feed and trending). The
+// previous mobile-only HomePage used the legacy MobilePageContainer and its
+// own header, which broke the standard adaptive Header pattern.
 export const HomePage = () => {
-  const isMobile = useIsMobile()
-  const Component = isMobile ? MobileHomePage : DesktopHomePage
   return (
-    <Component
+    <DesktopHomePage
       title={messages.title}
       pageTitle={messages.pageTitle}
       description={messages.description}

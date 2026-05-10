@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef } from 'react'
 
 import { useCurrentAccountUser } from '@audius/common/api'
+import { useNotificationModal } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router'
@@ -12,13 +13,7 @@ import {
 import BottomBar from 'components/bottom-bar/BottomBar'
 import { getPathname } from 'utils/route'
 import { useIsDarkMode, useIsMatrix } from 'utils/theme/theme'
-const {
-  FEED_PAGE,
-  TRENDING_PAGE,
-  EXPLORE_PAGE,
-  HOMEPAGE_PAGE,
-  NOTIFICATION_PAGE
-} = route
+const { FEED_PAGE, TRENDING_PAGE, EXPLORE_PAGE, HOMEPAGE_PAGE } = route
 
 const ConnectedBottomBar = () => {
   const location = useLocation()
@@ -32,16 +27,11 @@ const ConnectedBottomBar = () => {
     })
   })
   const { handle } = accountData ?? {}
+  const { onOpen: openNotifications } = useNotificationModal()
 
   // Memoize navRoutes to avoid recreating Set on every render
   const navRoutes = useMemo(() => {
-    return new Set([
-      HOMEPAGE_PAGE,
-      TRENDING_PAGE,
-      FEED_PAGE,
-      EXPLORE_PAGE,
-      NOTIFICATION_PAGE
-    ])
+    return new Set([HOMEPAGE_PAGE, TRENDING_PAGE, FEED_PAGE, EXPLORE_PAGE])
   }, [])
 
   // Use ref to track last nav route synchronously (avoids render loops)
@@ -101,9 +91,11 @@ const ConnectedBottomBar = () => {
     if (!handle) {
       handleOpenSignOn()
     } else {
-      goToRoute(NOTIFICATION_PAGE)
+      // Open the shared notification panel rather than routing to a separate
+      // page — same UX as the desktop bell icon.
+      openNotifications()
     }
-  }, [goToRoute, handle, handleOpenSignOn])
+  }, [handle, handleOpenSignOn, openNotifications])
 
   return (
     <BottomBar

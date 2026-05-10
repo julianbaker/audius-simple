@@ -1,0 +1,48 @@
+/* Mobile-only nav scaling. Bumps in-drawer text, icon, and touch-target
+   sizes so the nav reads as a real mobile drawer rather than a 240px
+   sidebar dropped into a wider panel. The .mobileScale class is applied
+   to LeftNav's root only when isMobile.
+
+   IMPORTANT: scope to [data-left-nav-item] (set on LeftNavLink) so we do
+   NOT affect <AccountDetails>, which is also wrapped in an <a>. Without
+   this scoping, blanket `a > div` rules ballooned the avatar container. */
+
+/* Release the 240px width cap that NavItem applies inline so each row
+   fills the drawer. */
+.mobileScale [data-left-nav-item],
+.mobileScale [data-left-nav-item] > div,
+.mobileScale [data-left-nav-item] > div > div,
+.mobileScale [data-left-nav-item] > div > div > div {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Bump touch padding on the clickable nav row. The inner background
+   wrapper (second div) gets the visual hit-target sizing. */
+.mobileScale [data-left-nav-item] > div > div {
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+}
+
+/* Increase the inner content row height + gap so icons and text breathe. */
+.mobileScale [data-left-nav-item] > div > div > div {
+  height: 40px !important;
+  gap: 16px !important;
+}
+
+/* Scale up nav-item SVG icons. Harmony's size='l' resolves to 24px. */
+.mobileScale [data-left-nav-item] svg {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+/* Scale up nav-item text labels. */
+.mobileScale [data-left-nav-item] {
+  font-size: 17px !important;
+}
+
+.mobileScale [data-left-nav-item] span,
+.mobileScale [data-left-nav-item] p {
+  font-size: 17px !important;
+  line-height: 1.3 !important;
+}

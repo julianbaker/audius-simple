@@ -1,11 +1,7 @@
-import React from 'react'
-
 import cn from 'classnames'
 
-import { Card } from 'components/card'
 import { Draggable } from 'components/dragndrop'
 import CategoryHeader from 'components/header/desktop/CategoryHeader'
-import { useIsMobile } from 'hooks/useIsMobile'
 
 import styles from './CardLineup.module.css'
 
@@ -50,51 +46,14 @@ const DesktopCardContainer = ({
   )
 }
 
-const EmptyMobileCard = () => (
-  <div className={styles.mobileCardContainer}>
-    <Card size='xs' css={{ display: 'none' }} />
-  </div>
-)
-
-const renderEmptyCards = (cardsLength: number) => {
-  if (cardsLength === 1) {
-    return (
-      <>
-        <EmptyMobileCard />
-        <EmptyMobileCard />
-      </>
-    )
-  }
-  if (cardsLength === 2) {
-    return <EmptyMobileCard />
-  }
-  if (cardsLength % 2 === 1) {
-    return <EmptyMobileCard />
-  }
-  return null
-}
-
-const MobileCardContainer = ({
-  cards,
-  containerClassName
-}: CardLineupProps) => {
-  return (
-    <div className={cn(styles.mobileContainer, containerClassName)}>
-      {cards.map((card, index) => (
-        <div className={styles.mobileCardContainer} key={index}>
-          {card}
-        </div>
-      ))}
-      {renderEmptyCards(cards.length)}
-    </div>
-  )
-}
-
+// Single responsive container. The DesktopCardContainer's `cardsContainer`
+// class already has proper container-query-based grid sizing (see
+// LibraryPage.module.css's `library-content` queries), so it adapts to
+// narrow viewports without needing a separate mobile branch. The legacy
+// MobileCardContainer (flex: 1 items with no flex-basis) was producing
+// uneven row layouts whenever useIsMobile flipped true at narrow widths.
 const CardLineup = (props: CardLineupProps) => {
-  const isMobile = useIsMobile()
-  const Container = isMobile ? MobileCardContainer : DesktopCardContainer
-
-  return React.createElement(Container, props)
+  return <DesktopCardContainer {...props} />
 }
 
 export default CardLineup

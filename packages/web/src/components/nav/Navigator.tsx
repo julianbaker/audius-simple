@@ -41,6 +41,37 @@ const Navigator = ({ className }: OwnProps) => {
 
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
+  // Swipe-to-close gesture state for the mobile drawer
+  const swipeStartX = useRef<number | null>(null)
+  const swipeDelta = useRef(0)
+  const [swipeOffsetPx, setSwipeOffsetPx] = useState(0)
+  const [isSwiping, setIsSwiping] = useState(false)
+
+  const handlePanelTouchStart = useCallback((e: React.TouchEvent) => {
+    swipeStartX.current = e.touches[0].clientX
+    swipeDelta.current = 0
+  }, [])
+
+  const handlePanelTouchMove = useCallback((e: React.TouchEvent) => {
+    if (swipeStartX.current === null) return
+    const delta = e.touches[0].clientX - swipeStartX.current
+    // Only react to leftward drags (closing direction)
+    if (delta < 0) {
+      swipeDelta.current = delta
+      setSwipeOffsetPx(delta)
+      setIsSwiping(true)
+    }
+  }, [])
+
+  const handlePanelTouchEnd = useCallback(() => {
+    const closed = swipeDelta.current < -60
+    swipeStartX.current = null
+    swipeDelta.current = 0
+    setIsSwiping(false)
+    setSwipeOffsetPx(0)
+    if (closed) setIsMobileOpen(false)
+  }, [])
+
   const [isCollapsed, setIsCollapsedState] = useState<boolean>(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === 'true'
@@ -151,21 +182,66 @@ const Navigator = ({ className }: OwnProps) => {
     setIsMobileOpen(false)
   }, [location.pathname])
 
-  // Track scroll direction to hide on scroll-down, reveal on scroll-up
+  // Track scroll direction to hide on scroll-down, reveal on scroll-up.
+  // rAF-throttled with hysteresis so the class doesn't flicker mid-frame
+  // and re-trigger the chrome shrink/expand transitions before they
+  // complete (which is what the user saw as "flakey").
   useEffect(() => {
     if (!isMobile) return
+
     let lastY = window.scrollY
-    const THRESHOLD = 6
-    const handleScroll = () => {
-      const currentY = window.scrollY
-      const delta = currentY - lastY
-      lastY = currentY
-      if (currentY <= 10 || delta < -THRESHOLD) {
-        document.body.classList.remove('mobile-nav-scrolled')
-      } else if (delta > THRESHOLD) {
+    let accumDown = 0
+    let accumUp = 0
+    let isScrolled = false
+    let frameQueued = false
+
+    // Larger downward distance to engage the shrink, smaller upward to
+    // un-engage. Avoids the "stuck mid-transition" state from rapid
+    // toggling within a single momentum scroll.
+    const ENGAGE_PX = 24
+    const DISENGAGE_PX = 8
+    const TOP_REGION_PX = 10
+
+    const apply = (next: boolean) => {
+      if (next === isScrolled) return
+      isScrolled = next
+      if (next) {
         document.body.classList.add('mobile-nav-scrolled')
+      } else {
+        document.body.classList.remove('mobile-nav-scrolled')
       }
     }
+
+    const handleScroll = () => {
+      if (frameQueued) return
+      frameQueued = true
+      requestAnimationFrame(() => {
+        frameQueued = false
+        const currentY = window.scrollY
+        const delta = currentY - lastY
+        lastY = currentY
+
+        if (currentY <= TOP_REGION_PX) {
+          accumDown = 0
+          accumUp = 0
+          apply(false)
+          return
+        }
+
+        if (delta > 0) {
+          // Scrolling down: build up engage budget, reset disengage.
+          accumDown += delta
+          accumUp = 0
+          if (!isScrolled && accumDown >= ENGAGE_PX) apply(true)
+        } else if (delta < 0) {
+          // Scrolling up: build up disengage budget, reset engage.
+          accumUp += -delta
+          accumDown = 0
+          if (isScrolled && accumUp >= DISENGAGE_PX) apply(false)
+        }
+      })
+    }
+
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScroll)
@@ -218,8 +294,18 @@ const Navigator = ({ className }: OwnProps) => {
             ) : null}
             <div
               className={cn(styles.mobilePanel, {
-                [styles.mobilePanelOpen]: isMobileOpen
+                [styles.mobilePanelOpen]: isMobileOpen,
+                [styles.mobilePanelDragging]: isSwiping
               })}
+              style={
+                isSwiping
+                  ? { transform: `translateX(${swipeOffsetPx}px)` }
+                  : undefined
+              }
+              onTouchStart={handlePanelTouchStart}
+              onTouchMove={handlePanelTouchMove}
+              onTouchEnd={handlePanelTouchEnd}
+              onTouchCancel={handlePanelTouchEnd}
             >
               <LeftNav isElectron={isElectron} showNavHeader={false} />
             </div>

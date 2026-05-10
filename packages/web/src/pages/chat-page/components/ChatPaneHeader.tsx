@@ -1,7 +1,7 @@
 import { ComponentPropsWithoutRef } from 'react'
 
 import { chatSelectors, CommonState } from '@audius/common/store'
-import { Flex } from '@audius/harmony'
+import { Flex, IconButton, IconCaretLeft } from '@audius/harmony'
 import type { ChatBlast } from '@audius/sdk'
 import cn from 'classnames'
 import { useSelector } from 'react-redux'
@@ -17,10 +17,15 @@ const CHAT_PANE_HEADER_PADDING_PX = 20
 type ChatPaneHeaderProps = ComponentPropsWithoutRef<'div'> & {
   chatId?: string
   isNarrowLayout?: boolean
+  /**
+   * When provided, renders a back button on the left of the header. Used in
+   * the single-pane layout to return to the chat list.
+   */
+  onBack?: () => void
 }
 
 export const ChatPaneHeader = (props: ChatPaneHeaderProps) => {
-  const { chatId, className, isNarrowLayout, ...other } = props
+  const { chatId, className, isNarrowLayout, onBack, ...other } = props
   const chat = useSelector((state: CommonState) =>
     chatSelectors.getChat(state, chatId ?? '')
   )
@@ -49,11 +54,20 @@ export const ChatPaneHeader = (props: ChatPaneHeaderProps) => {
     >
       <Flex
         w='100%'
+        h='100%'
         ph={CHAT_PANE_HEADER_PADDING_PX}
-        pv='l'
         alignItems='center'
+        gap='m'
         css={{ minWidth: 0 }}
       >
+        {onBack ? (
+          <IconButton
+            aria-label='Back to chats'
+            icon={IconCaretLeft}
+            color='subdued'
+            onClick={onBack}
+          />
+        ) : null}
         {chat ? (
           isBlast ? (
             <ChatBlastHeader chat={chat as ChatBlast} />

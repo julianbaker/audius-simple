@@ -41,7 +41,7 @@ import {
   getWelcomeModalShown
 } from 'common/store/pages/signon/selectors'
 import { EditingStatus } from 'common/store/pages/signon/types'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { SignInPage } from 'pages/sign-in-page'
 import SignUpPage from 'pages/sign-up-page'
 import { NavHeader } from 'pages/sign-up-page/components/NavHeader'

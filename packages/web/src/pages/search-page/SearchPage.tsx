@@ -35,6 +35,7 @@ export const SearchPage = () => {
       header={header}
       fullHeight
       showSearch={false}
+      mobileContentTopOverlap={32}
     >
       <Flex ref={pageContentRef} direction='column' w='100%' h='100%'>
         {!showSearchResults ? (

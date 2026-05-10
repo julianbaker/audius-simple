@@ -268,8 +268,9 @@ const SearchExplorePage = ({
     <Flex
       column
       w='100%'
-      css={{ paddingInline: 'var(--page-padding-inline, var(--harmony-unit-8))', paddingBlock: 'var(--harmony-spacing-m)' }}
       css={{
+        paddingInline: 'var(--page-padding-inline, var(--harmony-unit-8))',
+        paddingBlock: 'var(--harmony-spacing-m)',
         borderTop: '1px solid var(--harmony-n-100)',
         background: 'color-mix(in srgb, var(--harmony-n-950) 3%, transparent)',
         alignSelf: 'stretch'
@@ -290,7 +291,7 @@ const SearchExplorePage = ({
           onClear={handleClearSearch}
         />
         {isMobileLayout ? (
-          /* Mobile: category pills + filter buttons in a scrollable row */
+          /* Mobile: category pills + filter buttons in a scrollable row, bleeding to screen edges */
           <Flex
             direction='row'
             gap='s'
@@ -298,7 +299,9 @@ const SearchExplorePage = ({
               overflowX: 'auto',
               scrollbarWidth: 'none',
               '&::-webkit-scrollbar': { display: 'none' },
-              paddingBottom: 2
+              paddingBottom: 2,
+              marginInline: 'calc(-1 * var(--page-padding-inline, var(--harmony-unit-8)))',
+              paddingInline: 'var(--page-padding-inline, var(--harmony-unit-8))'
             }}
           >
             {categoryKey === CategoryView.ALL

@@ -1,0 +1,70 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  animation: backdropFadeIn 0.2s ease;
+}
+
+/* Bottom-sheet drawer. Sits at the bottom of the viewport with a max height
+   so the user can still see context above it; rounded top corners; native
+   vertical scroll inside. */
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--harmony-bg-default, var(--harmony-n-25));
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.22);
+  animation: sheetSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: hidden;
+  /* Clip rounded corners on the inner header */
+  isolation: isolate;
+}
+
+.dragHandleArea {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0 4px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.dragHandle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--harmony-n-200);
+}
+
+.scrollArea {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheetSlideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

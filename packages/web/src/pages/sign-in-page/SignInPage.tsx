@@ -26,7 +26,7 @@ import {
   getStatus
 } from 'common/store/pages/signon/selectors'
 import { HarmonyPasswordField } from 'components/form-fields/HarmonyPasswordField'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 import { useNavigateToPage } from 'hooks/useNavigateToPage'
 import { GuestEmailHint } from 'pages/sign-on-page/GuestEmailHint'
 import { EmailField } from 'pages/sign-up-page/components/EmailField'

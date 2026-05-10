@@ -29,7 +29,7 @@ import {
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
 import { HarmonyTextField } from 'components/form-fields/HarmonyTextField'
-import { useMedia } from 'hooks/useMedia'
+import { useMedia } from '@audius/harmony'
 
 import { AccountHeader } from '../components/AccountHeader'
 import { ImageFieldValue } from '../components/ImageField'
