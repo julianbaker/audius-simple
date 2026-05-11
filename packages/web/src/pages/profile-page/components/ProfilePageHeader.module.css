@@ -1,0 +1,162 @@
+/* Profile header row — sits beneath the cover photo. PFP straddles the
+   cover/content boundary via negative margin-top so the bottom of the
+   image overlaps the top of the header row.
+
+   Layout:
+     [PFP] [name+handle+stats] [action buttons →]
+
+   Container queries (using the `page` container set by FlushPageContainer):
+     - default     wide layout: 152px PFP, all in one row
+     - <= 720px    PFP 112px; actions wrap to second row beneath name
+     - <= 480px    PFP 88px; tighter spacing; stats wrap if needed
+*/
+
+/* WIDE layout: PFP and identity in one horizontal row. Bottom-aligned
+   so identity bottom and PFP bottom share a baseline. We hold this
+   wide arrangement for as long as it comfortably fits — the column
+   fallback kicks in only when horizontal space runs out (see the
+   @container query below). */
+.headerRow {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--harmony-spacing-l);
+  width: 100%;
+  flex-wrap: wrap;
+  padding-top: var(--harmony-spacing-l);
+}
+
+.pfpWrapper {
+  flex-shrink: 0;
+  /* Lighter overlap than before — the cover used to swallow half the
+     PFP, which looked aggressive at desktop sizes. ~40% gives the
+     PFP a visible anchor in the cover while keeping more of it on
+     the content surface. */
+  margin-top: -64px;
+  width: 152px;
+  height: 152px;
+  border-radius: 50%;
+  background: var(--harmony-bg-white);
+  /* Outer ring: keep the avatar image edge aligned with the content
+     column, while drawing the surrounding surface ring outside the
+     layout box instead of consuming 4px inside the image. */
+  box-shadow: 0 0 0 4px var(--harmony-bg-white);
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* The legacy ProfilePicture component hard-codes its internal box at
+   208px (.profilePictureBackground in its CSS module). The wrapper
+   above is 152px — without this override the inner box overflows
+   left-aligned and the avatar gets clipped in the top-left quadrant.
+   Forcing the direct child + grandchild to fill 100% lets the image
+   actually fit the circle. */
+.pfpWrapper > div,
+.pfpWrapper > div > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* The legacy ProfilePicture image layer also carries a 4px inner
+   border. In this header, the wrapper supplies the ring as an outer
+   shadow, so remove the inner border to keep the image edge flush. */
+.pfpWrapper > div > div > div {
+  border: 0 !important;
+}
+
+/* Identity stack — name, handle, stats. Takes the middle column and
+   grows to fill the space between the PFP and right-aligned actions. */
+.identity {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--harmony-spacing-xs);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--harmony-spacing-m);
+  flex-wrap: wrap;
+}
+
+/* Handle + follows-you + account-type badges. Bumped gap to `m` so the
+   pills get visual breathing room instead of clustering on top of the
+   handle text. */
+.handleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--harmony-spacing-m);
+  flex-wrap: wrap;
+}
+
+.stats {
+  margin-top: var(--harmony-spacing-xs);
+}
+
+/* Action buttons row — right-aligned at desktop, but aligned to the
+   top of the header line so it sits beside the display name instead
+   of down by the stats row. At narrow widths it wraps below identity. */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--harmony-spacing-s);
+  flex-shrink: 0;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-self: flex-start;
+  margin-left: auto;
+}
+
+/* MID/NARROW layout: switch the header to a 2-column grid —
+   PFP top-left, actions top-right, identity below spanning full width.
+   This is the "mobile" arrangement; we use it whenever the wide
+   horizontal layout would run out of room rather than trying to
+   awkwardly cram PFP + identity + actions onto one shrinking line. */
+@container page (max-width: 720px) {
+  .headerRow {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    column-gap: var(--harmony-spacing-l);
+    row-gap: var(--harmony-spacing-m);
+  }
+  .pfpWrapper {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .identity {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+  .actions {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-end;
+    align-self: start;
+  }
+}
+
+@container page (max-width: 480px) {
+  .pfpWrapper {
+    width: 112px;
+    height: 112px;
+    margin-top: -56px;
+    box-shadow: 0 0 0 3px var(--harmony-bg-white);
+  }
+  .nameRow {
+    /* Smaller name + badges at phone widths. */
+    gap: var(--harmony-spacing-xs);
+  }
+  /* On phone widths the actions row is tight; share is dropped in favor
+     of message + follow. Share can still be reached via the browser's
+     own share affordance. */
+  .shareButton {
+    display: none;
+  }
+}

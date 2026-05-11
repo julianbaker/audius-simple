@@ -3,15 +3,9 @@ import { useState, useCallback, useEffect, forwardRef, Ref } from 'react'
 import { useTheme, type CSSObject } from '@emotion/react'
 import styled from '@emotion/styled'
 
-import type { IconComponent } from '~harmony/components/icon'
 import { Flex } from '~harmony/components/layout/Flex'
 import { Text } from '~harmony/components/text'
 import { useControlled } from '~harmony/hooks/useControlled'
-import {
-  IconUserFollowing,
-  IconUserFollow,
-  IconUserUnfollow
-} from '~harmony/icons'
 
 import type { FollowButtonProps } from './types'
 
@@ -100,13 +94,10 @@ export const FollowButton = forwardRef(
     }, [value, setValueState, onUnfollow, onFollow])
 
     const checkedValue = value
-    let Icon: IconComponent = IconUserFollow
     let text = messages.follow
     if (checkedValue && !isHovering) {
-      Icon = IconUserFollowing
       text = messages.following
     } else if (checkedValue && isHovering && !isPressing) {
-      Icon = IconUserUnfollow
       text = messages.unfollow
     }
 
@@ -120,7 +111,7 @@ export const FollowButton = forwardRef(
 
     const rootCss: CSSObject = {
       cursor: 'pointer',
-      minWidth: size === 'small' ? 128 : 152,
+      minWidth: size === 'small' ? 106 : 130,
       width: fullWidth ? '100%' : undefined,
       userSelect: 'none',
       borderRadius,
@@ -187,13 +178,13 @@ export const FollowButton = forwardRef(
         {...buttonProps}
         {...rootProps}
       >
-        <Icon height={18} width={18} color={textColor} />
         <Text
           variant='label'
           tag='span'
           size={size === 'small' ? 's' : 'l'}
           strength='default'
           color={textColor}
+          textTransform='none'
         >
           {text}
         </Text>
