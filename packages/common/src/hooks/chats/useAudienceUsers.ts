@@ -1,11 +1,6 @@
 import { ChatBlast, ChatBlastAudience, OptionalHashId } from '@audius/sdk'
 
-import {
-  useCurrentUserId,
-  useFollowers,
-  useRemixers,
-  useUsers
-} from '~/api'
+import { useCurrentUserId, useFollowers, useRemixers, useUsers } from '~/api'
 import { UserMetadata } from '~/models'
 
 export const useAudienceUsers = (chat: ChatBlast, limit?: number) => {

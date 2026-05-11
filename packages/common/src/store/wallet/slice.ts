@@ -58,7 +58,7 @@ const slice = createSlice({
       if (totalBalanceLoadDidFail != null) {
         state.totalBalanceLoadDidFail = totalBalanceLoadDidFail
       }
-    },
+    }
     // Balance is kept for internal account state only.
   }
 })

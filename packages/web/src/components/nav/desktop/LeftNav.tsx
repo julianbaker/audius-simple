@@ -15,7 +15,6 @@ import { LeftNavCTA } from './LeftNavCTA'
 import { NavHeader } from './NavHeader'
 import { useNavSidebar } from './NavSidebarContext'
 import { NowPlayingArtworkTile } from './NowPlayingArtworkTile'
-import { RouteNav } from './RouteNav'
 import {
   HomeNavItem,
   FeedNavItem,
@@ -34,12 +33,11 @@ export const LEFT_NAV_WIDTH = 240
 export const LEFT_NAV_COLLAPSED_WIDTH = 64
 
 type OwnProps = {
-  isElectron: boolean
   showNavHeader?: boolean
 }
 
 export const LeftNav = (props: OwnProps) => {
-  const { isElectron, showNavHeader = true } = props
+  const { showNavHeader = true } = props
   const { isCollapsed } = useNavSidebar()
   const { isMobile } = useMedia()
   const { data: accountStatus } = useAccountStatus()
@@ -100,7 +98,6 @@ export const LeftNav = (props: OwnProps) => {
           'var(--frosted-surface-background, color-mix(in srgb, var(--frosted-surface-background-color, var(--harmony-n-25)) var(--frosted-surface-opacity, 65%), transparent))'
       }}
     >
-      {isElectron ? <RouteNav /> : null}
       {showNavHeader ? <NavHeader /> : null}
 
       <Flex

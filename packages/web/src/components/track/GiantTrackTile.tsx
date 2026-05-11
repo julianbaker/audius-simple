@@ -6,7 +6,6 @@ import {
   useToggleFavoriteTrack,
   useTrack
 } from '@audius/common/api'
-import { useFeatureFlag } from '@audius/common/hooks'
 import {
   ID,
   FieldVisibility,
@@ -14,7 +13,6 @@ import {
   AccessConditions,
   FavoriteSource
 } from '@audius/common/models'
-import { FeatureFlags } from '@audius/common/services'
 import {
   useEarlyReleaseConfirmationModal,
   usePublishConfirmationModal
@@ -194,15 +192,11 @@ export const GiantTrackTile = ({
     source: FavoriteSource.TRACK_PAGE
   })
 
-  const { data: remixContest, isLoading: isEventsLoading } =
-    useRemixContest(trackId)
+  const { isLoading: isEventsLoading } = useRemixContest(trackId)
   // When CONTESTS is on, the track page is just a normal track page and the
-  // contest detail experience moved to `/{handle}/{slug}/contest`. The track
+  // Contest detail experience lives on `/{handle}/{slug}/contest`. The track
   // tile keeps its standard "TRACK" / "REMIX" label rather than swapping in
-  // "REMIX CONTEST" — Figma 2844-51756 shows this layout. The legacy
-  // "REMIX CONTEST" pill is kept for the flag-off branch (in-line tabs).
-  const { isEnabled: isContestsEnabled } = useFeatureFlag(FeatureFlags.CONTESTS)
-  const isRemixContest = !!remixContest && !isContestsEnabled
+  // a "REMIX CONTEST" pill — Figma 2844-51756 shows this layout.
 
   const isLongFormContent =
     genre === Genre.Podcasts || genre === Genre.Audiobooks
@@ -258,7 +252,7 @@ export const GiantTrackTile = ({
         isStreamGated={isStreamGated}
         isPodcast={genre === Genre.Podcasts}
         streamConditions={streamConditions}
-        isRemixContest={!!isRemixContest}
+        isRemixContest={false}
       />
     )
   }

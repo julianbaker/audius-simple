@@ -209,10 +209,7 @@ export const authenticatedRoutes = [
   CHAT_PAGE
 ]
 
-export const guestRoutes = [
-  SAVED_PAGE,
-  LIBRARY_PAGE
-]
+export const guestRoutes = [SAVED_PAGE, LIBRARY_PAGE]
 
 export const publicSiteRoutes = [
   PRESS_PAGE,

@@ -1,4 +1,10 @@
-import { useCallback, useRef, useState, ComponentProps, MouseEvent } from 'react'
+import {
+  useCallback,
+  useRef,
+  useState,
+  ComponentProps,
+  MouseEvent
+} from 'react'
 
 import { useTheme } from '@emotion/react'
 
@@ -101,7 +107,13 @@ const MobilePopupMenu = ({
   }
 
   const headerSlot =
-    mobileHeader === undefined ? (title ? <MobileMenuTitle title={title} /> : null) : mobileHeader
+    mobileHeader === undefined ? (
+      title ? (
+        <MobileMenuTitle title={title} />
+      ) : null
+    ) : (
+      mobileHeader
+    )
 
   return (
     <>
@@ -146,12 +158,11 @@ const MobileMenuList = ({
 }) => {
   const { color, typography, spacing } = useTheme()
 
-  const handleClick =
-    (item: PopupMenuItem) => (e: MouseEvent<HTMLElement>) => {
-      e.stopPropagation()
-      item.onClick(e)
-      onItemClick()
-    }
+  const handleClick = (item: PopupMenuItem) => (e: MouseEvent<HTMLElement>) => {
+    e.stopPropagation()
+    item.onClick(e)
+    onItemClick()
+  }
 
   return (
     <Flex
@@ -179,9 +190,7 @@ const MobileMenuList = ({
             minHeight: 48,
             fontSize: typography.size.l,
             fontWeight: typography.weight.demiBold,
-            color: item.destructive
-              ? color.status.error
-              : color.text.default,
+            color: item.destructive ? color.status.error : color.text.default,
             cursor: 'pointer',
             borderRadius: spacing.s,
             // Press feedback — native mobile menus subtly tint on touch.

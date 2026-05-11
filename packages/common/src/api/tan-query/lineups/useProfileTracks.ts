@@ -81,10 +81,7 @@ export const useProfileTracks = (
       if (!tracks) return []
 
       const processedTracks = filterUnsupportedCryptoGatedTracks(
-        transformAndCleanList(
-        tracks,
-        userTrackMetadataFromSDK
-        )
+        transformAndCleanList(tracks, userTrackMetadataFromSDK)
       )
       primeTrackData({ tracks: processedTracks, queryClient })
 

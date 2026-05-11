@@ -15,8 +15,9 @@ import { CollectionCard } from 'components/collection'
 import { InfiniteCardLineup } from 'components/lineup/InfiniteCardLineup'
 import UploadChip from 'components/upload/UploadChip'
 
+import styles from '../ProfilePage.module.css'
+
 import { EmptyTab } from './EmptyTab'
-import styles from './ProfilePage.module.css'
 
 const { getProfileCollectionSortMode } = profilePageSelectors
 

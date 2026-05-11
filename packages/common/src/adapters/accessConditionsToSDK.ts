@@ -1,9 +1,6 @@
 import type { TrackMetadata } from '@audius/sdk'
 
-import {
-  AccessConditions,
-  isContentFollowGated
-} from '~/models'
+import { AccessConditions, isContentFollowGated } from '~/models'
 
 export const accessConditionsToSDK = (
   input: AccessConditions

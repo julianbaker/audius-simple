@@ -26,10 +26,8 @@ export const priceAndAudienceMessages = {
   done: 'Done',
   publishDisabled:
     'Publishing is disabled for empty albums and albums containing hidden tracks.',
-  fromFreeHint: (
-    contentType: 'album' | 'track',
-    gatedType: 'gated'
-  ) => `You can't make a free ${contentType} ${gatedType}.`,
+  fromFreeHint: (contentType: 'album' | 'track', gatedType: 'gated') =>
+    `You can't make a free ${contentType} ${gatedType}.`,
   freeRadio: {
     title: 'Free for Everyone',
     description: (contentType: 'album' | 'track') =>

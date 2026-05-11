@@ -1,26 +1,13 @@
-import { RefObject } from 'react'
+import { SettingsPage as SettingsPageContent } from './components/desktop/SettingsPage'
 
-import { useIsMobile } from 'hooks/useIsMobile'
-
-import { SettingsPage as DesktopSettingsPage } from './components/desktop/SettingsPage'
-import {
-  SettingsPage as MobileSettingsPage,
-  SubPage
-} from './components/mobile/SettingsPage'
-
-type SettingsPageProps = {
-  containerRef: RefObject<HTMLDivElement>
-  subPage?: SubPage
-}
-
-const SettingsPage = ({ subPage }: SettingsPageProps) => {
-  const isMobile = useIsMobile()
-
-  return isMobile ? (
-    <MobileSettingsPage subPage={subPage} />
-  ) : (
-    <DesktopSettingsPage />
-  )
+// Single-implementation settings page. The desktop SettingsPage uses
+// stacked Harmony sections and works at narrow widths; the previously
+// mobile-only sub-page navigation pattern (Account / Password / Email /
+// Notifications / About as their own pages) is replaced by scrolling
+// within the single page. Sub-page route URLs still resolve here — they
+// just land on the full settings view.
+const SettingsPage = () => {
+  return <SettingsPageContent />
 }
 
 export default SettingsPage

@@ -28,7 +28,7 @@ export const ProfileTopTags = () => {
         Icon={IconTrending}
         title={messages.topTags}
       />
-      <Paper p='s' gap='s' wrap='wrap'>
+      <Paper p='s' gap='s' wrap='wrap' border='default'>
         {topTags.map((tag) => (
           <SearchTag key={tag} source='profile page'>
             {tag}

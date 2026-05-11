@@ -1,22 +1,16 @@
 import { RefObject } from 'react'
 
-import { useIsMobile } from 'hooks/useIsMobile'
-
-import RemixesPageDesktopContent from './components/desktop/RemixesPage'
-import RemixesPageMobileContent from './components/mobile/RemixesPage'
+import RemixesPageContent from './components/desktop/RemixesPage'
 
 type RemixesPageProps = {
   containerRef: RefObject<HTMLDivElement>
 }
 
+// Single-implementation remixes page. The desktop content tree is already
+// responsive (Page shell + container queries) so the previously parallel
+// mobile variant is no longer needed.
 const RemixesPage = ({ containerRef }: RemixesPageProps) => {
-  const isMobile = useIsMobile()
-
-  return isMobile ? (
-    <RemixesPageMobileContent containerRef={containerRef} />
-  ) : (
-    <RemixesPageDesktopContent containerRef={containerRef} />
-  )
+  return <RemixesPageContent containerRef={containerRef} />
 }
 
 export default RemixesPage

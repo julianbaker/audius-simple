@@ -24,7 +24,7 @@ export const useCollectionAccessTypeLabel = (
   const isPrivate = collection?.isPrivate
 
   let type: Nullable<AccessType> = null
-  let isUnlocked = false
+  const isUnlocked = false
 
   if (isScheduledRelease) {
     type = AccessType.SCHEDULED_RELEASE

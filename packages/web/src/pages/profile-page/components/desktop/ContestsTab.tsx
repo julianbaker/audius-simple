@@ -6,8 +6,9 @@ import { Box, Flex, LoadingSpinner } from '@audius/harmony'
 
 import { ContestCard } from 'components/contest-card/ContestCard'
 
+import styles from '../ProfilePage.module.css'
+
 import { EmptyTab } from './EmptyTab'
-import styles from './ProfilePage.module.css'
 
 const messages = {
   emptyContests: 'hosted any contests'

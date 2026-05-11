@@ -53,9 +53,7 @@ const actionsMap: ActionsMap<LibraryPageState> = {
   [ADD_LOCAL_COLLECTION](state, action) {
     const kindKey = action.isAlbum ? 'album' : 'playlist'
     const categoryKey =
-      action.category === LibraryCategory.Repost
-        ? 'reposts'
-        : 'favorites'
+      action.category === LibraryCategory.Repost ? 'reposts' : 'favorites'
     const newState = { ...state }
     newState.local[kindKey][categoryKey].added = [
       action.collectionId,
@@ -70,9 +68,7 @@ const actionsMap: ActionsMap<LibraryPageState> = {
   [REMOVE_LOCAL_COLLECTION](state, action) {
     const kindKey = action.isAlbum ? 'album' : 'playlist'
     const categoryKey =
-      action.category === LibraryCategory.Repost
-        ? 'reposts'
-        : 'favorites'
+      action.category === LibraryCategory.Repost ? 'reposts' : 'favorites'
     const newState = { ...state }
     newState.local[kindKey][categoryKey].removed = [
       action.collectionId,

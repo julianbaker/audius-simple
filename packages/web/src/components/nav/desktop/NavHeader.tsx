@@ -87,8 +87,9 @@ export const NavHeader = () => {
     useNotificationModal()
 
   // Mobile: compact persistent nav bar — [hamburger/X] [Logo] [Settings].
-  // Notifications are reached from the bottom-bar bell on mobile to avoid two
-  // entry points for the same panel.
+  // Logo is absolutely centered so it stays put regardless of the widths
+  // of the flanking controls. Notifications are reached from the bottom-bar
+  // bell on mobile to avoid two entry points for the same panel.
   if (isMobile) {
     return (
       <Flex
@@ -98,6 +99,7 @@ export const NavHeader = () => {
         ph='m'
         flex={0}
         css={{
+          position: 'relative',
           height: 44,
           flexShrink: 0,
           backdropFilter: 'var(--frosted-surface-backdrop-filter, blur(10px))',
@@ -107,7 +109,7 @@ export const NavHeader = () => {
             'var(--frosted-surface-background, color-mix(in srgb, var(--frosted-surface-background-color, var(--harmony-n-25)) var(--frosted-surface-opacity, 65%), transparent))'
         }}
       >
-        <Flex alignItems='center' gap='s'>
+        <Flex alignItems='center'>
           <button
             aria-label={isMobileOpen ? 'Close navigation' : 'Open navigation'}
             onClick={() => setIsMobileOpen(!isMobileOpen)}
@@ -156,14 +158,24 @@ export const NavHeader = () => {
               </svg>
             )}
           </button>
-          <Link to={HOME_PAGE} aria-label={messages.homeLink}>
-            <IconAudiusLogoHorizontalNew
-              color='subdued'
-              size='m'
-              width='auto'
-            />
-          </Link>
         </Flex>
+        <Link
+          to={HOME_PAGE}
+          aria-label={messages.homeLink}
+          css={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            display: 'flex',
+            alignItems: 'center',
+            // Don't intercept taps along the centerline beyond the logo's
+            // own footprint — the bar's left/right zones stay tappable.
+            pointerEvents: 'auto'
+          }}
+        >
+          <IconAudiusLogoHorizontalNew color='subdued' size='m' width='auto' />
+        </Link>
         <Flex justifyContent='center' alignItems='center'>
           <RestrictedLink to={SETTINGS_PAGE} restriction='account'>
             <NavHeaderButton

@@ -1,49 +1,79 @@
-.contentWrapper {
-  position: relative;
-  padding: 14px 12px 0px;
+.headerWrapper {
+  position: absolute;
   width: 100%;
+  height: 376px;
 }
 
+/* Mirror CoverPhoto.module.css's mobile shrink so the wrapper height
+   doesn't reserve unused space below the (now shorter) cover image. */
+@media (max-width: 480px) {
+  .headerWrapper {
+    height: 180px;
+  }
+}
+
+/* The tile sits on top of the cover photo overlap. Width is constrained
+   to 960px on wide layouts and full-bleed on narrow. */
 .tile {
   width: 100%;
-  border-radius: 6px;
+  max-width: 960px;
+  border-radius: 12px;
   overflow: hidden;
   background-color: var(--harmony-white);
-  padding: 16px 24px 24px;
-  box-shadow:
-    0 0 1px 0 var(--tile-shadow-1),
-    0 1px 0 0 var(--tile-shadow-2),
-    0 2px 5px -2px var(--tile-shadow-3);
-  border: 1px solid var(--harmony-n-100);
-
+  box-shadow: 0 16px 20px 0 var(--table-shadow);
   margin: 0 auto;
   text-align: left;
   user-select: none;
-
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+}
+
+/* At narrow container widths, stack image above the text instead of
+   side-by-side. 560px chosen so the side-by-side layout has room for a
+   readable title next to the 195px image. Adjust if the title runs out
+   of room visually. */
+@container page (max-width: 560px) {
+  .tile {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .image {
+    margin: 24px 24px 12px 24px;
+  }
+  .rightSide {
+    padding: 12px 24px 24px;
+    align-items: center;
+  }
+  .title {
+    font-size: 28px !important;
+  }
 }
 
 .image {
   height: 195px;
   width: 195px;
-  margin-bottom: 23px;
-  border-radius: 4px;
+  margin: 24px 12px 24px 24px;
+  border-radius: 8px;
   overflow: hidden;
+  flex-shrink: 0;
+}
+
+.rightSide {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  flex-grow: 1;
 }
 
 .type {
-  margin-bottom: 15px;
-  height: 18px;
   color: var(--harmony-n-400);
-  font-family: var(--harmony-font-family);
   font-size: var(--harmony-font-s);
-  font-weight: var(--harmony-font-demi-bold);
-  letter-spacing: 2px;
-  text-align: center;
+  font-weight: var(--harmony-font-medium);
+  letter-spacing: 3.5px;
+  user-select: none;
   text-transform: uppercase;
+  margin-bottom: 24px;
 }
 
 .title {
@@ -64,6 +94,8 @@
   color: var(--harmony-n-300);
   font-size: var(--harmony-font-l);
   font-weight: var(--harmony-font-bold);
+  display: flex;
+  align-items: center;
   width: 100%;
   position: relative;
   margin-bottom: 24px;
@@ -89,13 +121,14 @@
 }
 
 .lineupWrapper {
+  width: 100%;
+  max-width: 720px;
   margin: auto;
 }
 
 .lineupHeader {
   text-align: center;
   text-transform: uppercase;
-
   color: var(--harmony-n-400);
   font-size: var(--harmony-font-medium);
   font-weight: var(--harmony-font-bold);

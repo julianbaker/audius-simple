@@ -76,16 +76,13 @@ export const useProfileReposts = (
       )
 
       const supportedTracks = filterUnsupportedCryptoGatedTracks(
+        reposts.filter((item): item is UserTrackMetadata => 'track_id' in item)
+      )
+      const supportedCollections = filterUnsupportedCryptoGatedCollections(
         reposts.filter(
-          (item): item is UserTrackMetadata => 'track_id' in item
+          (item): item is UserCollectionMetadata => 'playlist_id' in item
         )
       )
-      const supportedCollections =
-        filterUnsupportedCryptoGatedCollections(
-          reposts.filter(
-            (item): item is UserCollectionMetadata => 'playlist_id' in item
-          )
-        )
       const supportedTrackIds = new Set(
         supportedTracks.map((track) => track.track_id)
       )

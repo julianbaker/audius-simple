@@ -1,7 +1,5 @@
 import { useRemixContest, useTrack } from '@audius/common/api'
-import { useFeatureFlag } from '@audius/common/hooks'
 import { ID } from '@audius/common/models'
-import { FeatureFlags } from '@audius/common/services'
 import { dayjs, formatContestDeadline } from '@audius/common/utils'
 import {
   Button,
@@ -38,15 +36,9 @@ type RemixContestTeaserProps = {
  * to drop into every track-page view unconditionally.
  */
 export const RemixContestTeaser = ({ trackId }: RemixContestTeaserProps) => {
-  const { isEnabled: isContestsEnabled } = useFeatureFlag(FeatureFlags.CONTESTS)
   const { data: track } = useTrack(trackId)
   const { data: contest } = useRemixContest(trackId)
 
-  // Piggyback on the same flag that gates the `/contests` discovery page
-  // (see main's ContestsPage). When the flag is off the dedicated contest
-  // detail page is unreachable, so surfacing a CTA that links into it
-  // would be a dead-end.
-  if (!isContestsEnabled) return null
   if (!contest || !track) return null
 
   const isEnded = dayjs(contest.endDate).isBefore(dayjs())

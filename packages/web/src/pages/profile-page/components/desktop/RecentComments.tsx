@@ -171,7 +171,8 @@ export const RecentComments = ({ userId }: { userId: number }) => {
         borderRadius='m'
         shadow='mid'
         p='l'
-        backgroundColor='surface1'
+        backgroundColor='white'
+        border='default'
       >
         {trail.map((style, index) => (
           <CommentListItem

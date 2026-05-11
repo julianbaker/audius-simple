@@ -1,22 +1,4 @@
-import { RefObject } from 'react'
-
-import { useIsMobile } from 'hooks/useIsMobile'
-
-import DesktopProfilePage from './components/desktop/ProfilePage'
-import MobileProfilePage from './components/mobile/ProfilePage'
-
-type ProfilePageProps = {
-  containerRef: RefObject<HTMLDivElement>
-}
-
-const ProfilePage = ({ containerRef }: ProfilePageProps) => {
-  const isMobile = useIsMobile()
-
-  return isMobile ? (
-    <MobileProfilePage containerRef={containerRef} />
-  ) : (
-    <DesktopProfilePage containerRef={containerRef} />
-  )
-}
-
-export default ProfilePage
+// Single-implementation profile page. The unified component lives at
+// `./components/ProfilePage.tsx`; the previous desktop/mobile fork is
+// gone — layout responds to container width via container queries.
+export { default } from './components/ProfilePage'

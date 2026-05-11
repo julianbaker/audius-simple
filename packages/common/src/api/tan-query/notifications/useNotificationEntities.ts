@@ -111,9 +111,7 @@ export const useNotificationEntities = <T extends Notification>(
   }, [tracks, trackUsers])
 
   // Return appropriate data based on notification type
-  if (
-    notification.type === NotificationType.AddTrackToPlaylist
-  ) {
+  if (notification.type === NotificationType.AddTrackToPlaylist) {
     const currentUser = currentUserId ? trackUsers?.[currentUserId] : null
     return {
       track: track && currentUser ? { ...track, user: currentUser } : null,

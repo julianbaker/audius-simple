@@ -197,7 +197,6 @@ export function CommentSectionProvider<NavigationProp>(
       if (timestampSeconds !== undefined) {
         // But only if the user has access to the stream
         if (!hasStreamAccess) {
-          return
         } else {
           dispatchPlay()
           setTimeout(() => dispatch(seekTo({ seconds: timestampSeconds })), 100)
@@ -206,12 +205,7 @@ export function CommentSectionProvider<NavigationProp>(
         dispatchPlay()
       }
     },
-    [
-      dispatch,
-      hasStreamAccess,
-      playbackSource,
-      track
-    ]
+    [dispatch, hasStreamAccess, playbackSource, track]
   )
 
   const commentSectionLoading =

@@ -2,10 +2,7 @@ import { useMemo } from 'react'
 
 import { ChatBlastAudience } from '@audius/sdk'
 
-import {
-  useCurrentAccountUser,
-  useRemixersCount
-} from '~/api'
+import { useCurrentAccountUser, useRemixersCount } from '~/api'
 
 export const useFirstAvailableBlastAudience = () => {
   const { data: user } = useCurrentAccountUser()

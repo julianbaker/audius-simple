@@ -80,7 +80,10 @@ export const useTracks = (
     [tracks]
   )
 
-  const byId = useMemo(() => keyBy(filteredTracks, 'track_id'), [filteredTracks])
+  const byId = useMemo(
+    () => keyBy(filteredTracks, 'track_id'),
+    [filteredTracks]
+  )
 
   return {
     data: filteredTracks,

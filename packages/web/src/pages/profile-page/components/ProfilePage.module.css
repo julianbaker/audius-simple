@@ -1,0 +1,150 @@
+/* Cover photo wrapper. Tighter than the legacy 376px height — the old
+   value came from the era when the cover hosted text overlays. With
+   the identity stack sitting below on its own surface, a shorter
+   banner reads better and lets the actual content above the fold be
+   profile content, not decoration. */
+.coverWrapper {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+}
+
+/* Container query against the topSurface's own `profileTop` context.
+   Fires at ~544 because topSurface = page-container-width + 2x
+   PAGE_GUTTER (32px each), so this lines up with the
+   `@container page (max-width: 480px)` rule the header uses. */
+@container profileTop (max-width: 544px) {
+  .coverWrapper {
+    height: 160px;
+  }
+}
+
+/* Upper "card" — cover + header row + bio all share one surface so
+   they read as one block, distinct from the lineup/sidebar content
+   below. Full-bleed across the page width; inner content is still
+   constrained by the inner FlushPageContainer. */
+.topSurface {
+  width: 100%;
+  background-color: var(--harmony-bg-white);
+  /* Establish a stacking context so sticky descendants layer above
+     the lineup below. */
+  position: relative;
+  z-index: 5;
+  /* Standalone container query context for the cover image. The
+     cover lives outside FlushPageContainer (it's full-bleed) so it
+     can't use the `page` container; we set our own so the cover can
+     shrink based on the section's own width, in step with the
+     header-row container queries inside FlushPageContainer. */
+  container-type: inline-size;
+  container-name: profileTop;
+}
+
+/* Sticky bar at the bottom of the top section. Single horizontal row
+   for tabs only. Top padding gives the contents breathing room; the
+   only divider is the bottom border — no border above (the intro
+   flows directly into this bar). */
+.stickyHeader {
+  position: sticky;
+  top: var(--mobile-nav-height, 0px);
+  z-index: 4;
+  background-color: var(--harmony-bg-white);
+  padding-top: 16px;
+  border-bottom: 1px solid var(--harmony-border-default);
+  /* Downward-only shadow — using the all-sides part of the harmony
+     mid token caused a visible top edge that read as a divider above
+     the bar. Keep just the offset-down shadow. */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.06);
+}
+
+.stickyRow {
+  display: flex;
+  align-items: center;
+  gap: var(--harmony-spacing-m);
+  width: 100%;
+}
+
+/* Tabs anchor at the left edge of the row. The negative left margin
+   offsets the Tab component's internal 8px padding so the active
+   tab's icon/label aligns with surrounding content above. */
+.stickyTabs {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-left: -8px;
+}
+
+/* Padded column inside topSurface that holds header + bio + tabs. The
+   cover sits above this (full-bleed, no horizontal padding) and the
+   PFP in the header overlaps the cover via its own negative margin.
+   Tabs are part of this surface so the whole identity block reads as
+   one card. */
+.topContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--harmony-spacing-l);
+  /* No bottom padding — the NavBanner's own bottom border meets the
+     surface boundary cleanly. */
+  padding-bottom: 0;
+}
+
+/* Main column flow beneath the upper surface. Holds the lineup/sidebar
+   row. Sits on the default page background so it pulls away from the
+   upper surface. Bottom padding clears the persistent playbar so the
+   final lineup row is never hidden beneath it. */
+.body {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--harmony-spacing-xl);
+  padding-top: var(--harmony-spacing-xl);
+  padding-bottom: calc(var(--play-bar-height) + var(--harmony-spacing-2xl));
+}
+
+/* The lineup + sidebar row. At wide widths the sidebar lives on the
+   right; at narrower widths it collapses below the lineup. Using flex
+   instead of grid so the lineup gets all remaining space without an
+   explicit minmax. */
+.contentRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--harmony-spacing-2xl);
+  width: 100%;
+  align-items: flex-start;
+}
+
+.lineup {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sidebar {
+  flex: 0 0 240px;
+  width: 240px;
+}
+
+/* Drop the sidebar only at narrow widths. The discovery widgets it
+   contains are secondary content, but they still fit comfortably at
+   mid sizes — we only hide them when the lineup column would
+   otherwise be squeezed. */
+@container page (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+/* Stat banner / nav banner column at narrow widths: nothing to tweak
+   here — the components themselves render flex-wrap on their internal
+   rows. The cover + header overlap math is the only fragile part and
+   it lives in ProfilePageHeader.module.css. */
+
+/* Wraps Album/Playlist/Contest card lineups inside the tab content
+   area. Used by AlbumsTab, PlaylistsTab, ContestsTab (which live in
+   ./desktop/ and import via ../ProfilePage.module.css). */
+.cardLineup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--harmony-unit-3);
+}

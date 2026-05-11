@@ -11,11 +11,7 @@ import {
 } from '~/api'
 import { Collection } from '~/models/Collection'
 import { ID } from '~/models/Identifiers'
-import {
-  AccessConditions,
-  Track,
-  isContentFollowGated
-} from '~/models/Track'
+import { AccessConditions, Track, isContentFollowGated } from '~/models/Track'
 import { gatedContentSelectors } from '~/store/gated-content'
 import { isContentPartialTrack } from '~/utils/contentTypeUtils'
 import { Nullable, removeNullable } from '~/utils/typeUtils'

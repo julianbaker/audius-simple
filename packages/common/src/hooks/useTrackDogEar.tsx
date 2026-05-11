@@ -2,9 +2,7 @@ import { useCurrentUserId } from '~/api'
 import { useTrack } from '~/api/tan-query/tracks/useTrack'
 import { DogEarType } from '~/models'
 import { ID } from '~/models/Identifiers'
-import {
-  isContentFollowGated,
-} from '~/models/Track'
+import { isContentFollowGated } from '~/models/Track'
 import { Nullable } from '~/utils'
 
 import { useGatedTrackAccess } from './useGatedContent'

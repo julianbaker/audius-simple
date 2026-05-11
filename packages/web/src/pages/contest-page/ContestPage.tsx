@@ -1,9 +1,6 @@
 import { RefObject } from 'react'
 
-import { useIsMobile } from 'hooks/useIsMobile'
-
-import ContestPageDesktopContent from './components/desktop/ContestPage'
-import ContestPageMobileContent from './components/mobile/ContestPage'
+import ContestPageContent from './components/desktop/ContestPage'
 
 type ContestPageProps = {
   containerRef: RefObject<HTMLDivElement>
@@ -17,15 +14,14 @@ type ContestPageProps = {
  * The page is keyed by the same (handle, slug) pair as the parent track, but
  * hangs its data off the contest event_id rather than the track itself — this
  * is what lets comments and follows be scoped to the *event*, not the track.
+ *
+ * Single-implementation: the desktop content tree uses container queries to
+ * adapt at narrow widths (see HEADER_STACK_BREAKPOINT_PX and
+ * DETAILS_STACK_BREAKPOINT_PX in ContestPage.tsx), so the previously parallel
+ * mobile variant is no longer needed.
  */
 const ContestPage = ({ containerRef }: ContestPageProps) => {
-  const isMobile = useIsMobile()
-
-  return isMobile ? (
-    <ContestPageMobileContent containerRef={containerRef} />
-  ) : (
-    <ContestPageDesktopContent containerRef={containerRef} />
-  )
+  return <ContestPageContent containerRef={containerRef} />
 }
 
 export default ContestPage

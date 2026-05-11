@@ -3,7 +3,6 @@ import {
   getEventQueryKey,
   getTrackQueryKey
 } from '@audius/common/api'
-import { FeatureFlags } from '@audius/common/services'
 import { EventEntityTypeEnum, EventEventTypeEnum } from '@audius/sdk'
 import { describe, expect } from 'vitest'
 
@@ -11,12 +10,6 @@ import { queryClient } from 'services/query-client'
 import { render, screen, it } from 'test/test-utils'
 
 import { RemixContestTeaser } from './RemixContestTeaser'
-
-// Teaser is gated on CONTESTS; tests pass the flag in `render` for parity with
-// other track UI. (While `useFeatureFlag` still lists CONTESTS in
-// `HARDCODED_ENABLED_FLAGS`, "flag off" is not testable through the app context
-// mock — the hook always returns enabled for that flag.)
-const withContestsFlag = { featureFlags: { [FeatureFlags.CONTESTS]: true } }
 
 // Minimal track shape; useTrack just returns whatever we put in the cache,
 // and the teaser only reads `permalink` from it.
@@ -83,7 +76,7 @@ describe('RemixContestTeaser', () => {
     const track = makeTrack()
     primeContestCache(track, null)
 
-    render(<RemixContestTeaser trackId={track.track_id} />, withContestsFlag)
+    render(<RemixContestTeaser trackId={track.track_id} />)
 
     // The teaser bails out with `return null`, so none of its identifying
     // elements should be present in the DOM. (We can't assert the container
@@ -99,7 +92,7 @@ describe('RemixContestTeaser', () => {
     const track = makeTrack()
     primeContestCache(track, makeContestEvent())
 
-    render(<RemixContestTeaser trackId={track.track_id} />, withContestsFlag)
+    render(<RemixContestTeaser trackId={track.track_id} />)
 
     // Badge text is locked — the track page must always call this a
     // "Remix Contest" so users recognise the CTA.
@@ -118,7 +111,7 @@ describe('RemixContestTeaser', () => {
       makeContestEvent({ endDate: '2099-12-31T23:59:00Z' })
     )
 
-    render(<RemixContestTeaser trackId={track.track_id} />, withContestsFlag)
+    render(<RemixContestTeaser trackId={track.track_id} />)
     // The exact formatted date string depends on formatContestDeadline; we
     // don't couple the test to the format, only to the "Ends …" prefix so
     // the distinction between active and ended is covered.
@@ -133,7 +126,7 @@ describe('RemixContestTeaser', () => {
       makeContestEvent({ endDate: '2000-01-01T00:00:00Z' })
     )
 
-    render(<RemixContestTeaser trackId={track.track_id} />, withContestsFlag)
+    render(<RemixContestTeaser trackId={track.track_id} />)
     expect(screen.getByText(/contest ended/i)).toBeInTheDocument()
   })
 })

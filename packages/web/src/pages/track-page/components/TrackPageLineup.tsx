@@ -5,9 +5,7 @@ import {
   useRemixContest,
   useTrackPageLineup
 } from '@audius/common/api'
-import { useFeatureFlag } from '@audius/common/hooks'
 import { User } from '@audius/common/models'
-import { FeatureFlags } from '@audius/common/services'
 import { Flex, Text, IconRemix } from '@audius/harmony'
 import type { IconComponent } from '@audius/harmony'
 
@@ -59,8 +57,10 @@ export const TrackPageLineup = ({
   const { trackIds, indices, isPending, isFetching, isError } =
     useTrackPageLineup({ trackId })
   const { data: remixContest } = useRemixContest(trackId)
-  const { isEnabled: isContestsEnabled } = useFeatureFlag(FeatureFlags.CONTESTS)
-  const suppressRemixLineupForContest = !!remixContest && isContestsEnabled
+  // Contest tracks have their own remix experience on the dedicated
+  // contest page, so the inline remix lineup is suppressed when this
+  // track is hosting one.
+  const suppressRemixLineupForContest = !!remixContest
 
   const { isDesktop, isMobile } = useTrackPageSize()
 

@@ -10,7 +10,6 @@ export enum FeatureFlags {
   FAST_REFERRAL = 'fast_referral',
   REACT_QUERY_SYNC = 'react_query_sync',
   COLLAPSED_EXPLORE_HEADER = 'collapsed_explore_header',
-  CONTESTS = 'contests',
   QUEUE_NEW_FEATURE_BADGE = 'queue_new_feature_badge'
 }
 
@@ -36,6 +35,5 @@ export const flagDefaults: FlagDefaults = {
   [FeatureFlags.FAST_REFERRAL]: false,
   [FeatureFlags.REACT_QUERY_SYNC]: false,
   [FeatureFlags.COLLAPSED_EXPLORE_HEADER]: false,
-  [FeatureFlags.CONTESTS]: false,
   [FeatureFlags.QUEUE_NEW_FEATURE_BADGE]: false
 }

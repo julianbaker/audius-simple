@@ -44,7 +44,6 @@ import { NotificationRedirect } from 'components/notification'
 import PlayBarProvider from 'components/play-bar/PlayBarProvider'
 import { useEnvironment } from 'hooks/useEnvironment'
 import { MAIN_CONTENT_ID, MainContentContext } from 'pages/MainContentContext'
-import { SubPage } from 'pages/settings-page/components/mobile/SettingsPage'
 import { remoteConfigInstance } from 'services/remote-config/remote-config-instance'
 import { getShowCookieBanner } from 'store/application/ui/cookieBanner/selectors'
 import { getClient } from 'utils/clientUtil'
@@ -787,72 +786,42 @@ const WebPlayer = (props: WebPlayerProps) => {
                 path={DEACTIVATE_PAGE}
                 element={<DeactivateAccountPage />}
               />
-              <Route
-                path={SETTINGS_PAGE}
-                element={<SettingsPage containerRef={mainContentRef} />}
-              />
+              <Route path={SETTINGS_PAGE} element={<SettingsPage />} />
               <Route
                 path={AUTHORIZED_APPS_SETTINGS_PAGE}
-                element={<SettingsPage containerRef={mainContentRef} />}
+                element={<SettingsPage />}
               />
               <Route
                 path={ACCOUNTS_YOU_MANAGE_SETTINGS_PAGE}
-                element={<SettingsPage containerRef={mainContentRef} />}
+                element={<SettingsPage />}
               />
               <Route
                 path={ACCOUNTS_MANAGING_YOU_SETTINGS_PAGE}
-                element={<SettingsPage containerRef={mainContentRef} />}
+                element={<SettingsPage />}
               />
               <Route
                 path={LABEL_ACCOUNT_SETTINGS_PAGE}
-                element={<SettingsPage containerRef={mainContentRef} />}
+                element={<SettingsPage />}
               />
               <Route path={CHECK_PAGE} element={<CheckPage />} />
-              <Route
-                path={ACCOUNT_SETTINGS_PAGE}
-                element={
-                  <SettingsPage
-                    containerRef={mainContentRef}
-                    subPage={SubPage.ACCOUNT}
-                  />
-                }
-              />
+              {/* Settings sub-pages — previously mobile-only standalone
+                  pages. After the page consolidation they all resolve to
+                  the unified SettingsPage; the URL deep links still work
+                  but no longer scroll to a specific section. */}
+              <Route path={ACCOUNT_SETTINGS_PAGE} element={<SettingsPage />} />
               <Route
                 path={CHANGE_PASSWORD_SETTINGS_PAGE}
-                element={
-                  <SettingsPage
-                    containerRef={mainContentRef}
-                    subPage={SubPage.CHANGE_PASSWORD}
-                  />
-                }
+                element={<SettingsPage />}
               />
               <Route
                 path={CHANGE_EMAIL_SETTINGS_PAGE}
-                element={
-                  <SettingsPage
-                    containerRef={mainContentRef}
-                    subPage={SubPage.CHANGE_EMAIL}
-                  />
-                }
+                element={<SettingsPage />}
               />
               <Route
                 path={NOTIFICATION_SETTINGS_PAGE}
-                element={
-                  <SettingsPage
-                    containerRef={mainContentRef}
-                    subPage={SubPage.NOTIFICATIONS}
-                  />
-                }
+                element={<SettingsPage />}
               />
-              <Route
-                path={ABOUT_SETTINGS_PAGE}
-                element={
-                  <SettingsPage
-                    containerRef={mainContentRef}
-                    subPage={SubPage.ABOUT}
-                  />
-                }
-              />
+              <Route path={ABOUT_SETTINGS_PAGE} element={<SettingsPage />} />
               <Route path={APP_REDIRECT} element={<AppRedirectListener />} />
               <Route path={NOT_FOUND_PAGE} element={<NotFoundPage />} />
               <Route

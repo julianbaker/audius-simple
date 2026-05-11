@@ -75,8 +75,16 @@ const SocialLink = (props: SocialLinkProps) => {
   }
 
   if (href) {
+    // Expose the destination URL via title + aria-label so users can
+    // see where an icon-only link points before clicking — protects
+    // against an icon being used to disguise a malicious URL.
     return (
-      <ExternalTextLink to={href} onClick={onClick}>
+      <ExternalTextLink
+        to={href}
+        onClick={onClick}
+        title={href}
+        aria-label={href}
+      >
         {icon} <Text ellipses>{iconOnly ? null : text}</Text>
       </ExternalTextLink>
     )

@@ -32,6 +32,7 @@ export const ProfilePictureListTile = ({
       pv='s'
       alignItems='flex-start'
       backgroundColor='white'
+      border='default'
       onClick={onClick}
     >
       <UserProfilePictureList

@@ -231,14 +231,16 @@ export function stripUnsupportedCryptoGateMetadata<
 
   return {
     ...track,
-    is_stream_gated:
-      !!stripUnsupportedCryptoGatedConditions(track.stream_conditions),
+    is_stream_gated: !!stripUnsupportedCryptoGatedConditions(
+      track.stream_conditions
+    ),
     stream_conditions: stripUnsupportedCryptoGatedConditions(
       track.stream_conditions
     ),
     ...(hadUnsupportedStreamGate ? { preview_start_seconds: null } : {}),
-    is_download_gated:
-      !!stripUnsupportedCryptoGatedConditions(track.download_conditions),
+    is_download_gated: !!stripUnsupportedCryptoGatedConditions(
+      track.download_conditions
+    ),
     download_conditions: stripUnsupportedCryptoGatedConditions(
       track.download_conditions
     ),

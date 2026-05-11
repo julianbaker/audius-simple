@@ -65,13 +65,9 @@ const DDEXRightsController = z
 
 const gatedMetadataSchema = z.object({
   is_stream_gated: z.optional(z.boolean()).nullable(),
-  stream_conditions: z
-    .optional(FollowGatedConditionsSchema)
-    .nullable(),
+  stream_conditions: z.optional(FollowGatedConditionsSchema).nullable(),
   is_download_gated: z.optional(z.boolean()).nullable(),
-  download_conditions: z
-    .optional(FollowGatedConditionsSchema)
-    .nullable()
+  download_conditions: z.optional(FollowGatedConditionsSchema).nullable()
 })
 
 const hiddenMetadataSchema = z.object({

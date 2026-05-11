@@ -66,7 +66,8 @@ const getPublishCollectionOptions = (context: PublishCollectionContext) =>
           params.collectionMetadata.download_conditions
         ) as typeof params.collectionMetadata.download_conditions
       }
-      collectionMetadata.is_stream_gated = !!collectionMetadata.stream_conditions
+      collectionMetadata.is_stream_gated =
+        !!collectionMetadata.stream_conditions
       collectionMetadata.is_download_gated =
         !!collectionMetadata.download_conditions
 
@@ -106,9 +107,7 @@ const getPublishCollectionOptions = (context: PublishCollectionContext) =>
           metadata
         })
       } else {
-        const metadata = playlistMetadataForCreateWithSDK(
-          collectionMetadata
-        )
+        const metadata = playlistMetadataForCreateWithSDK(collectionMetadata)
         metadata.playlistContents = publishedTracks
           .filter((t) => !!t.trackId)
           .map((t) => ({

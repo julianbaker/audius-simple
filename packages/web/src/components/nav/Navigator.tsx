@@ -471,12 +471,12 @@ const Navigator = ({ className }: OwnProps) => {
               onTouchEnd={handlePanelTouchEnd}
               onTouchCancel={handlePanelTouchEnd}
             >
-              <LeftNav isElectron={isElectron} showNavHeader={false} />
+              <LeftNav showNavHeader={false} />
             </div>
           </>
         ) : (
           <>
-            <LeftNav isElectron={isElectron} />
+            <LeftNav />
             <div
               className={styles.resizeHandle}
               style={{ cursor: isCollapsed ? 'e-resize' : 'w-resize' }}

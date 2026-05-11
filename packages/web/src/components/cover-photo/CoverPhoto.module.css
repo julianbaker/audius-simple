@@ -18,6 +18,20 @@
   z-index: 0;
 }
 
+/* On phones the 376px banner ate roughly half the viewport. Shrink to a
+   tighter strip that still reads as a cover image without dominating the
+   page. Both .placeholder/.photo min-height drops in lockstep so the
+   background image scales correctly inside the smaller frame. */
+@media (max-width: 480px) {
+  .coverPhoto {
+    height: 180px;
+  }
+  .placeholder,
+  .photo {
+    min-height: 180px;
+  }
+}
+
 .photo {
   display: flex;
   flex-direction: column;
