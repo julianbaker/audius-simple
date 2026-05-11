@@ -7,6 +7,7 @@ import { Name, SquareSizes } from '@audius/common/models'
 import { fillString, route } from '@audius/common/utils'
 import {
   Modal,
+  BottomSheet,
   Button,
   Flex,
   IconArrowRight,
@@ -25,7 +26,6 @@ import {
   getNameField,
   getProfileImageField
 } from 'common/store/pages/signon/selectors'
-import Drawer from 'components/drawer/Drawer'
 import { useProfilePicture } from 'hooks/useProfilePicture'
 import { CoverPhotoBanner } from 'pages/sign-up-page/components/CoverPhotoBanner'
 import { useSelector } from 'utils/reducer'
@@ -52,7 +52,6 @@ export const WelcomeModal = () => {
   const profileImage =
     profileImageField?.url ?? (presavedProfilePic || imageProfilePicEmpty)
 
-  const Root = isMobile ? Drawer : Modal
   const onClose = useCallback(() => {
     setIsOpen(false)
   }, [setIsOpen])
@@ -63,13 +62,8 @@ export const WelcomeModal = () => {
     }
   }, [dispatch, isOpen])
 
-  return (
-    <Root
-      isOpen={isOpen}
-      onClose={onClose}
-      size='small'
-      aria-labelledby='welcome-title'
-    >
+  const content = (
+    <>
       <Flex w='100%' h={96} css={{ zIndex: 1 }}>
         <CoverPhotoBanner />
       </Flex>
@@ -133,6 +127,30 @@ export const WelcomeModal = () => {
           </Button>
         </Flex>
       </Flex>
-    </Root>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={onClose}
+        ariaLabel={welcomeModalMessages.welcome}
+        hideClose
+      >
+        {content}
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size='small'
+      aria-labelledby='welcome-title'
+    >
+      {content}
+    </Modal>
   )
 }

@@ -1,4 +1,5 @@
 import {
+  BottomSheet,
   Flex,
   Modal,
   ModalContent,
@@ -9,13 +10,18 @@ import {
 } from '@audius/harmony'
 import cn from 'classnames'
 
-import Drawer, { DrawerProps } from 'components/drawer/Drawer'
 import { useIsMobile } from 'hooks/useIsMobile'
 
 import styles from './ModalDrawer.module.css'
 
+type LegacyDrawerProps = {
+  isFullscreen?: boolean
+  shouldClose?: boolean
+  zIndex?: number
+}
+
 type ModalDrawerProps = ModalProps &
-  DrawerProps &
+  LegacyDrawerProps &
   (
     | { newModal?: false }
     | {
@@ -56,16 +62,22 @@ const ModalDrawer = (props: ModalDrawerProps) => {
 
   const isMobile = useIsMobile()
   if (isMobile) {
+    const ariaLabel =
+      'title' in props && typeof props.title === 'string'
+        ? props.title
+        : 'Modal'
+
     return (
-      <Drawer
+      <BottomSheet
         isOpen={props.isOpen}
         onClose={props.onClose}
         onClosed={props.onClosed}
+        ariaLabel={ariaLabel}
         isFullscreen={
           props.isFullscreen === undefined ? true : props.isFullscreen
         }
         zIndex={props.zIndex}
-        shouldClose={props.shouldClose}
+        hideClose
       >
         <Flex column h='100%' gap='l'>
           <Flex pt='l' pb='s' justifyContent='center'>
@@ -77,7 +89,7 @@ const ModalDrawer = (props: ModalDrawerProps) => {
             {props.children}
           </Flex>
         </Flex>
-      </Drawer>
+      </BottomSheet>
     )
   }
 

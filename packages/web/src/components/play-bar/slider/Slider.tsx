@@ -158,7 +158,9 @@ export const Slider = ({
   const onTouchStart = (e: React.TouchEvent) => {
     touchMoveRef.current = onTouchMove
     touchEndRef.current = onTouchEnd
-    document.addEventListener('touchmove', touchMoveRef.current)
+    document.addEventListener('touchmove', touchMoveRef.current, {
+      passive: false
+    })
     document.addEventListener('touchend', touchEndRef.current)
     setIsActive(true)
 

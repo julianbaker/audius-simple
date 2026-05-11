@@ -1,4 +1,4 @@
-import { useCallback, useEffect, MouseEvent } from 'react'
+import { useCallback, useEffect, useMemo, MouseEvent } from 'react'
 
 import { useCurrentUserId, useTrack, useUser } from '@audius/common/api'
 import { useGatedContentAccess } from '@audius/common/hooks'
@@ -255,33 +255,53 @@ export const TrackTile = ({
     [onTogglePlay]
   )
 
-  const renderOverflowMenu = () => {
-    const menu: Omit<import('components/menu/TrackMenu').OwnProps, 'children'> =
-      {
-        extraMenuItems: [],
-        handle: partialUser?.handle || '',
-        includeAddToPlaylist: !trackWithFallback.is_unlisted || isOwner,
-        includeAddToAlbum: isOwner && !trackWithFallback.ddex_app,
-        includeArtistPick: isOwner,
-        includeEdit: isOwner,
-        ddexApp: track?.ddex_app,
-        includeFavorite: hasStreamAccess,
-        includeRepost: hasStreamAccess,
-        includeShare: true,
-        includeTrackPage: true,
-        isDeleted: is_delete || isOwnerDeactivated,
-        isFavorited,
-        isOwner,
-        isReposted,
-        isUnlisted: trackWithFallback.is_unlisted,
-        trackId,
-        trackTitle: title,
-        genre: genre as Genre,
-        trackPermalink: permalink,
-        type: 'track'
-      }
-    return (
-      <Menu menu={menu}>
+  const overflowMenu = useMemo<
+    Omit<import('components/menu/TrackMenu').OwnProps, 'children'>
+  >(
+    () => ({
+      extraMenuItems: [],
+      handle: partialUser?.handle || '',
+      includeAddToPlaylist: !trackWithFallback.is_unlisted || isOwner,
+      includeAddToAlbum: isOwner && !trackWithFallback.ddex_app,
+      includeArtistPick: isOwner,
+      includeEdit: isOwner,
+      ddexApp: track?.ddex_app,
+      includeFavorite: hasStreamAccess,
+      includeRepost: hasStreamAccess,
+      includeShare: true,
+      includeTrackPage: true,
+      isDeleted: is_delete || isOwnerDeactivated,
+      isFavorited,
+      isOwner,
+      isReposted,
+      isUnlisted: trackWithFallback.is_unlisted,
+      trackId,
+      trackTitle: title,
+      genre: genre as Genre,
+      trackPermalink: permalink,
+      type: 'track'
+    }),
+    [
+      genre,
+      hasStreamAccess,
+      isFavorited,
+      isOwner,
+      isOwnerDeactivated,
+      isReposted,
+      is_delete,
+      partialUser?.handle,
+      permalink,
+      title,
+      track?.ddex_app,
+      trackId,
+      trackWithFallback.ddex_app,
+      trackWithFallback.is_unlisted
+    ]
+  )
+
+  const overflowMenuButton = useMemo(
+    () => (
+      <Menu menu={overflowMenu}>
         {(ref, triggerPopup) => (
           <IconButton
             size={size === TrackTileSize.LARGE ? 'l' : 'm'}
@@ -296,8 +316,9 @@ export const TrackTile = ({
           />
         )}
       </Menu>
-    )
-  }
+    ),
+    [overflowMenu, size]
+  )
 
   if (is_delete || isOwnerDeactivated) return null
 
@@ -455,7 +476,7 @@ export const TrackTile = ({
               contentType='track'
               isDisabled={disableActions}
               isLoading={isLoading}
-              rightActions={renderOverflowMenu()}
+              rightActions={overflowMenuButton}
               isDarkMode={isDarkMode}
               isMatrixMode={isMatrixMode}
               showIconButtons={true}
@@ -471,7 +492,7 @@ export const TrackTile = ({
               hasStreamAccess={hasStreamAccess}
               isDisabled={disableActions}
               isLoading={isLoading}
-              rightActions={renderOverflowMenu()}
+              rightActions={overflowMenuButton}
               isDarkMode={isDarkMode}
               isMatrixMode={isMatrixMode}
               showIconButtons={true}

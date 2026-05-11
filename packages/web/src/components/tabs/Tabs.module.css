@@ -32,7 +32,7 @@
   background: none;
   border: none;
   text-decoration: none;
-  transition: all 0.18s ease-in-out;
+  transition: color 0.18s ease-in-out;
   color: var(--harmony-text-subdued);
 }
 
@@ -81,7 +81,7 @@
 
 .tab path {
   fill: var(--harmony-text-subdued);
-  transition: all 0.18s ease-in-out;
+  transition: fill 0.18s ease-in-out;
 }
 
 .tabDesktop:hover:not(.tabDisabled),

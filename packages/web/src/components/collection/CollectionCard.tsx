@@ -1,12 +1,15 @@
-import { MouseEvent, Ref, forwardRef, useCallback } from 'react'
+import { MouseEvent, Ref, forwardRef, useCallback, useMemo } from 'react'
 
 import { useCollection } from '@audius/common/api'
-import { ID, SquareSizes } from '@audius/common/models'
-import { formatCount, formatReleaseDate } from '@audius/common/utils'
+import { Collection, ID, SquareSizes } from '@audius/common/models'
+import {
+  createShallowSelector,
+  formatCount,
+  formatReleaseDate
+} from '@audius/common/utils'
 import { Flex, Skeleton, Text, useTheme } from '@audius/harmony'
 import IconHeart from '@audius/harmony/src/assets/icons/Heart.svg'
 import IconRepost from '@audius/harmony/src/assets/icons/Repost.svg'
-import { pick } from 'lodash'
 import { useLinkClickHandler } from 'react-router'
 
 import { Card, CardProps, CardFooter, CardContent } from 'components/card'
@@ -81,19 +84,46 @@ export const CollectionCard = forwardRef(
       ...other
     } = props
 
+    const selectCollectionCardFields = useMemo(
+      () =>
+        createShallowSelector(
+          [
+            (collection: Collection | undefined) => collection?.playlist_name,
+            (collection: Collection | undefined) => collection?.permalink,
+            (collection: Collection | undefined) =>
+              collection?.playlist_owner_id,
+            (collection: Collection | undefined) => collection?.repost_count,
+            (collection: Collection | undefined) => collection?.save_count,
+            (collection: Collection | undefined) => collection?.is_private,
+            (collection: Collection | undefined) =>
+              collection?.is_scheduled_release,
+            (collection: Collection | undefined) => collection?.release_date
+          ],
+          (
+            playlist_name,
+            permalink,
+            playlist_owner_id,
+            repost_count,
+            save_count,
+            is_private,
+            is_scheduled_release,
+            release_date
+          ) => ({
+            playlist_name,
+            permalink,
+            playlist_owner_id,
+            repost_count,
+            save_count,
+            is_private,
+            is_scheduled_release,
+            release_date
+          })
+        ),
+      []
+    )
+
     const { data: collection, isPending } = useCollection(id, {
-      select: (collection) =>
-        pick(
-          collection,
-          'playlist_name',
-          'permalink',
-          'playlist_owner_id',
-          'repost_count',
-          'save_count',
-          'is_private',
-          'is_scheduled_release',
-          'release_date'
-        )
+      select: selectCollectionCardFields
     })
 
     const {

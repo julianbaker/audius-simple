@@ -13,6 +13,7 @@ import { ChatBlastAudience } from '@audius/sdk'
 import { useDispatch, useSelector } from 'react-redux'
 import { useMatch, useLocation } from 'react-router'
 
+import ResponsiveModal from 'components/modal/ResponsiveModal'
 import { FavoritesUserList } from 'components/user-list/lists/FavoritesUserList'
 import { FollowingUserList } from 'components/user-list/lists/FollowingUserList'
 import { MutualsUserList } from 'components/user-list/lists/MutualsUserList'
@@ -27,8 +28,6 @@ import {
 } from 'store/application/ui/userListModal/selectors'
 import { setVisibility } from 'store/application/ui/userListModal/slice'
 import { UserListType } from 'store/application/ui/userListModal/types'
-
-import ResponsiveModal from 'components/modal/ResponsiveModal'
 
 import { FollowersUserList } from '../user-list/lists/FollowersUserList'
 const { getPageTitle } = notificationsUserListSelectors

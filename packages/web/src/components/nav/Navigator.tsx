@@ -217,7 +217,12 @@ const Navigator = ({ className }: OwnProps) => {
       return smoothstep01(linearT)
     }
 
-    const syncMeasurements = () => {
+    type ChromeMeasurements = {
+      subHeight: number | null
+      barHeight: number | null
+    }
+
+    const readMeasurements = (): ChromeMeasurements => {
       const sub = document.querySelector(
         '[data-mobile-chrome-expanded="page-subheader"]'
       )
@@ -225,10 +230,26 @@ const Navigator = ({ className }: OwnProps) => {
         '[data-mobile-chrome-expanded="header-bottom-bar"]'
       )
 
-      if (sub instanceof HTMLElement) {
+      return {
+        subHeight:
+          sub instanceof HTMLElement
+            ? Math.max(1, Math.ceil(sub.scrollHeight))
+            : null,
+        barHeight:
+          bar instanceof HTMLElement
+            ? Math.max(1, Math.ceil(bar.scrollHeight))
+            : null
+      }
+    }
+
+    const writeMeasurements = ({
+      subHeight,
+      barHeight
+    }: ChromeMeasurements) => {
+      if (subHeight !== null) {
         document.documentElement.style.setProperty(
           '--mobile-chrome-page-subheader-px',
-          `${Math.max(1, Math.ceil(sub.scrollHeight))}px`
+          `${subHeight}px`
         )
       } else {
         document.documentElement.style.removeProperty(
@@ -236,10 +257,10 @@ const Navigator = ({ className }: OwnProps) => {
         )
       }
 
-      if (bar instanceof HTMLElement) {
+      if (barHeight !== null) {
         document.documentElement.style.setProperty(
           '--mobile-chrome-header-bottom-bar-px',
-          `${Math.max(1, Math.ceil(bar.scrollHeight))}px`
+          `${barHeight}px`
         )
       } else {
         document.documentElement.style.removeProperty(
@@ -248,9 +269,26 @@ const Navigator = ({ className }: OwnProps) => {
       }
     }
 
-    const resizeObserver = new ResizeObserver(() => {
-      syncMeasurements()
-    })
+    let measureReadRaf: number | null = null
+    let measureWriteRaf: number | null = null
+    let attachRaf: number | null = null
+
+    const scheduleMeasurements = () => {
+      if (measureReadRaf !== null) return
+      measureReadRaf = requestAnimationFrame(() => {
+        measureReadRaf = null
+        const measurements = readMeasurements()
+        if (measureWriteRaf !== null) {
+          cancelAnimationFrame(measureWriteRaf)
+        }
+        measureWriteRaf = requestAnimationFrame(() => {
+          measureWriteRaf = null
+          writeMeasurements(measurements)
+        })
+      })
+    }
+
+    const resizeObserver = new ResizeObserver(scheduleMeasurements)
 
     const attachObservers = () => {
       resizeObserver.disconnect()
@@ -259,8 +297,18 @@ const Navigator = ({ className }: OwnProps) => {
         .forEach((el) => {
           resizeObserver.observe(el)
         })
-      syncMeasurements()
+      scheduleMeasurements()
     }
+
+    const scheduleAttachObservers = () => {
+      if (attachRaf !== null) return
+      attachRaf = requestAnimationFrame(() => {
+        attachRaf = null
+        attachObservers()
+      })
+    }
+
+    const mutationObserver = new MutationObserver(scheduleAttachObservers)
 
     let lastScrollY = window.scrollY
     let targetCollapse = initialCollapseHint(lastScrollY)
@@ -319,23 +367,41 @@ const Navigator = ({ className }: OwnProps) => {
       kickPump()
     }
 
-    attachObservers()
+    scheduleAttachObservers()
     requestAnimationFrame(() => {
-      attachObservers()
+      scheduleAttachObservers()
       lastScrollY = window.scrollY
       targetCollapse = initialCollapseHint(lastScrollY)
       kickPump()
     })
 
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-mobile-chrome-expanded']
+    })
     window.addEventListener('scroll', handleScroll, { passive: true })
-    window.addEventListener('resize', attachObservers)
+    window.addEventListener('resize', scheduleAttachObservers, {
+      passive: true
+    })
 
     return () => {
       window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', attachObservers)
+      window.removeEventListener('resize', scheduleAttachObservers)
       resizeObserver.disconnect()
+      mutationObserver.disconnect()
       if (pumpRaf !== null) {
         cancelAnimationFrame(pumpRaf)
+      }
+      if (measureReadRaf !== null) {
+        cancelAnimationFrame(measureReadRaf)
+      }
+      if (measureWriteRaf !== null) {
+        cancelAnimationFrame(measureWriteRaf)
+      }
+      if (attachRaf !== null) {
+        cancelAnimationFrame(attachRaf)
       }
       document.documentElement.style.removeProperty('--mobile-chrome-collapse')
       document.documentElement.style.removeProperty(
@@ -345,7 +411,7 @@ const Navigator = ({ className }: OwnProps) => {
         '--mobile-chrome-header-bottom-bar-px'
       )
     }
-  }, [isMobile, hideMobileNav, location.pathname])
+  }, [isMobile, hideMobileNav])
 
   // Lock body scroll and mark nav open when mobile drawer is open
   useEffect(() => {

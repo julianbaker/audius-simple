@@ -47,8 +47,7 @@ const ActionRow = ({ icon, label, onClick }: ActionRowProps) => {
         borderRadius: spacing.s,
         '&:active': { background: color.background.surface2 },
         '&:focus-visible': {
-          outline:
-            '2px solid var(--harmony-focus, var(--harmony-secondary))',
+          outline: '2px solid var(--harmony-focus, var(--harmony-secondary))',
           outlineOffset: '2px'
         },
         // The brand icons in the share menu are colored to match the

@@ -236,7 +236,11 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
       // Need to prevent safari iOS bounce
       // overscroll effect by intercepting
       // touchmove events.
-      if (modalRoot) modalRoot.addEventListener('touchmove', onTouchMove)
+      if (modalRoot) {
+        modalRoot.addEventListener('touchmove', onTouchMove, {
+          passive: allowScroll
+        })
+      }
       return () => {
         if (bgModal) bgModal.classList.remove('bgModalVisible')
       }
@@ -435,7 +439,7 @@ export const Modal = forwardRef<HTMLDivElement, ModalProps>(function Modal(
     const onResize = () => {
       setHeight(window.innerHeight)
     }
-    window.addEventListener('resize', onResize)
+    window.addEventListener('resize', onResize, { passive: true })
     return () => {
       window.removeEventListener('resize', onResize)
     }

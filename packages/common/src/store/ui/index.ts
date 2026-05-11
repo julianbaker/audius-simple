@@ -19,14 +19,6 @@ export {
 export { default as duplicateAddConfirmationModalUISagas } from './duplicate-add-confirmation-modal/sagas'
 export * from './duplicate-add-confirmation-modal/types'
 
-export * as mobileOverflowMenuUISelectors from './mobile-overflow-menu/selectors'
-export {
-  default as mobileOverflowMenuUIReducer,
-  actions as mobileOverflowMenuUIActions
-} from './mobile-overflow-menu/slice'
-export { default as mobileOverflowMenuUISagas } from './mobile-overflow-menu/sagas'
-export * from './mobile-overflow-menu/types'
-
 export * from './modals'
 
 export * as nowPlayingUISelectors from './now-playing/selectors'

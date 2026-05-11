@@ -43,5 +43,7 @@
   height: var(--harmony-unit-6);
   width: var(--harmony-unit-6);
   padding-left: var(--harmony-unit-half);
-  transition: all var(--harmony-quick);
+  transition:
+    color var(--harmony-quick),
+    transform var(--harmony-quick);
 }

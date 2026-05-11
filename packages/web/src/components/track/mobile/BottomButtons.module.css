@@ -15,7 +15,7 @@
   width: var(--harmony-unit-6);
   height: var(--harmony-unit-6);
   transform: scale3d(1, 1, 1);
-  transition: all 0.12s ease-in-out !important;
+  transition: transform 0.12s ease-in-out !important;
 }
 
 .buttonContent:hover {
@@ -69,7 +69,7 @@
   height: var(--harmony-unit-6);
   width: var(--harmony-unit-6);
   transform: scale3d(1, 1, 1);
-  transition: all 0.12s ease-in-out !important;
+  transition: transform 0.12s ease-in-out !important;
 }
 
 /* Match repost/favorite 1.18 hover total – Harmony IconButton already scales svg on hover */

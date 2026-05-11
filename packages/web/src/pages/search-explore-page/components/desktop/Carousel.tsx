@@ -59,8 +59,10 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(
       if (!container) return
 
       updateScrollButtons()
-      container.addEventListener('scroll', updateScrollButtons)
-      window.addEventListener('resize', updateScrollButtons)
+      container.addEventListener('scroll', updateScrollButtons, {
+        passive: true
+      })
+      window.addEventListener('resize', updateScrollButtons, { passive: true })
 
       return () => {
         container.removeEventListener('scroll', updateScrollButtons)

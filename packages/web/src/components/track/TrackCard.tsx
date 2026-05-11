@@ -1,12 +1,11 @@
-import { MouseEvent, Ref, forwardRef, useCallback } from 'react'
+import { MouseEvent, Ref, forwardRef, useCallback, useMemo } from 'react'
 
 import { useTrack } from '@audius/common/api'
-import { ID, SquareSizes } from '@audius/common/models'
-import { formatCount } from '@audius/common/utils'
+import { ID, SquareSizes, Track } from '@audius/common/models'
+import { createShallowSelector, formatCount } from '@audius/common/utils'
 import { Flex, Skeleton, Text } from '@audius/harmony'
 import IconHeart from '@audius/harmony/src/assets/icons/Heart.svg'
 import IconRepost from '@audius/harmony/src/assets/icons/Repost.svg'
-import { pick } from 'lodash'
 import { useLinkClickHandler } from 'react-router'
 
 import { Card, CardProps, CardFooter, CardContent } from 'components/card'
@@ -77,16 +76,29 @@ export const TrackCard = forwardRef(
       ...other
     } = props
 
+    const selectTrackCardFields = useMemo(
+      () =>
+        createShallowSelector(
+          [
+            (track: Track | undefined) => track?.title,
+            (track: Track | undefined) => track?.permalink,
+            (track: Track | undefined) => track?.owner_id,
+            (track: Track | undefined) => track?.repost_count,
+            (track: Track | undefined) => track?.save_count
+          ],
+          (title, permalink, owner_id, repost_count, save_count) => ({
+            title,
+            permalink,
+            owner_id,
+            repost_count,
+            save_count
+          })
+        ),
+      []
+    )
+
     const { data: track, isPending } = useTrack(id, {
-      select: (track) =>
-        pick(
-          track,
-          'title',
-          'permalink',
-          'owner_id',
-          'repost_count',
-          'save_count'
-        )
+      select: selectTrackCardFields
     })
 
     const { title, permalink, owner_id, repost_count, save_count } = track ?? {}

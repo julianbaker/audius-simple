@@ -267,7 +267,7 @@ export const Table = ({
       resizeObserver.observe(node)
       tableResizeObserverRef.current = resizeObserver
     } else {
-      window.addEventListener('resize', measure)
+      window.addEventListener('resize', measure, { passive: true })
       tableResizeHandlerRef.current = measure
     }
   }, [])

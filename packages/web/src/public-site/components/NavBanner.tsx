@@ -78,7 +78,7 @@ const NavBanner = (props: NavBannerProps) => {
 
   useEffect(() => {
     setScrolling()
-    window.addEventListener('scroll', setScrolling)
+    window.addEventListener('scroll', setScrolling, { passive: true })
     return () => window.removeEventListener('scroll', setScrolling)
   }, [setScrolling])
 

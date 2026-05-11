@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   useCurrentUserId,
@@ -20,17 +20,15 @@ import {
   playbackSelectors,
   RepeatMode,
   tracksSocialActions,
-  mobileOverflowMenuUIActions,
   shareModalUIActions,
-  OverflowAction,
-  OverflowSource,
-  playbackRateValueMap,
-  OverflowActionCallbacks
+  playbackRateValueMap
 } from '@audius/common/store'
 import { Genre, route } from '@audius/common/utils'
 import {
   IconCaretRight as IconCaret,
+  IconButton,
   IconImage,
+  IconKebabHorizontal,
   Scrubber,
   Image
 } from '@audius/harmony'
@@ -40,6 +38,8 @@ import { Dispatch } from 'redux'
 
 import { useHistoryContext } from 'app/HistoryProvider'
 import { useRecord, make } from 'common/store/analytics/actions'
+import Menu from 'components/menu/Menu'
+import { OwnProps as TrackMenuProps } from 'components/menu/TrackMenu'
 import PlayButton from 'components/play-bar/PlayButton'
 import NextButtonProvider from 'components/play-bar/next-button/NextButtonProvider'
 import PreviousButtonProvider from 'components/play-bar/previous-button/PreviousButtonProvider'
@@ -55,7 +55,7 @@ import {
 } from 'hooks/useTrackCoverArt'
 import { audioPlayer } from 'services/audio-player'
 import { AppState } from 'store/types'
-import { pushUniqueRoute as pushRoute } from 'utils/route'
+import { albumPage, pushUniqueRoute as pushRoute } from 'utils/route'
 import { useIsDarkMode, useIsMatrix } from 'utils/theme/theme'
 import { withNullGuard } from 'utils/withNullGuard'
 
@@ -68,7 +68,6 @@ const { getBuffering, getCounter, getPlaying, getPlaybackRate, getSeek } =
 
 const { seekTo: seek, reset } = playbackActions
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const { repostTrack, undoRepostTrack } = tracksSocialActions
 const {
   next,
@@ -130,7 +129,6 @@ const NowPlaying = g(
     shuffle,
     repost,
     undoRepost,
-    clickOverflow,
     goToRoute
   }) => {
     const { trackId: queueTrackId, track, user } = currentQueueItem
@@ -263,54 +261,120 @@ const NowPlaying = g(
       share(track_id)
     }, [share, track_id])
 
-    const goToTrackPage = () => {
+    const goToTrackPage = useCallback(() => {
       onClose()
       goToRoute(history.location, track.permalink)
-    }
+    }, [goToRoute, history.location, onClose, track.permalink])
 
-    const goToProfilePage = () => {
+    const goToProfilePage = useCallback(() => {
       onClose()
       goToRoute(history.location, profilePage(handle))
-    }
+    }, [goToRoute, handle, history.location, onClose])
 
-    const onClickOverflow = useCallback(() => {
-      const isOwner = currentUserId === owner_id
+    const isOwner = currentUserId === owner_id
+    const overflowExtraMenuItems = useMemo(() => {
+      const items = [
+        {
+          text: isLongFormContent ? 'Visit Episode Page' : 'Visit Track Page',
+          onClick: goToTrackPage
+        }
+      ]
 
-      const overflowActions = [
-        !isOwner
-          ? has_current_user_reposted
-            ? OverflowAction.UNREPOST
-            : OverflowAction.REPOST
-          : null,
-        !isOwner
-          ? has_current_user_saved
-            ? OverflowAction.UNFAVORITE
-            : OverflowAction.FAVORITE
-          : null,
-        isOwner ? OverflowAction.ADD_TO_ALBUM : null,
-        !track?.is_unlisted || isOwner ? OverflowAction.ADD_TO_PLAYLIST : null,
-        OverflowAction.VIEW_TRACK_PAGE,
-        albumInfo ? OverflowAction.VIEW_ALBUM_PAGE : null,
-        OverflowAction.VIEW_ARTIST_PAGE
-      ].filter(Boolean) as OverflowAction[]
-
-      const overflowCallbacks = {
-        [OverflowAction.VIEW_TRACK_PAGE]: onClose,
-        [OverflowAction.VIEW_ARTIST_PAGE]: onClose
+      if (albumInfo) {
+        items.push({
+          text: 'Visit Album Page',
+          onClick: () => {
+            onClose()
+            goToRoute(
+              history.location,
+              albumPage(handle, albumInfo.playlist_name, albumInfo.playlist_id)
+            )
+          }
+        })
       }
 
-      clickOverflow(track_id, overflowActions, overflowCallbacks)
+      items.push({
+        text: 'Visit Profile',
+        onClick: goToProfilePage
+      })
+
+      return items
     }, [
-      currentUserId,
-      owner_id,
-      has_current_user_reposted,
-      has_current_user_saved,
-      track,
       albumInfo,
-      onClose,
-      clickOverflow,
-      track_id
+      goToProfilePage,
+      goToRoute,
+      goToTrackPage,
+      handle,
+      history.location,
+      isLongFormContent,
+      onClose
     ])
+
+    const overflowMenu = useMemo<Omit<TrackMenuProps, 'children'>>(
+      () => ({
+        extraMenuItems: overflowExtraMenuItems,
+        handle,
+        includeAddToPlaylist: !track?.is_unlisted || isOwner,
+        includeAddToAlbum: isOwner,
+        includeArtistPick: false,
+        includeDelete: false,
+        includeEdit: false,
+        includeFavorite: !isOwner,
+        includeRepost: !isOwner,
+        includeShare: false,
+        includeArtistPage: false,
+        includeTrackPage: false,
+        includeAlbumPage: false,
+        includePlayNext: false,
+        includeAddToQueue: false,
+        isDeleted: track.is_delete,
+        isFavorited: has_current_user_saved,
+        isOwner,
+        isReposted: has_current_user_reposted,
+        isUnlisted: track?.is_unlisted,
+        trackId: track_id,
+        trackTitle: title,
+        genre: track.genre as Genre,
+        trackPermalink: track.permalink,
+        type: 'track'
+      }),
+      [
+        handle,
+        has_current_user_reposted,
+        has_current_user_saved,
+        isOwner,
+        overflowExtraMenuItems,
+        title,
+        track.genre,
+        track.is_delete,
+        track.permalink,
+        track?.is_unlisted,
+        track_id
+      ]
+    )
+
+    const renderOverflowMenu = useCallback(
+      () => (
+        <Menu menu={overflowMenu}>
+          {(ref, triggerPopup) => (
+            <IconButton
+              ref={ref}
+              aria-label='more actions'
+              icon={IconKebabHorizontal}
+              color='default'
+              size='xl'
+              onClick={(e) => {
+                e.stopPropagation()
+                triggerPopup()
+              }}
+            />
+          )}
+        </Menu>
+      ),
+      [overflowMenu]
+    )
+
+    const noopOverflow = useCallback(() => {}, [])
 
     const onPrevious = () => {
       const isLongFormContent =
@@ -485,7 +549,8 @@ const NowPlaying = g(
             onToggleRepost={toggleRepost}
             onToggleFavorite={toggleFavorite}
             onShare={onShare}
-            onClickOverflow={onClickOverflow}
+            onClickOverflow={noopOverflow}
+            renderOverflow={renderOverflowMenu}
             isDarkMode={isDarkMode}
             isMatrixMode={isMatrixMode}
           />
@@ -549,19 +614,6 @@ function mapDispatchToProps(dispatch: Dispatch) {
       dispatch(repostTrack(trackId, RepostSource.NOW_PLAYING)),
     undoRepost: (trackId: ID) =>
       dispatch(undoRepostTrack(trackId, RepostSource.NOW_PLAYING)),
-    clickOverflow: (
-      trackId: ID | string,
-      overflowActions: OverflowAction[],
-      callbacks: OverflowActionCallbacks
-    ) =>
-      dispatch(
-        open({
-          source: OverflowSource.TRACKS,
-          id: trackId,
-          overflowActions,
-          overflowActionCallbacks: callbacks
-        })
-      ),
     goToRoute: (location: Location, route: string) =>
       dispatch(pushRoute(location, route))
   }

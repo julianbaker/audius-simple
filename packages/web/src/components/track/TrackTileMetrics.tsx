@@ -1,13 +1,18 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { useTrack } from '@audius/common/api'
-import { FavoriteType, ID, Name } from '@audius/common/models'
+import { FavoriteType, ID, Name, Track } from '@audius/common/models'
 import {
   favoritesUserListActions,
   repostsUserListActions,
   RepostType
 } from '@audius/common/store'
-import { formatCount, route, pluralize } from '@audius/common/utils'
+import {
+  createShallowSelector,
+  formatCount,
+  route,
+  pluralize
+} from '@audius/common/utils'
 import { IconMessage, Text, Flex, IconRepost, IconHeart } from '@audius/harmony'
 import { useDispatch } from 'react-redux'
 
@@ -44,13 +49,22 @@ type RepostsMetricProps = {
 
 export const RepostsMetric = (props: RepostsMetricProps) => {
   const { trackId, size } = props
+  const selectRepostsMetricFields = useMemo(
+    () =>
+      createShallowSelector(
+        [
+          (track: Track | undefined) => track?.repost_count,
+          (track: Track | undefined) => track?.followee_reposts
+        ],
+        (repostCount, followeeReposts) => ({
+          repostCount,
+          followeeReposts
+        })
+      ),
+    []
+  )
   const { data: partialTrack } = useTrack(trackId, {
-    select: (track) => {
-      return {
-        repostCount: track?.repost_count,
-        followeeReposts: track?.followee_reposts
-      }
-    }
+    select: selectRepostsMetricFields
   })
   const { repostCount, followeeReposts } = partialTrack ?? {}
 
@@ -163,14 +177,24 @@ type CommentMetricProps = {
 export const CommentMetric = (props: CommentMetricProps) => {
   const { trackId, size } = props
   const isMobile = useIsMobile()
+  const selectCommentMetricFields = useMemo(
+    () =>
+      createShallowSelector(
+        [
+          (track: Track | undefined) => track?.comment_count,
+          (track: Track | undefined) => track?.permalink,
+          (track: Track | undefined) => track?.comments_disabled
+        ],
+        (commentCount, permalink, commentsDisabled) => ({
+          commentCount,
+          permalink,
+          commentsDisabled
+        })
+      ),
+    []
+  )
   const { data: partialTrack } = useTrack(trackId, {
-    select: (track) => {
-      return {
-        commentCount: track?.comment_count,
-        permalink: track?.permalink,
-        commentsDisabled: track?.comments_disabled
-      }
-    }
+    select: selectCommentMetricFields
   })
   const { commentCount = 0, permalink, commentsDisabled } = partialTrack ?? {}
 

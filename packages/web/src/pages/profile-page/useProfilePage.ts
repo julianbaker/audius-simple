@@ -23,10 +23,7 @@ import {
   chatSelectors,
   ChatPermissionAction,
   usersSocialActions as socialActions,
-  mobileOverflowMenuUIActions,
   shareModalUIActions,
-  OverflowAction,
-  OverflowSource,
   inboxUnavailableModalActions,
   followingUserListActions,
   followersUserListActions
@@ -53,7 +50,6 @@ const { NOT_FOUND_PAGE, profilePage: profilePageRoute } = route
 const { setFollowers } = followersUserListActions
 const { setFollowing } = followingUserListActions
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const { fetchHasTracks } = accountActions
 const { createPlaylist } = cacheCollectionsActions
 
@@ -567,14 +563,6 @@ export const useProfilePage = () => {
     [dispatch]
   )
 
-  const clickOverflow = useCallback(
-    (userId: ID, overflowActions: OverflowAction[]) =>
-      dispatch(
-        open({ source: OverflowSource.PROFILE, id: userId, overflowActions })
-      ),
-    [dispatch]
-  )
-
   const onMessage = useCallback(() => {
     if (!profile) return
     if (chatPermissions?.callToAction === ChatPermissionAction.SIGN_UP) {
@@ -746,7 +734,6 @@ export const useProfilePage = () => {
     onCloseUnblockUserConfirmationModal,
     onCloseMuteUserConfirmationModal,
     onCloseUnmuteUserConfirmationModal,
-    clickOverflow,
     createPlaylist: createPlaylistCallback
   }
 }

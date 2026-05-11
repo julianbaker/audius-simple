@@ -1,5 +1,3 @@
-import { forwardRef } from 'react'
-
 import {
   PopupMenuItem,
   PopupMenuProps,
@@ -31,7 +29,7 @@ type MenuProps = {
  * PopupMenu options. Anchored popup on desktop, bottom-sheet on mobile
  * (≤480px) — same trigger, same items, viewport-appropriate surface.
  */
-const Menu = forwardRef<HTMLDivElement, MenuProps>((props, ref) => {
+const Menu = (props: MenuProps) => {
   const { menu, onClose, zIndex: popupZIndexProp, children, ...other } = props
   const mainContentRef = useMainContentRef()
   const popupZIndex = popupZIndexProp ?? appZIndex.PROFILE_EDITABLE_COMPONENTS
@@ -42,7 +40,6 @@ const Menu = forwardRef<HTMLDivElement, MenuProps>((props, ref) => {
       onClose={onClose}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
-      ref={ref}
       renderTrigger={children}
       zIndex={popupZIndex}
       containerRef={mainContentRef}
@@ -64,6 +61,6 @@ const Menu = forwardRef<HTMLDivElement, MenuProps>((props, ref) => {
   } else if (menu.type === 'notification') {
   }
   return null
-})
+}
 
 export default Menu

@@ -5,7 +5,7 @@
   width: var(--harmony-unit-6);
   align-items: center;
   transform: scale3d(1, 1, 1);
-  transition: all 0.12s ease-in-out !important;
+  transition: transform 0.12s ease-in-out !important;
 }
 
 /* Subdued inactive – matches share icon */
@@ -29,7 +29,7 @@
   align-items: center;
   justify-content: center;
   transform: scale3d(1, 1, 1);
-  transition: all 0.12s ease-in-out !important;
+  transition: transform 0.12s ease-in-out !important;
 }
 
 /* Match repost/favorite 1.18 total – IconButton adds svg scale(1.1), so ~1.07 here */

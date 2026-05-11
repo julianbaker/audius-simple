@@ -236,7 +236,7 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--harmony-n-400);
-  transition: all 0.07s ease-in-out;
+  transition: color 0.07s ease-in-out;
 }
 
 .showMoreCaret {
@@ -245,7 +245,7 @@
 }
 
 .showMoreCaret path {
-  transition: all 0.07s ease-in-out;
+  transition: fill 0.07s ease-in-out;
   fill: var(--harmony-n-400);
 }
 
@@ -293,7 +293,9 @@
   box-shadow:
     0 1px 0 0 var(--harmony-n-100),
     0 -1px 0 0 var(--harmony-n-100);
-  transition: all 0.07s ease-in-out;
+  transition:
+    background-color 0.07s ease-in-out,
+    box-shadow 0.07s ease-in-out;
   background-color: var(--harmony-n-50);
 }
 
@@ -322,7 +324,7 @@
   padding: 20px 12px;
   background-color: transparent;
   user-select: none;
-  transition: all 0.05s ease-in-out;
+  transition: background-color 0.05s ease-in-out;
 }
 
 .textContainer {

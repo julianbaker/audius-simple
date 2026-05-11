@@ -1,18 +1,19 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 
 import { useCollection, useUserByHandle } from '@audius/common/api'
 import {
   ShareSource,
   RepostSource,
-  FavoriteSource,
-  ID
+  FavoriteSource
 } from '@audius/common/models'
 import {
+  cacheCollectionsActions,
   playbackActions,
   playbackSelectors,
   QueueSource,
   shareModalUIActions,
-  collectionsSocialActions as socialActions
+  collectionsSocialActions as socialActions,
+  deletePlaylistConfirmationModalUIActions
 } from '@audius/common/store'
 import { route } from '@audius/common/utils'
 import { PopupMenuItem } from '@audius/harmony'
@@ -25,6 +26,9 @@ import { AppState } from 'store/types'
 import { push } from 'utils/navigation'
 
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
+const { requestOpen: requestOpenDeletePlaylist } =
+  deletePlaylistConfirmationModalUIActions
+const { publishPlaylist } = cacheCollectionsActions
 const { profilePage, collectionPage } = route
 
 type PlaylistId = number
@@ -34,7 +38,9 @@ export type OwnProps = {
   extraMenuItems?: PopupMenuItem[]
   handle: string
   includeEdit?: boolean
+  includeDelete?: boolean
   includeFavorite?: boolean
+  includePublish?: boolean
   includeRepost?: boolean
   includeShare?: boolean
   includeVisitPage?: boolean
@@ -43,6 +49,7 @@ export type OwnProps = {
   includeAddToQueue?: boolean
   isFavorited?: boolean
   isOwner?: boolean
+  isPublished?: boolean
   isPublic?: boolean
   isReposted?: boolean
   onClose?: () => void
@@ -84,7 +91,10 @@ const CollectionMenu = ({
     ddexApp,
     playlistId,
     isOwner,
+    isPublished,
+    includeDelete,
     includeEdit,
+    includePublish,
     includeShare,
     includeRepost,
     includeVisitArtistPage = true,
@@ -93,6 +103,8 @@ const CollectionMenu = ({
     goToRoute,
     permalink,
     shareCollection,
+    deletePlaylist,
+    publishPlaylist,
     saveCollection,
     unsaveCollection,
     repostCollection,
@@ -115,7 +127,16 @@ const CollectionMenu = ({
 
   const navigate = useNavigate()
 
-  const getMenu = () => {
+  const collectionTracks = useMemo(
+    () =>
+      (collectionTrackIds ?? []).map((trackId) => ({
+        trackId,
+        source: QueueSource.COLLECTION_TRACKS
+      })),
+    [collectionTrackIds]
+  )
+
+  const menu = useMemo(() => {
     const routePage = collectionPage
     const shareMenuItem = {
       text: 'Share',
@@ -168,10 +189,16 @@ const CollectionMenu = ({
       onClick: () => navigate(`${permalink}/edit`)
     }
 
-    const collectionTracks = (collectionTrackIds ?? []).map((trackId) => ({
-      trackId,
-      source: QueueSource.COLLECTION_TRACKS
-    }))
+    const publishCollectionMenuItem = {
+      text: `Publish ${typeName}`,
+      onClick: () => publishPlaylist(playlistId)
+    }
+
+    const deleteCollectionMenuItem = {
+      text: `Delete ${typeName}`,
+      onClick: () => deletePlaylist(playlistId),
+      destructive: true
+    }
 
     const playCollectionNextMenuItem = {
       text: messages.playNext,
@@ -213,9 +240,7 @@ const CollectionMenu = ({
     ) {
       menu.items.push(addCollectionToQueueMenuItem)
     }
-    if (menu) {
-      if (includeShare) menu.items.push(shareMenuItem)
-    }
+    if (includeShare) menu.items.push(shareMenuItem)
     if (!isOwner) {
       if (includeRepost) menu.items.push(repostMenuItem)
       if (includeFavorite) menu.items.push(favoriteMenuItem)
@@ -232,11 +257,54 @@ const CollectionMenu = ({
     if (includeEdit && isOwner && !ddexApp) {
       menu.items.push(editCollectionMenuItem)
     }
+    if (includePublish && isOwner && !isPublished && type === 'playlist') {
+      menu.items.push(publishCollectionMenuItem)
+    }
+    if (includeDelete && isOwner && !ddexApp && type === 'playlist') {
+      menu.items.push(deleteCollectionMenuItem)
+    }
 
     return menu
-  }
-
-  const menu = getMenu()
+  }, [
+    collectionTracks,
+    ddexApp,
+    dispatch,
+    goToRoute,
+    handle,
+    includeAddToQueue,
+    includeDelete,
+    includeEdit,
+    includeFavorite,
+    includePlayNext,
+    includePublish,
+    includeRepost,
+    includeShare,
+    includeVisitArtistPage,
+    includeVisitPage,
+    isArtist,
+    isFavorited,
+    isOwner,
+    isPublished,
+    isPublic,
+    isReposted,
+    navigate,
+    onRepost,
+    onShare,
+    permalink,
+    playbackIndex,
+    playlistId,
+    playlistName,
+    publishPlaylist,
+    deletePlaylist,
+    repostCollection,
+    saveCollection,
+    shareCollection,
+    toast,
+    type,
+    undoRepostCollection,
+    unsaveCollection,
+    extraMenuItems
+  ])
 
   return props.children(menu.items)
 }
@@ -260,6 +328,10 @@ function mapDispatchToProps(dispatch: Dispatch) {
       dispatch(
         socialActions.saveCollection(playlistId, FavoriteSource.OVERFLOW)
       ),
+    deletePlaylist: (playlistId: PlaylistId) =>
+      dispatch(requestOpenDeletePlaylist({ playlistId })),
+    publishPlaylist: (playlistId: PlaylistId) =>
+      dispatch(publishPlaylist(playlistId)),
     unsaveCollection: (playlistId: PlaylistId) =>
       dispatch(
         socialActions.unsaveCollection(playlistId, FavoriteSource.OVERFLOW)

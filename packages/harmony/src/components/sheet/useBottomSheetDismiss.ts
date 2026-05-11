@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useRef, useState } from 'react'
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react'
 
 type Args = {
   /** Sheet element used to size the dismiss threshold against. */
@@ -73,15 +73,55 @@ export const useBottomSheetDismiss = ({
   dismissHeightRatio = 1 / 4,
   onDismiss
 }: Args) => {
-  const [offset, setOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const isDraggingRef = useRef(false)
+  const offsetRef = useRef(0)
+  const frameRef = useRef<number | null>(null)
+
+  const setDragging = useCallback((next: boolean) => {
+    if (isDraggingRef.current === next) return
+    isDraggingRef.current = next
+    setIsDragging(next)
+  }, [])
+
+  const writeSheetTransform = useCallback(
+    (nextOffset: number, dragging: boolean) => {
+      const sheet = sheetRef.current
+      if (!sheet) return
+      sheet.style.transform =
+        dragging && nextOffset > 0 ? `translateY(${nextOffset}px)` : ''
+      sheet.style.transition = dragging ? 'none' : ''
+    },
+    [sheetRef]
+  )
+
+  const scheduleSheetOffset = useCallback(
+    (nextOffset: number) => {
+      offsetRef.current = nextOffset
+      if (frameRef.current !== null) return
+      frameRef.current = requestAnimationFrame(() => {
+        frameRef.current = null
+        writeSheetTransform(offsetRef.current, true)
+      })
+    },
+    [writeSheetTransform]
+  )
+
+  const resetSheetTransform = useCallback(() => {
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current)
+      frameRef.current = null
+    }
+    offsetRef.current = 0
+    writeSheetTransform(0, false)
+  }, [writeSheetTransform])
 
   useEffect(() => {
     if (!enabled) {
-      setOffset(0)
-      setIsDragging(false)
+      resetSheetTransform()
+      setDragging(false)
     }
-  }, [enabled])
+  }, [enabled, resetSheetTransform, setDragging])
 
   // Stable refs for the latest callback values — the touch listeners are
   // bound once in useEffect and shouldn't re-attach on every render.
@@ -124,8 +164,8 @@ export const useBottomSheetDismiss = ({
       activeTouchId = null
       engaged = false
       startedInScroll = false
-      setIsDragging(false)
-      setOffset(0)
+      setDragging(false)
+      resetSheetTransform()
     }
 
     const handleStart = (e: TouchEvent, fromScroll: boolean) => {
@@ -174,14 +214,14 @@ export const useBottomSheetDismiss = ({
           e.preventDefault()
         }
         engaged = true
-        setOffset(delta)
-        setIsDragging(true)
+        scheduleSheetOffset(delta)
+        setDragging(true)
       } else {
         // Pulling back up past the start: clamp to 0 so the sheet returns
         // to its open position (doesn't translate above the start).
         if (engaged) {
-          setOffset(0)
-          setIsDragging(false)
+          scheduleSheetOffset(0)
+          setDragging(false)
         }
       }
     }
@@ -229,9 +269,17 @@ export const useBottomSheetDismiss = ({
       scrollArea?.removeEventListener('touchend', handleEnd)
       scrollArea?.removeEventListener('touchcancel', handleEnd)
     }
-  }, [enabled, dragRegionRef, scrollRef, sheetRef])
+  }, [
+    enabled,
+    dragRegionRef,
+    resetSheetTransform,
+    scheduleSheetOffset,
+    scrollRef,
+    setDragging,
+    sheetRef
+  ])
 
-  return { offset, isDragging }
+  return { isDragging }
 }
 
 /**

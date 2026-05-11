@@ -2,6 +2,7 @@ import { ReactNode } from 'react'
 
 import {
   Button,
+  BottomSheet,
   Flex,
   IconComponent,
   Modal,
@@ -13,7 +14,6 @@ import {
   Text
 } from '@audius/harmony'
 
-import Drawer from 'components/drawer/Drawer'
 import { useIsMobile } from 'hooks/useIsMobile'
 
 /**
@@ -176,27 +176,27 @@ const ResponsiveModal = ({
     const confirmVariant = isDestructive ? 'destructive' : 'primary'
 
     if (shouldRenderAsDrawer) {
+      const header =
+        title || Icon ? (
+          <Flex ph='l' pt='s' pb='m' justifyContent='center'>
+            <ModalTitle title={title} Icon={Icon} />
+          </Flex>
+        ) : undefined
+
       return (
-        <Drawer
+        <BottomSheet
           isOpen={isOpen}
-          shouldClose={!isOpen}
           onClose={handleCancel}
           onClosed={onClosed}
+          ariaLabel={title ?? confirmText}
           isFullscreen={isFullscreen}
           zIndex={zIndex}
+          header={header}
+          hideClose
+          dismissOnClickOutside={dismissOnClickOutside}
         >
           <Flex column gap='l' p='l' pt='l'>
-            {(title || Icon) && (
-              <Flex justifyContent='center'>
-                <ModalTitle title={title} Icon={Icon} />
-              </Flex>
-            )}
-            <Text
-              variant='body'
-              size='m'
-              color='default'
-              textAlign='center'
-            >
+            <Text variant='body' size='m' color='default' textAlign='center'>
               {description}
             </Text>
             {subtitle && (
@@ -224,7 +224,7 @@ const ResponsiveModal = ({
               </Button>
             </Flex>
           </Flex>
-        </Drawer>
+        </BottomSheet>
       )
     }
 
@@ -251,7 +251,7 @@ const ResponsiveModal = ({
               size='s'
               color='subdued'
               textAlign='center'
-              mt='s'
+              css={{ marginTop: 8 }}
             >
               {subtitle}
             </Text>
@@ -282,29 +282,34 @@ const ResponsiveModal = ({
 
   // ---- Open-ended variant (existing) ----
   if (shouldRenderAsDrawer) {
-    return (
-      <Drawer
-        isOpen={isOpen}
-        shouldClose={!isOpen}
-        onClose={onClose}
-        onClosed={onClosed}
-        isFullscreen={isFullscreen}
-        zIndex={zIndex}
-      >
-        <Flex column h='100%' gap='l'>
-          {(title || Icon) && (
-            <Flex pt='l' pb='s' justifyContent='center'>
-              <ModalTitle title={title} Icon={Icon} />
-            </Flex>
-          )}
+    const header =
+      title || Icon || subtitle ? (
+        <Flex column ph='l' pt='s' pb='l' gap='s' alignItems='center'>
+          {(title || Icon) && <ModalTitle title={title} Icon={Icon} />}
           {subtitle && (
             <Text variant='body' size='s' color='subdued'>
               {subtitle}
             </Text>
           )}
+        </Flex>
+      ) : undefined
+
+    return (
+      <BottomSheet
+        isOpen={isOpen}
+        onClose={onClose}
+        onClosed={onClosed}
+        ariaLabel={title ?? 'Modal'}
+        isFullscreen={isFullscreen}
+        zIndex={zIndex}
+        header={header}
+        hideClose={!showDismissButton}
+        dismissOnClickOutside={dismissOnClickOutside}
+      >
+        <Flex column h='100%' gap='l' className={className}>
           {children}
         </Flex>
-      </Drawer>
+      </BottomSheet>
     )
   }
 

@@ -1,14 +1,11 @@
-import { ReactNode, useRef } from 'react'
+import { ReactNode, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
 import { IconClose } from '../../icons'
 import { IconButton } from '../button'
 
 import styles from './BottomSheet.module.css'
-import {
-  useBottomSheetDismiss,
-  useSheetA11y
-} from './useBottomSheetDismiss'
+import { useBottomSheetDismiss, useSheetA11y } from './useBottomSheetDismiss'
 
 const DEFAULT_BACKDROP_Z_INDEX = 9990
 const DEFAULT_SHEET_Z_INDEX = 9991
@@ -18,6 +15,8 @@ export type BottomSheetProps = {
   isOpen: boolean
   /** Called when the user dismisses (close button, backdrop, ESC, drag-down). */
   onClose: () => void
+  /** Called after the sheet transitions from open to closed. */
+  onClosed?: () => void
   /** Required: announces the sheet to screen readers. */
   ariaLabel: string
   /** Sheet content rendered inside the scrollable area. */
@@ -40,6 +39,10 @@ export type BottomSheetProps = {
    * sized to sit above app chrome but below toast / system overlays.
    */
   zIndex?: number
+  /** Render at full viewport height instead of leaving top breathing room. */
+  isFullscreen?: boolean
+  /** Whether tapping the backdrop should close the sheet. Default: true. */
+  dismissOnClickOutside?: boolean
   /** Minimum downward drag distance to dismiss. Default: 80px. */
   minDismissPx?: number
   /** Drag distance as a fraction of sheet height that also dismisses. Default: 0.25. */
@@ -65,12 +68,15 @@ export type BottomSheetProps = {
 export const BottomSheet = ({
   isOpen,
   onClose,
+  onClosed,
   ariaLabel,
   children,
   header,
   hideClose = false,
   closeAriaLabel = 'Close',
   zIndex = DEFAULT_SHEET_Z_INDEX,
+  isFullscreen = false,
+  dismissOnClickOutside = true,
   minDismissPx,
   dismissHeightRatio,
   scrollAreaClassName
@@ -78,12 +84,20 @@ export const BottomSheet = ({
   const sheetRef = useRef<HTMLDivElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const dragRegionRef = useRef<HTMLDivElement>(null)
+  const wasOpenRef = useRef(isOpen)
 
   useSheetA11y({ isOpen, onClose })
 
+  useEffect(() => {
+    if (wasOpenRef.current && !isOpen) {
+      onClosed?.()
+    }
+    wasOpenRef.current = isOpen
+  }, [isOpen, onClosed])
+
   // Ref objects are stable — pass `enabled: isOpen` so the gesture effect
   // re-runs after open when drag/scroll nodes exist (see hook JSDoc).
-  const { offset, isDragging } = useBottomSheetDismiss({
+  const { isDragging } = useBottomSheetDismiss({
     sheetRef,
     dragRegionRef,
     scrollRef,
@@ -107,7 +121,7 @@ export const BottomSheet = ({
     <>
       <div
         className={styles.backdrop}
-        onClick={onClose}
+        onClick={dismissOnClickOutside ? onClose : undefined}
         onTouchStart={stopReactTreeBubble}
         onTouchMove={stopReactTreeBubble}
         onTouchEnd={stopReactTreeBubble}
@@ -117,7 +131,11 @@ export const BottomSheet = ({
       />
       <div
         ref={sheetRef}
-        className={styles.sheet}
+        className={
+          isFullscreen
+            ? `${styles.sheet} ${styles.sheetFullscreen}`
+            : styles.sheet
+        }
         role='dialog'
         aria-modal='true'
         aria-label={ariaLabel}
@@ -125,11 +143,8 @@ export const BottomSheet = ({
         onTouchMove={stopReactTreeBubble}
         onTouchEnd={stopReactTreeBubble}
         onMouseDown={stopReactTreeBubble}
-        style={{
-          zIndex,
-          transform: isDragging ? `translateY(${offset}px)` : undefined,
-          transition: isDragging ? 'none' : undefined
-        }}
+        style={{ zIndex }}
+        data-dragging={isDragging || undefined}
       >
         {hideClose ? null : (
           <IconButton

@@ -11,7 +11,7 @@
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   background-color: var(--harmony-primary);
-  transition-property: all;
+  transition-property: left, width;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 300ms;
 }

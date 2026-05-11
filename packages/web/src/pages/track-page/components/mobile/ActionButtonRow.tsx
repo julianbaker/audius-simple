@@ -1,3 +1,5 @@
+import { ReactNode } from 'react'
+
 import {
   IconShare,
   IconKebabHorizontal,
@@ -26,6 +28,7 @@ type ActionButtonRowProps = {
   onFavorite?: () => void
   onShare?: () => void
   onClickOverflow?: () => void
+  renderOverflow?: () => ReactNode
   onClickEdit?: () => void
   showFavorite: boolean
   showShare: boolean
@@ -52,6 +55,7 @@ const ActionButtonRow = ({
   onFavorite = () => {},
   onShare = () => {},
   onClickOverflow = () => {},
+  renderOverflow,
   onClickEdit = () => {},
   darkMode
 }: ActionButtonRowProps) => {
@@ -111,6 +115,8 @@ const ActionButtonRow = ({
   }
 
   const renderOverflowMenu = () => {
+    if (renderOverflow) return renderOverflow()
+
     return (
       <IconButton
         aria-label='more actions'

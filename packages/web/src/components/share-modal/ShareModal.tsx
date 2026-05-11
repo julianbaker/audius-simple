@@ -95,7 +95,6 @@ export const ShareModal = () => {
     onClose()
   }, [dispatch, toast, content, source, onClose])
 
-
   // Trigger share action on mount with new content
   useEffect(() => {
     if (!content) return

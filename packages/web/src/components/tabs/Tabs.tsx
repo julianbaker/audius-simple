@@ -211,7 +211,7 @@ export const TabList = ({
   // Reposition on window resize too (handles container reflow without size change).
   useEffect(() => {
     const onResize = () => positionAccent()
-    window.addEventListener('resize', onResize)
+    window.addEventListener('resize', onResize, { passive: true })
     return () => window.removeEventListener('resize', onResize)
   }, [positionAccent])
 

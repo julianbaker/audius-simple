@@ -52,6 +52,13 @@
   isolation: isolate;
 }
 
+.sheetFullscreen {
+  height: 100vh;
+  height: 100dvh;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
 /* Absolute-positioned close button — sits in the top-right corner of the
    drawer regardless of header padding. Pinned ABOVE the dragRegion so its
    visual placement doesn't shift with the handle's whitespace. */

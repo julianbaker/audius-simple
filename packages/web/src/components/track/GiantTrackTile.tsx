@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useMemo, useRef } from 'react'
 
 import {
   useTrackRank,
@@ -50,7 +50,6 @@ import IconVisibilityHidden from '@audius/harmony/src/assets/icons/VisibilityHid
 import { useTheme } from '@emotion/react'
 import { ResizeObserver } from '@juggle/resize-observer'
 import cn from 'classnames'
-import { pick } from 'lodash'
 import { useToggle } from 'react-use'
 import useMeasure from 'react-use-measure'
 
@@ -207,10 +206,10 @@ export const GiantTrackTile = ({
 
   const isLongFormContent =
     genre === Genre.Podcasts || genre === Genre.Audiobooks
-  const { data: track } = useTrack(trackId, {
-    select: (track) => pick(track, ['is_downloadable'])
+  const { data: isDownloadable } = useTrack(trackId, {
+    select: (track) => track?.is_downloadable
   })
-  const shouldShowDownloadSection = !!track?.is_downloadable
+  const shouldShowDownloadSection = !!isDownloadable
   const showPlay = true
   const shouldShowScheduledRelease =
     isScheduledRelease && dayjs(releaseDate).isAfter(dayjs())
@@ -437,39 +436,60 @@ export const GiantTrackTile = ({
 
   const isLoading = loading || artworkLoading || isEventsLoading
 
-  const overflowMenuExtraItems = []
-  if (!isOwner) {
-    overflowMenuExtraItems.push({
-      text: following ? 'Unfollow Artist' : 'Follow Artist',
-      onClick: () =>
-        setTimeout(() => (following ? onUnfollow() : onFollow()), 0)
-    })
-  }
+  const overflowMenuExtraItems = useMemo(
+    () =>
+      isOwner
+        ? []
+        : [
+            {
+              text: following ? 'Unfollow Artist' : 'Follow Artist',
+              onClick: () =>
+                setTimeout(() => (following ? onUnfollow() : onFollow()), 0)
+            }
+          ],
+    [following, isOwner, onFollow, onUnfollow]
+  )
 
-  const overflowMenu = {
-    menu: {
-      type: 'track',
-      trackId,
-      trackTitle,
+  const overflowMenu = useMemo(
+    () => ({
+      menu: {
+        type: 'track',
+        trackId,
+        trackTitle,
+        ddexApp,
+        genre,
+        handle: artistHandle,
+        isFavorited: isSaved,
+        isReposted,
+        mount: 'page',
+        isOwner,
+        includeFavorite: hasStreamAccess,
+        includeRepost: hasStreamAccess,
+        includeShare: true,
+        includeTrackPage: false,
+        isArtistPick,
+        isUnlisted,
+        includeArtistPick: true,
+        includeAddToAlbum: isOwner && !ddexApp,
+        includeRemixContest: true,
+        extraMenuItems: overflowMenuExtraItems
+      }
+    }),
+    [
+      artistHandle,
       ddexApp,
       genre,
-      handle: artistHandle,
-      isFavorited: isSaved,
-      isReposted,
-      mount: 'page',
-      isOwner,
-      includeFavorite: hasStreamAccess,
-      includeRepost: hasStreamAccess,
-      includeShare: true,
-      includeTrackPage: false,
+      hasStreamAccess,
       isArtistPick,
+      isOwner,
+      isReposted,
+      isSaved,
       isUnlisted,
-      includeArtistPick: true,
-      includeAddToAlbum: isOwner && !ddexApp,
-      includeRemixContest: true,
-      extraMenuItems: overflowMenuExtraItems
-    }
-  }
+      overflowMenuExtraItems,
+      trackId,
+      trackTitle
+    ]
+  )
 
   const fadeIn = {
     [styles.show]: !isLoading,

@@ -1,12 +1,11 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 
-import { useCollection, useCollectionTracks } from '@audius/common/api'
+import { useCollection, useCollectionTracks, useUser } from '@audius/common/api'
 import {
   useGatedContentAccessMap,
   useGatedContentAccess
 } from '@audius/common/hooks'
-import { SquareSizes, ID } from '@audius/common/models'
-import { OverflowAction } from '@audius/common/store'
+import { SquareSizes } from '@audius/common/models'
 import { dayjs, formatReleaseDate } from '@audius/common/utils'
 import {
   Box,
@@ -15,6 +14,8 @@ import {
   IconCalendarMonth,
   IconPause,
   IconPlay,
+  IconButton,
+  IconKebabHorizontal,
   IconVisibilityHidden,
   MusicBadge,
   Text,
@@ -25,6 +26,8 @@ import { pick } from 'lodash'
 import { useNavigate } from 'react-router'
 
 import { UserLink } from 'components/link'
+import { OwnProps as CollectionMenuProps } from 'components/menu/CollectionMenu'
+import Menu from 'components/menu/Menu'
 import Skeleton from 'components/skeleton/Skeleton'
 import { GatedContentSection } from 'components/track/GatedContentSection'
 import { UserGeneratedText } from 'components/user-generated-text'
@@ -60,10 +63,6 @@ type MobileCollectionHeaderProps = CollectionHeaderProps & {
   onShare: () => void
   onSave?: () => void
   onRepost?: () => void
-  onClickMobileOverflow?: (
-    collectionId: ID,
-    overflowActions: OverflowAction[]
-  ) => void
 }
 
 const CollectionHeader = ({
@@ -91,11 +90,13 @@ const CollectionHeader = ({
   onSave,
   onRepost,
   onClickFavorites = () => {},
-  onClickReposts = () => {},
-  onClickMobileOverflow
+  onClickReposts = () => {}
 }: MobileCollectionHeaderProps) => {
   const navigate = useNavigate()
   const darkMode = useIsDarkMode()
+  const { data: partialUser } = useUser(userId, {
+    select: (user) => ({ handle: user?.handle })
+  })
 
   const { data: partialCollection } = useCollection(collectionId, {
     select: (collection) =>
@@ -137,29 +138,67 @@ const CollectionHeader = ({
     if (!isOwner) onSave?.()
   }
 
-  const onClickOverflow = () => {
-    const overflowActions = [
-      isOwner || !isPublished || !hasStreamAccess
-        ? null
-        : isReposted
-          ? OverflowAction.UNREPOST
-          : OverflowAction.REPOST,
-      isOwner || !isPublished || !hasStreamAccess
-        ? null
-        : isSaved
-          ? OverflowAction.UNFAVORITE
-          : OverflowAction.FAVORITE,
-      isOwner && !isPublished ? OverflowAction.PUBLISH_PLAYLIST : null,
-      isOwner && !ddexApp
-        ? isAlbum
-          ? OverflowAction.DELETE_ALBUM
-          : OverflowAction.DELETE_PLAYLIST
-        : null,
-      OverflowAction.VIEW_ARTIST_PAGE
-    ].filter(Boolean) as OverflowAction[]
+  const overflowMenu = useMemo<Omit<CollectionMenuProps, 'children'>>(
+    () => ({
+      extraMenuItems: [],
+      handle: partialUser?.handle ?? '',
+      includeAddToQueue: false,
+      includeDelete: isOwner,
+      includeEdit: false,
+      includeFavorite: !isOwner && isPublished && hasStreamAccess,
+      includePlayNext: false,
+      includePublish: isOwner && !isPublished,
+      includeRepost: !isOwner && isPublished && hasStreamAccess,
+      includeShare: false,
+      includeVisitPage: false,
+      includeVisitArtistPage: true,
+      isFavorited: isSaved,
+      isOwner,
+      isPublished,
+      isPublic: !isPrivate,
+      isReposted,
+      playlistId: collectionId ?? 0,
+      playlistName: title,
+      ddexApp,
+      type: isAlbum ? 'album' : 'playlist',
+      permalink: permalink ?? ''
+    }),
+    [
+      collectionId,
+      ddexApp,
+      hasStreamAccess,
+      isAlbum,
+      isOwner,
+      isPrivate,
+      isPublished,
+      isReposted,
+      isSaved,
+      partialUser?.handle,
+      permalink,
+      title
+    ]
+  )
 
-    onClickMobileOverflow?.(collectionId, overflowActions)
-  }
+  const renderOverflowMenu = useCallback(
+    () => (
+      <Menu menu={overflowMenu}>
+        {(ref, triggerPopup) => (
+          <IconButton
+            ref={ref}
+            aria-label='more actions'
+            icon={IconKebabHorizontal}
+            color='subdued'
+            size='2xl'
+            onClick={(e) => {
+              e.stopPropagation()
+              triggerPopup()
+            }}
+          />
+        )}
+      </Menu>
+    ),
+    [overflowMenu]
+  )
 
   const { imageUrl: image } = useCollectionCoverArt({
     collectionId,
@@ -239,7 +278,7 @@ const CollectionHeader = ({
           isPublished={isPublished}
           isPublishing={isPublishing}
           onRepost={onRepost}
-          onClickOverflow={onClickOverflow}
+          renderOverflow={renderOverflowMenu}
           onClickEdit={handleClickEdit}
           showFavorite={!!onSave && !isOwner && hasStreamAccess && !isPrivate}
           showRepost={!isOwner && hasStreamAccess && !isPrivate}

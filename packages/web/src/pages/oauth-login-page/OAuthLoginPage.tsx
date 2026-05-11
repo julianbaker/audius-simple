@@ -319,7 +319,13 @@ export const OAuthLoginPage = () => {
                 w='88px'
                 css={{ borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}
               >
-                <img src={AppIcon} alt='Audius Logo' />
+                <img
+                  src={AppIcon}
+                  alt='Audius Logo'
+                  width={88}
+                  height={88}
+                  decoding='async'
+                />
               </Flex>
               <IconTransaction color='default' />
               <Flex
@@ -329,7 +335,13 @@ export const OAuthLoginPage = () => {
                 css={{ overflow: 'hidden', flexShrink: 0 }}
               >
                 {appImage ? (
-                  <img src={appImage} alt={`${appName} Image`} />
+                  <img
+                    src={appImage}
+                    alt={`${appName} Image`}
+                    width={88}
+                    height={88}
+                    decoding='async'
+                  />
                 ) : (
                   <Flex
                     w='100%'

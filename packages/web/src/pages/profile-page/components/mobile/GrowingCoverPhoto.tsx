@@ -102,9 +102,9 @@ const GrowingCoverPhoto = ({
   }, [setShouldTrackScroll])
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScrollEvent)
-    window.addEventListener('touchend', handleReset, false)
-    window.addEventListener('touchmove', handleTouch, false)
+    window.addEventListener('scroll', handleScrollEvent, { passive: true })
+    window.addEventListener('touchend', handleReset, { passive: true })
+    window.addEventListener('touchmove', handleTouch, { passive: true })
     return () => {
       window.removeEventListener('scroll', handleScrollEvent)
       window.removeEventListener('touchend', handleReset)

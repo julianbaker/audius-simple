@@ -202,7 +202,6 @@ export const EditCollectionForm = (props: EditCollectionFormProps) => {
             <DeleteCollectionConfirmationModal
               visible={isDeleteConfirmationOpen}
               collectionId={playlist_id}
-              entity={collectionTypeName}
               onCancel={() => setIsDeleteConfirmationOpen(false)}
             />
           </>

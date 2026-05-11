@@ -1,22 +1,30 @@
-import { Suspense, useCallback } from 'react'
+import { Suspense, useCallback, useMemo } from 'react'
 
-import { useRemixContest, useTrack, useTrackRank } from '@audius/common/api'
+import {
+  useRemixContest,
+  useTrack,
+  useTrackRank,
+  useUser
+} from '@audius/common/api'
 import { useFeatureFlag } from '@audius/common/hooks'
 import {
   SquareSizes,
   ID,
   FieldVisibility,
   Remix,
-  AccessConditions
+  AccessConditions,
+  FollowSource
 } from '@audius/common/models'
 import { FeatureFlags } from '@audius/common/services'
-import { OverflowAction } from '@audius/common/store'
-import { Nullable, formatReleaseDate, dayjs } from '@audius/common/utils'
+import { usersSocialActions } from '@audius/common/store'
+import { Genre, Nullable, formatReleaseDate, dayjs } from '@audius/common/utils'
 import {
   Flex,
   IconPause,
   IconPlay,
   IconUserFollowing,
+  IconButton,
+  IconKebabHorizontal,
   Box,
   Button,
   MusicBadge,
@@ -29,6 +37,8 @@ import cn from 'classnames'
 import { useDispatch } from 'react-redux'
 
 import { UserLink } from 'components/link'
+import Menu from 'components/menu/Menu'
+import { OwnProps as TrackMenuProps } from 'components/menu/TrackMenu'
 import { SearchTag } from 'components/search-bar/SearchTag'
 import { GatedContentSection } from 'components/track/GatedContentSection'
 import { TrackArtwork } from 'components/track/TrackArtwork'
@@ -111,10 +121,6 @@ type TrackHeaderProps = {
   isRemix: boolean
   fieldVisibility: FieldVisibility
   coSign: Remix | null
-  onClickMobileOverflow: (
-    trackId: ID,
-    overflowActions: OverflowAction[]
-  ) => void
   onPlay: () => void
   onPreview: () => void
   onShare: () => void
@@ -132,6 +138,7 @@ const TrackHeader = ({
   isOwner,
   isFollowing,
   releaseDate,
+  genre,
   isLoading,
   isPlaying,
   isPreviewing,
@@ -154,7 +161,6 @@ const TrackHeader = ({
   onShare,
   onSave,
   onRepost,
-  onClickMobileOverflow,
   goToFavoritesPage,
   goToRepostsPage
 }: TrackHeaderProps) => {
@@ -179,6 +185,12 @@ const TrackHeader = ({
     permalink,
     _stems
   } = partialTrack ?? {}
+  const { data: partialUser } = useUser(userId, {
+    select: (user) => ({
+      handle: user?.handle,
+      is_deactivated: user?.is_deactivated
+    })
+  })
 
   const dispatch = useDispatch()
   const hasDownloadableAssets = is_downloadable || (_stems?.length ?? 0) > 0
@@ -216,29 +228,89 @@ const TrackHeader = ({
 
   const filteredTags = (tags || '').split(',').filter(Boolean)
 
-  const onClickOverflow = () => {
-    const overflowActions = [
-      isOwner || !showSocials
-        ? null
-        : isReposted
-          ? OverflowAction.UNREPOST
-          : OverflowAction.REPOST,
-      isOwner || !showSocials
-        ? null
-        : isSaved
-          ? OverflowAction.UNFAVORITE
-          : OverflowAction.FAVORITE,
-      isOwner && !ddex_app ? OverflowAction.ADD_TO_ALBUM : null,
-      isOwner || !isUnlisted ? OverflowAction.ADD_TO_PLAYLIST : null,
-      albumInfo ? OverflowAction.VIEW_ALBUM_PAGE : null,
-      isFollowing
-        ? OverflowAction.UNFOLLOW_ARTIST
-        : OverflowAction.FOLLOW_ARTIST,
-      OverflowAction.VIEW_ARTIST_PAGE
-    ].filter(Boolean) as OverflowAction[]
+  const overflowExtraMenuItems = useMemo(
+    () => [
+      {
+        text: isFollowing ? 'Unfollow Artist' : 'Follow Artist',
+        onClick: () => {
+          dispatch(
+            isFollowing
+              ? usersSocialActions.unfollowUser(userId, FollowSource.OVERFLOW)
+              : usersSocialActions.followUser(userId, FollowSource.OVERFLOW)
+          )
+        }
+      }
+    ],
+    [dispatch, isFollowing, userId]
+  )
 
-    onClickMobileOverflow(trackId, overflowActions)
-  }
+  const overflowMenu = useMemo<Omit<TrackMenuProps, 'children'>>(
+    () => ({
+      extraMenuItems: overflowExtraMenuItems,
+      handle: partialUser?.handle ?? '',
+      includeAddToPlaylist: isOwner || !isUnlisted,
+      includeAddToAlbum: isOwner && !ddex_app,
+      includeArtistPick: false,
+      includeDelete: false,
+      includeEdit: false,
+      includeFavorite: !isOwner && showSocials,
+      includeRepost: !isOwner && showSocials,
+      includeShare: false,
+      includeTrackPage: false,
+      includeAlbumPage: !!albumInfo,
+      includePlayNext: false,
+      includeAddToQueue: false,
+      isDeleted: false,
+      isFavorited: isSaved,
+      isOwner,
+      isOwnerDeactivated: partialUser?.is_deactivated,
+      isReposted,
+      isUnlisted,
+      trackId,
+      trackTitle: title,
+      genre: genre as Genre,
+      trackPermalink: permalink ?? '',
+      ddexApp: ddex_app,
+      type: 'track'
+    }),
+    [
+      albumInfo,
+      ddex_app,
+      genre,
+      isOwner,
+      isReposted,
+      isSaved,
+      isUnlisted,
+      overflowExtraMenuItems,
+      partialUser?.handle,
+      partialUser?.is_deactivated,
+      permalink,
+      showSocials,
+      title,
+      trackId
+    ]
+  )
+
+  const renderOverflowMenu = useCallback(
+    () => (
+      <Menu menu={overflowMenu}>
+        {(ref, triggerPopup) => (
+          <IconButton
+            ref={ref}
+            aria-label='more actions'
+            icon={IconKebabHorizontal}
+            color='subdued'
+            size='2xl'
+            onClick={(e) => {
+              e.stopPropagation()
+              triggerPopup()
+            }}
+          />
+        )}
+      </Menu>
+    ),
+    [overflowMenu]
+  )
 
   const renderTags = () => {
     if ((isUnlisted && !fieldVisibility.tags) || filteredTags.length === 0) {
@@ -360,7 +432,7 @@ const TrackHeader = ({
           isOwner={isOwner}
           isReposted={isReposted}
           isSaved={isSaved}
-          onClickOverflow={onClickOverflow}
+          renderOverflow={renderOverflowMenu}
           onRepost={onRepost}
           onFavorite={onSaveHeroTrack}
           onShare={onShare}

@@ -19,10 +19,7 @@ import {
 import {
   gatedContentActions,
   collectionsSocialActions,
-  mobileOverflowMenuUIActions,
   shareModalUIActions,
-  OverflowAction,
-  OverflowSource,
   playbackSelectors
 } from '@audius/common/store'
 import { formatLineupTileDuration, route } from '@audius/common/utils'
@@ -64,7 +61,6 @@ import TrackTileArt from './TrackTileArt'
 const { collectionPage } = route
 const { getTrackId, getBuffering, getPlaying } = playbackSelectors
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const {
   saveCollection,
   unsaveCollection,
@@ -327,19 +323,6 @@ export const CollectionTile = ({
     [dispatch]
   )
 
-  const clickOverflow = useCallback(
-    (collectionId: ID, overflowActions: OverflowAction[]) => {
-      dispatch(
-        open({
-          source: OverflowSource.COLLECTIONS,
-          id: collectionId,
-          overflowActions
-        })
-      )
-    },
-    [dispatch]
-  )
-
   const record = useRecord()
   const isActive = useMemo(() => {
     return (
@@ -399,39 +382,8 @@ export const CollectionTile = ({
     [shareCollection, collection.playlist_id]
   )
 
-  const onClickOverflow = useCallback(() => {
-    const overflowActions = [
-      hasStreamAccess
-        ? collection.has_current_user_reposted
-          ? OverflowAction.UNREPOST
-          : OverflowAction.REPOST
-        : null,
-      hasStreamAccess
-        ? collection.has_current_user_saved && hasStreamAccess
-          ? OverflowAction.UNFAVORITE
-          : OverflowAction.FAVORITE
-        : null,
-      collection.is_album
-        ? OverflowAction.VIEW_ALBUM_PAGE
-        : OverflowAction.VIEW_PLAYLIST_PAGE,
-      isOwner ? OverflowAction.PUBLISH_PLAYLIST : null,
-      isOwner
-        ? collection.is_album
-          ? OverflowAction.DELETE_ALBUM
-          : OverflowAction.DELETE_PLAYLIST
-        : null,
-      OverflowAction.VIEW_ARTIST_PAGE
-    ].filter(Boolean)
-
-    clickOverflow(
-      collection.playlist_id,
-      // @ts-ignore
-      overflowActions
-    )
-  }, [hasStreamAccess, collection, isOwner, clickOverflow])
-
-  const renderOverflowMenu = useCallback(() => {
-    const menu: Omit<CollectionMenuProps, 'children'> = {
+  const overflowMenu = useMemo<Omit<CollectionMenuProps, 'children'>>(
+    () => ({
       handle: handle ?? '',
       isFavorited: collection.has_current_user_saved,
       isReposted: collection.has_current_user_reposted,
@@ -440,16 +392,33 @@ export const CollectionTile = ({
       playlistName: collection.playlist_name,
       isPublic: !collection.is_private,
       isOwner,
+      isPublished: !collection.is_private,
       includeShare: true,
       includeRepost: hasStreamAccess,
       includeFavorite: hasStreamAccess,
       includeVisitPage: true,
+      includePublish: isOwner && collection.is_private,
+      includeDelete: isOwner,
       extraMenuItems: [],
       permalink: collection.permalink || ''
-    }
+    }),
+    [
+      collection.has_current_user_reposted,
+      collection.has_current_user_saved,
+      collection.is_album,
+      collection.is_private,
+      collection.permalink,
+      collection.playlist_id,
+      collection.playlist_name,
+      handle,
+      hasStreamAccess,
+      isOwner
+    ]
+  )
 
+  const renderOverflowMenu = useCallback(() => {
     return (
-      <Menu menu={menu}>
+      <Menu menu={overflowMenu}>
         {(ref, triggerPopup) => (
           <IconButton
             ref={ref}
@@ -465,7 +434,9 @@ export const CollectionTile = ({
         )}
       </Menu>
     )
-  }, [collection, handle, hasStreamAccess, isOwner])
+  }, [overflowMenu])
+
+  const noopOverflow = useCallback(() => {}, [])
 
   const togglePlay = useCallback(() => {
     if (uploading) return
@@ -678,7 +649,7 @@ export const CollectionTile = ({
               toggleSave={toggleSave}
               toggleRepost={toggleRepost}
               onShare={onShare}
-              onClickOverflow={onClickOverflow}
+              onClickOverflow={noopOverflow}
               renderOverflow={renderOverflowMenu}
               onClickGatedUnlockPill={onClickGatedUnlockPill}
               isLoading={isActive && isBuffering}

@@ -77,7 +77,7 @@ export const LinkPreview = (props: LinkPreviewProps) => {
         <>
           {image ? (
             <span className={styles.thumbnail}>
-              <img src={image} alt={siteName} />
+              <img src={image} alt={siteName} loading='lazy' decoding='async' />
             </span>
           ) : null}
           <span className={styles.domain}>{domain}</span>
@@ -90,7 +90,13 @@ export const LinkPreview = (props: LinkPreviewProps) => {
         </>
       ) : image ? (
         <span>
-          <img className={styles.image} src={image} alt={siteName} />
+          <img
+            className={styles.image}
+            src={image}
+            alt={siteName}
+            loading='lazy'
+            decoding='async'
+          />
         </span>
       ) : null}
     </a>

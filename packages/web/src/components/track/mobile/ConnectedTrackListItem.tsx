@@ -1,19 +1,20 @@
-import { memo, useCallback } from 'react'
+import { memo, useCallback, useMemo } from 'react'
 
 import { useCurrentUserId, useTrack, useUser } from '@audius/common/api'
 import { ID, RepostSource } from '@audius/common/models'
 import {
   gatedContentActions,
   gatedContentSelectors,
-  mobileOverflowMenuUIActions,
-  tracksSocialActions,
-  OverflowAction,
-  OverflowSource
+  tracksSocialActions
 } from '@audius/common/store'
+import { Genre } from '@audius/common/utils'
+import { IconButton, IconKebabHorizontal } from '@audius/harmony'
 import { connect, useDispatch } from 'react-redux'
 import { Dispatch } from 'redux'
 
 import { useModalState } from 'common/hooks/useModalState'
+import Menu from 'components/menu/Menu'
+import { OwnProps as TrackMenuProps } from 'components/menu/TrackMenu'
 import TrackListItem, {
   TrackItemAction,
   TrackListItemProps
@@ -26,7 +27,6 @@ const { setLockedContentId } = gatedContentActions
 
 const { getGatedContentStatusMap } = gatedContentSelectors
 
-const { open } = mobileOverflowMenuUIActions
 const { repostTrack, undoRepostTrack } = tracksSocialActions
 
 type OwnProps = TrackListItemProps
@@ -37,7 +37,6 @@ type ConnectedTrackListItemProps = OwnProps & StateProps & DispatchProps
 
 const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
   const {
-    clickOverflow,
     ddexApp,
     hasStreamAccess,
     isUnlisted,
@@ -51,11 +50,11 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
     select: (track) => {
       return {
         ownerId: track?.owner_id,
-        albumBacklink: track?.album_backlink
+        genre: track?.genre
       }
     }
   })
-  const { ownerId, albumBacklink } = partialTrack ?? {}
+  const { ownerId, genre } = partialTrack ?? {}
   const { data: user } = useUser(ownerId)
   const dispatch = useDispatch()
   const [, setLockedContentVisibility] = useModalState('LockedContent')
@@ -65,28 +64,73 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
   }, [dispatch, trackId, setLockedContentVisibility])
 
   const isOwner = user?.user_id === currentUserId
-  const onClickOverflow = () => {
-    const overflowActions = [
-      isLocked || isUnlisted
-        ? null
-        : isReposted
-          ? OverflowAction.UNREPOST
-          : OverflowAction.REPOST,
-      isLocked || isUnlisted
-        ? null
-        : isSaved
-          ? OverflowAction.UNFAVORITE
-          : OverflowAction.FAVORITE,
-      user?.user_id === currentUserId && !ddexApp
-        ? OverflowAction.ADD_TO_ALBUM
-        : null,
-      !isUnlisted || isOwner ? OverflowAction.ADD_TO_PLAYLIST : null,
-      OverflowAction.VIEW_TRACK_PAGE,
-      albumBacklink ? OverflowAction.VIEW_ALBUM_PAGE : null,
-      OverflowAction.VIEW_ARTIST_PAGE
-    ].filter(Boolean) as OverflowAction[]
-    clickOverflow(trackId, overflowActions)
-  }
+  const overflowMenu = useMemo<Omit<TrackMenuProps, 'children'>>(
+    () => ({
+      extraMenuItems: [],
+      handle: user?.handle ?? '',
+      includeAddToPlaylist: !isUnlisted || isOwner,
+      includeAddToAlbum: isOwner && !ddexApp,
+      includeArtistPick: false,
+      includeDelete: false,
+      includeEdit: false,
+      includeFavorite: !isLocked && !isUnlisted && hasStreamAccess,
+      includeRepost: !isLocked && !isUnlisted && hasStreamAccess,
+      includeShare: false,
+      includeTrackPage: true,
+      includeAlbumPage: true,
+      includePlayNext: false,
+      includeAddToQueue: false,
+      isDeleted: props.isDeleted,
+      isFavorited: isSaved,
+      isOwner,
+      isOwnerDeactivated: user?.is_deactivated,
+      isReposted,
+      isUnlisted,
+      trackId,
+      trackTitle: props.trackTitle,
+      genre: genre as Genre,
+      trackPermalink: props.permalink,
+      ddexApp,
+      type: 'track'
+    }),
+    [
+      ddexApp,
+      genre,
+      hasStreamAccess,
+      isLocked,
+      isOwner,
+      isReposted,
+      isSaved,
+      isUnlisted,
+      props.isDeleted,
+      props.permalink,
+      props.trackTitle,
+      trackId,
+      user?.handle,
+      user?.is_deactivated
+    ]
+  )
+
+  const renderOverflowMenu = useCallback(
+    () => (
+      <Menu menu={overflowMenu}>
+        {(ref, triggerPopup) => (
+          <IconButton
+            ref={ref}
+            aria-label='more actions'
+            icon={IconKebabHorizontal}
+            color='subdued'
+            size='m'
+            onClick={(e) => {
+              e.stopPropagation()
+              triggerPopup()
+            }}
+          />
+        )}
+      </Menu>
+    ),
+    [overflowMenu]
+  )
 
   const onClickGatedUnlockPill = useRequiresAccountOnClick(() => {
     if (trackId && !hasStreamAccess) {
@@ -97,7 +141,7 @@ const ConnectedTrackListItem = (props: ConnectedTrackListItemProps) => {
   return (
     <TrackListItem
       {...props}
-      onClickOverflow={onClickOverflow}
+      renderOverflow={renderOverflowMenu}
       onClickGatedUnlockPill={onClickGatedUnlockPill}
       trackItemAction={TrackItemAction.Overflow}
     />
@@ -117,11 +161,7 @@ function mapDispatchToProps(dispatch: Dispatch) {
     repostTrack: (trackId: ID) =>
       dispatch(repostTrack(trackId, RepostSource.TRACK_LIST)),
     unrepostTrack: (trackId: ID) =>
-      dispatch(undoRepostTrack(trackId, RepostSource.TRACK_LIST)),
-    clickOverflow: (trackId: ID, overflowActions: OverflowAction[]) =>
-      dispatch(
-        open({ source: OverflowSource.TRACKS, id: trackId, overflowActions })
-      )
+      dispatch(undoRepostTrack(trackId, RepostSource.TRACK_LIST))
   }
 }
 

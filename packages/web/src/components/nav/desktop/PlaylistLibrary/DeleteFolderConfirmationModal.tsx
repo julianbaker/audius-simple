@@ -13,7 +13,8 @@ const { removePlaylistFolderInLibrary } = playlistLibraryHelpers
 const messages = {
   title: 'Delete Folder',
   header: 'Are you sure you want to delete this folder?',
-  description: 'Any playlists inside will be moved out before the folder is deleted.',
+  description:
+    'Any playlists inside will be moved out before the folder is deleted.',
   confirm: 'Delete Folder',
   cancel: 'Cancel'
 }

@@ -74,21 +74,20 @@ const BottomButtons = (props: BottomButtonsProps) => {
     return null
   }
 
-  const moreButton =
-    !isMobile && props.renderOverflow ? (
-      props.renderOverflow()
-    ) : (
-      <IconButton
-        icon={IconKebabHorizontal}
-        onClick={(e) => {
-          e.stopPropagation()
-          props.onClickOverflow()
-        }}
-        size='l'
-        color='subdued'
-        aria-label='More'
-      />
-    )
+  const moreButton = props.renderOverflow ? (
+    props.renderOverflow()
+  ) : (
+    <IconButton
+      icon={IconKebabHorizontal}
+      onClick={(e) => {
+        e.stopPropagation()
+        props.onClickOverflow()
+      }}
+      size='l'
+      color='subdued'
+      aria-label='More'
+    />
+  )
 
   // Stream conditions without access
   if (!props.isLoading && props.streamConditions && !props.hasStreamAccess) {

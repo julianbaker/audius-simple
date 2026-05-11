@@ -4,12 +4,10 @@ import { Modals as ModalTypes } from '@audius/common/store'
 
 import FirstUploadModal from 'components/first-upload-modal/FirstUploadModal'
 import { PasswordResetModal } from 'components/password-reset/PasswordResetModal'
-import ConnectedMobileOverflowModal from 'components/track-overflow-modal/ConnectedMobileOverflowModal'
 import UnfollowConfirmationModal from 'components/unfollow-confirmation-modal/UnfollowConfirmationModal'
 import { UnsavedChangesDialog } from 'components/unsaved-changes-dialog/UnsavedChangesDialog'
 import { UserListModal } from 'components/user-list-modal/UserListModal'
 import { useEnvironment } from 'hooks/useEnvironment'
-import { useIsMobile } from 'hooks/useIsMobile'
 
 import AppModal from './AppModal'
 
@@ -133,9 +131,9 @@ const LockedContentModal = lazy(() =>
   }))
 )
 const PublishConfirmationModal = lazy(() =>
-  import(
-    'components/publish-confirmation-modal/PublishConfirmationModal'
-  ).then((m) => ({ default: m.PublishConfirmationModal }))
+  import('components/publish-confirmation-modal/PublishConfirmationModal').then(
+    (m) => ({ default: m.PublishConfirmationModal })
+  )
 )
 const ReplaceTrackConfirmationModal = lazy(() =>
   import(
@@ -152,11 +150,6 @@ const UploadConfirmationModal = lazy(() =>
   import('components/upload-confirmation-modal').then((m) => ({
     default: m.UploadConfirmationModal
   }))
-)
-const WaitForDownloadModal = lazy(() =>
-  import('components/wait-for-download-modal/WaitForDownloadModal').then(
-    (m) => ({ default: m.WaitForDownloadModal })
-  )
 )
 const WelcomeModal = lazy(() =>
   import('components/welcome-modal/WelcomeModal').then((m) => ({
@@ -201,7 +194,6 @@ const commonModals = Object.entries(commonModalsMap) as [
 ][]
 
 const Modals = () => {
-  const isMobile = useIsMobile()
   const { isDev } = useEnvironment()
 
   return (
@@ -220,14 +212,10 @@ const Modals = () => {
         return <AppModal key={modalName} name={modalName} modal={Modal} />
       })}
       {/* User-list (followers/following/reposts/etc.) and unfollow
-          confirmation now render at every viewport — UserListModal uses
-          ResponsiveModal so it becomes a Drawer on mobile, and the
-          unfollow confirmation was migrated to the same primitive in
-          E1. The track-overflow drawer stays mobile-only until E5
-          replaces it with a responsive popup-menu primitive. */}
+          confirmation render at every viewport — UserListModal uses
+          ResponsiveModal so it becomes a BottomSheet on mobile. */}
       <UserListModal />
       <UnfollowConfirmationModal />
-      {isMobile ? <ConnectedMobileOverflowModal /> : null}
       {/* Dev-only modals, hidden behind isProduction so the chunks never
           ship to production bundles. */}
       {isDev ? (

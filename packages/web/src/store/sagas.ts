@@ -5,7 +5,6 @@ import {
   remoteConfigSagas,
   deletePlaylistConfirmationModalUISagas as deletePlaylistConfirmationModalSagas,
   duplicateAddConfirmationModalUISagas as duplicateAddConfirmationModalSagas,
-  mobileOverflowMenuUISagas as overflowMenuSagas,
   shareModalUISagas as shareModalSagas,
   toastSagas,
   modalsSagas,
@@ -96,7 +95,6 @@ export default function* rootSaga() {
     firstUploadModalSagas(),
     scrollLockSagas(),
     shareModalSagas(),
-    overflowMenuSagas(),
     toastSagas(),
 
     stemUploadSagas(),

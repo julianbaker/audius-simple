@@ -19,7 +19,6 @@ import {
 import { useCurrentTrack } from '@audius/common/hooks'
 import {
   Status,
-  ID,
   isContentUnsupportedCryptoGated,
   Name,
   ShareSource,
@@ -36,10 +35,7 @@ import {
   collectionsSocialActions as socialCollectionsActions,
   tracksSocialActions as socialTracksActions,
   usersSocialActions as socialUsersActions,
-  mobileOverflowMenuUIActions,
   shareModalUIActions,
-  OverflowAction,
-  OverflowSource,
   repostsUserListActions,
   favoritesUserListActions,
   RepostType,
@@ -86,7 +82,6 @@ const {
 const { setFavorite } = favoritesUserListActions
 const { setRepost } = repostsUserListActions
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const { removeTrackFromPlaylist, orderPlaylist, publishPlaylist } =
   cacheCollectionsActions
 
@@ -872,19 +867,6 @@ export const useCollectionPage = (
     }
   }, [collection, dispatch])
 
-  const onClickMobileOverflow = useCallback(
-    (collectionId: ID, overflowActions: OverflowAction[]) => {
-      dispatch(
-        open({
-          source: OverflowSource.COLLECTIONS,
-          id: collectionId,
-          overflowActions
-        })
-      )
-    },
-    [dispatch]
-  )
-
   const refreshCollection = useCallback(() => {
     fetchCollection(pathname)
   }, [fetchCollection, pathname])
@@ -941,7 +923,6 @@ export const useCollectionPage = (
     onClickFavorites,
     onFollow,
     onUnfollow,
-    onClickMobileOverflow,
     refreshCollection,
     // SEO
     ...seoFields

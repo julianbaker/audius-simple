@@ -1,4 +1,4 @@
-import { memo, MouseEvent } from 'react'
+import { memo, MouseEvent, ReactNode } from 'react'
 
 import { useCurrentUserId, useTrack } from '@audius/common/api'
 import { useGatedContentAccess } from '@audius/common/hooks'
@@ -22,6 +22,7 @@ type ActionsBarProps = {
   onToggleFavorite: () => void
   onShare: () => void
   onClickOverflow: () => void
+  renderOverflow?: () => ReactNode
   isDarkMode: boolean
   isMatrixMode: boolean
 }
@@ -32,6 +33,7 @@ const ActionsBar = ({
   onToggleFavorite,
   onShare,
   onClickOverflow,
+  renderOverflow,
   isDarkMode,
   isMatrixMode
 }: ActionsBarProps) => {
@@ -92,16 +94,20 @@ const ActionsBar = ({
         icon={IconShare}
         onClick={onShare}
       />
-      <IconButton
-        aria-label='more actions'
-        size='xl'
-        color='default'
-        icon={IconKebabHorizontal}
-        onClick={(event: MouseEvent) => {
-          event.stopPropagation()
-          onClickOverflow()
-        }}
-      />
+      {renderOverflow ? (
+        renderOverflow()
+      ) : (
+        <IconButton
+          aria-label='more actions'
+          size='xl'
+          color='default'
+          icon={IconKebabHorizontal}
+          onClick={(event: MouseEvent) => {
+            event.stopPropagation()
+            onClickOverflow()
+          }}
+        />
+      )}
     </Flex>
   )
 }

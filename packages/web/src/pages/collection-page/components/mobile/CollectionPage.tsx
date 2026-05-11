@@ -65,7 +65,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
     onHeroTrackShare,
     onHeroTrackSave,
     onHeroTrackRepost,
-    onClickMobileOverflow,
     onClickFavorites,
     onClickReposts,
     title,
@@ -259,7 +258,6 @@ const CollectionPage = ({ type }: CollectionPageProps) => {
             onRepost={onHeroTrackRepost}
             onClickFavorites={onClickFavorites}
             onClickReposts={onClickReposts}
-            onClickMobileOverflow={onClickMobileOverflow}
           />
         </div>
         <div className={styles.collectionTracksContainer}>

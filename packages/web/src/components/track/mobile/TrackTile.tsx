@@ -1,4 +1,4 @@
-import { MouseEvent, useCallback, useEffect } from 'react'
+import { MouseEvent, useCallback, useEffect, useMemo } from 'react'
 
 import {
   useToggleFavoriteTrack,
@@ -17,10 +17,7 @@ import {
   gatedContentActions,
   gatedContentSelectors,
   tracksSocialActions,
-  mobileOverflowMenuUIActions,
   shareModalUIActions,
-  OverflowAction,
-  OverflowSource,
   playbackSelectors,
   CommonState
 } from '@audius/common/store'
@@ -60,7 +57,6 @@ const { setLockedContentId } = gatedContentActions
 const { getGatedContentStatusMap } = gatedContentSelectors
 const { getTrackId, getPlaying, getBuffering } = playbackSelectors
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const { repostTrack, undoRepostTrack } = tracksSocialActions
 
 type ConnectedTrackTileProps = Omit<
@@ -144,15 +140,6 @@ export const TrackTile = ({
     [dispatch]
   )
 
-  const clickOverflow = useCallback(
-    (trackId: ID, overflowActions: OverflowAction[]) => {
-      dispatch(
-        open({ source: OverflowSource.TRACKS, id: trackId, overflowActions })
-      )
-    },
-    [dispatch]
-  )
-
   const trackWithFallback = getTrackWithFallback(track)
   const {
     is_delete,
@@ -168,8 +155,7 @@ export const TrackTile = ({
     _co_sign,
     duration,
     preview_cid,
-    ddex_app: ddexApp,
-    album_backlink
+    ddex_app: ddexApp
   } = trackWithFallback
 
   const isOwner = user_id === currentUserId
@@ -189,10 +175,8 @@ export const TrackTile = ({
     [has_current_user_reposted, handleUnrepostTrack, handleRepostTrack, isFeed]
   )
 
-  // We wanted to use mobile track tile on desktop, which means shimming in the desktop overflow
-  // menu whenever isMobile is false.
-  const renderOverflowMenu = () => {
-    const menu: Omit<TrackMenuProps, 'children'> = {
+  const overflowMenu = useMemo<Omit<TrackMenuProps, 'children'>>(
+    () => ({
       extraMenuItems: [],
       handle,
       includeAddToPlaylist: !is_unlisted || isOwner,
@@ -214,10 +198,28 @@ export const TrackTile = ({
       genre: genre as Genre,
       trackPermalink: permalink,
       type: 'track'
-    }
+    }),
+    [
+      ddexApp,
+      genre,
+      handle,
+      hasStreamAccess,
+      has_current_user_reposted,
+      has_current_user_saved,
+      isOwner,
+      is_delete,
+      is_deactivated,
+      is_unlisted,
+      permalink,
+      title,
+      track?.ddex_app,
+      track_id
+    ]
+  )
 
+  const renderOverflowMenu = useCallback(() => {
     return (
-      <Menu menu={menu}>
+      <Menu menu={overflowMenu}>
         {(ref, triggerPopup) => (
           <IconButton
             ref={ref}
@@ -233,53 +235,7 @@ export const TrackTile = ({
         )}
       </Menu>
     )
-  }
-
-  const onClickOverflow = useCallback(
-    (trackId: ID) => {
-      const isLongFormContent =
-        genre === Genre.Podcasts || genre === Genre.Audiobooks
-
-      const repostAction =
-        !isOwner && hasStreamAccess
-          ? has_current_user_reposted
-            ? OverflowAction.UNREPOST
-            : OverflowAction.REPOST
-          : null
-      const favoriteAction =
-        !isOwner && hasStreamAccess
-          ? has_current_user_saved
-            ? OverflowAction.UNFAVORITE
-            : OverflowAction.FAVORITE
-          : null
-      const addToAlbumAction =
-        isOwner && !ddexApp ? OverflowAction.ADD_TO_ALBUM : null
-      const overflowActions = [
-        repostAction,
-        favoriteAction,
-        addToAlbumAction,
-        !is_unlisted || isOwner ? OverflowAction.ADD_TO_PLAYLIST : null,
-        isLongFormContent
-          ? OverflowAction.VIEW_EPISODE_PAGE
-          : OverflowAction.VIEW_TRACK_PAGE,
-        album_backlink ? OverflowAction.VIEW_ALBUM_PAGE : null,
-        OverflowAction.VIEW_ARTIST_PAGE
-      ].filter(Boolean) as OverflowAction[]
-
-      clickOverflow(trackId, overflowActions)
-    },
-    [
-      genre,
-      isOwner,
-      hasStreamAccess,
-      has_current_user_reposted,
-      has_current_user_saved,
-      ddexApp,
-      is_unlisted,
-      album_backlink,
-      clickOverflow
-    ]
-  )
+  }, [overflowMenu])
 
   const toggleSaveTrack = useToggleFavoriteTrack({
     trackId: id as number,
@@ -309,10 +265,7 @@ export const TrackTile = ({
     [dispatch, id]
   )
 
-  const onClickOverflowMenu = useCallback(
-    () => onClickOverflow && onClickOverflow(id),
-    [onClickOverflow, id]
-  )
+  const noopOverflow = useCallback(() => {}, [])
 
   const openLockedContentModal = useCallback(() => {
     if (gatedTrackId) {
@@ -481,7 +434,7 @@ export const TrackTile = ({
             toggleRepost={onToggleRepost}
             toggleSave={toggleSaveTrack}
             onShare={onClickShare}
-            onClickOverflow={onClickOverflowMenu}
+            onClickOverflow={noopOverflow}
             renderOverflow={renderOverflowMenu}
             onClickGatedUnlockPill={onClickPill}
             isOwner={isOwner}

@@ -310,8 +310,11 @@ export const Tooltip = ({
     updatePosition()
 
     // Update on scroll
-    window.addEventListener('scroll', updatePosition, true)
-    window.addEventListener('resize', updatePosition)
+    window.addEventListener('scroll', updatePosition, {
+      capture: true,
+      passive: true
+    })
+    window.addEventListener('resize', updatePosition, { passive: true })
 
     // Keep tracking briefly to absorb nearby layout transitions.
     const transitionTrackingMs = 400

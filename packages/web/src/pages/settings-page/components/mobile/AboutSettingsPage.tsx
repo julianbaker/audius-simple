@@ -57,7 +57,13 @@ const AboutSettingsPage = () => {
     >
       <div className={settingsPageStyles.bodyContainer}>
         <div className={styles.header}>
-          <img src={appIcon} alt='Audius' />
+          <img
+            src={appIcon}
+            alt='Audius'
+            width={84}
+            height={84}
+            decoding='async'
+          />
           <div className={styles.info}>
             <div className={styles.title}>{messages.title}</div>
             <div className={styles.versionInfo}>

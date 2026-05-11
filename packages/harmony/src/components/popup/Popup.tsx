@@ -436,8 +436,8 @@ export const PopupInternal = forwardRef<
         schedule(true)
       }
 
-      scrollParent.addEventListener('scroll', onScroll)
-      window.addEventListener('resize', onResize)
+      scrollParent.addEventListener('scroll', onScroll, { passive: true })
+      window.addEventListener('resize', onResize, { passive: true })
       return () => {
         scrollParent.removeEventListener('scroll', onScroll)
         window.removeEventListener('resize', onResize)

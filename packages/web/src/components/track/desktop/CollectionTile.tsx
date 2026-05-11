@@ -122,7 +122,6 @@ export const CollectionTile = ({
       has_current_user_saved: collection?.has_current_user_saved,
       track_count: collection?.track_count,
       permalink: collection?.permalink,
-      is_stream_gated: collection?.is_stream_gated,
       access: collection?.access
     })
   })
@@ -135,7 +134,6 @@ export const CollectionTile = ({
     has_current_user_saved: isFavorited,
     track_count: trackCount,
     permalink,
-    is_stream_gated: isStreamGated,
     access,
     playlist_owner_id
   } = getCollectionWithFallback(partialCollection)
@@ -298,43 +296,6 @@ export const CollectionTile = ({
     ? ''
     : collectionPage(handle, title, id, permalink, isAlbum)
 
-  const renderOverflowMenu = () => {
-    const menu: Omit<CollectionMenuProps, 'children'> = {
-      handle: handle ?? '',
-      isFavorited,
-      isReposted,
-      type: isAlbum ? 'album' : 'playlist', // playlist or album
-      playlistId: id,
-      playlistName: title,
-      isPublic: !isUnlisted,
-      isOwner,
-      includeShare: true,
-      includeRepost: hasStreamAccess,
-      includeFavorite: hasStreamAccess,
-      includeVisitPage: true,
-      extraMenuItems: [],
-      permalink: permalink || ''
-    }
-
-    return (
-      <Menu menu={menu}>
-        {(ref, triggerPopup) => (
-          <IconButton
-            size={size === TrackTileSize.LARGE ? 'l' : 'm'}
-            aria-label='More options'
-            onClick={(e) => {
-              e.stopPropagation()
-              triggerPopup()
-            }}
-            icon={IconKebabHorizontal}
-            color='subdued'
-            ref={ref}
-          />
-        )}
-      </Menu>
-    )
-  }
-
   const onClickFavorite = useCallback(() => {
     if (isFavorited) {
       handleUnsaveCollection(id)
@@ -366,6 +327,58 @@ export const CollectionTile = ({
   )
 
   const hasStreamAccess = !!access?.stream
+
+  const overflowMenu = useMemo<Omit<CollectionMenuProps, 'children'>>(
+    () => ({
+      handle: handle ?? '',
+      isFavorited,
+      isReposted,
+      type: isAlbum ? 'album' : 'playlist',
+      playlistId: id,
+      playlistName: title,
+      isPublic: !isUnlisted,
+      isOwner,
+      includeShare: true,
+      includeRepost: hasStreamAccess,
+      includeFavorite: hasStreamAccess,
+      includeVisitPage: true,
+      extraMenuItems: [],
+      permalink: permalink || ''
+    }),
+    [
+      handle,
+      hasStreamAccess,
+      id,
+      isAlbum,
+      isFavorited,
+      isOwner,
+      isReposted,
+      isUnlisted,
+      permalink,
+      title
+    ]
+  )
+
+  const overflowMenuButton = useMemo(
+    () => (
+      <Menu menu={overflowMenu}>
+        {(ref, triggerPopup) => (
+          <IconButton
+            size={size === TrackTileSize.LARGE ? 'l' : 'm'}
+            aria-label='More options'
+            onClick={(e) => {
+              e.stopPropagation()
+              triggerPopup()
+            }}
+            icon={IconKebabHorizontal}
+            color='subdued'
+            ref={ref}
+          />
+        )}
+      </Menu>
+    ),
+    [overflowMenu, size]
+  )
 
   const onClickGatedUnlockPill = useRequiresAccountOnClick(() => {
     if (id && !hasStreamAccess) {
@@ -637,7 +650,7 @@ export const CollectionTile = ({
             contentType='collection'
             isDisabled={disableActions}
             isLoading={isLoading}
-            rightActions={renderOverflowMenu()}
+            rightActions={overflowMenuButton}
             isDarkMode={isDarkMode}
             isMatrixMode={isMatrixMode}
             showIconButtons={true}
@@ -650,7 +663,7 @@ export const CollectionTile = ({
             hasStreamAccess={hasStreamAccess}
             isDisabled={disableActions}
             isLoading={isLoading}
-            rightActions={renderOverflowMenu()}
+            rightActions={overflowMenuButton}
             isDarkMode={isDarkMode}
             isMatrixMode={isMatrixMode}
             showIconButtons={true}

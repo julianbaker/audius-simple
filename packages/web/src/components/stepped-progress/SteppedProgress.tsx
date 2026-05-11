@@ -66,7 +66,7 @@ export const SteppedProgress = ({
     }
 
     setTabPosition()
-    window.addEventListener('resize', setTabPosition)
+    window.addEventListener('resize', setTabPosition, { passive: true })
 
     return () => window.removeEventListener('resize', setTabPosition)
   }, [activeStep, steps])

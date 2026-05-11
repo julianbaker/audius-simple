@@ -21,7 +21,6 @@ export const CollectionsTableOverflowMenuButton = (
         'is_album',
         'playlist_owner_id',
         'is_private',
-        'is_stream_gated',
         'permalink'
       )
   })
@@ -29,7 +28,6 @@ export const CollectionsTableOverflowMenuButton = (
     is_album: isAlbum,
     playlist_owner_id: playlistOwnerId,
     is_private: isPrivate,
-    is_stream_gated: isStreamGated,
     permalink
   } = partialCollection ?? {}
 

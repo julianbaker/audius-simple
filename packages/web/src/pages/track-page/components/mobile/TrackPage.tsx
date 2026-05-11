@@ -25,12 +25,10 @@ import {
 } from '@audius/common/models'
 import { FeatureFlags } from '@audius/common/services'
 import {
-  OverflowAction,
   tracksSocialActions as socialTracksActions,
   shareModalUIActions,
   favoritesUserListActions,
   repostsUserListActions,
-  mobileOverflowMenuUIActions,
   playbackSelectors,
   playbackActions,
   RepostType
@@ -66,7 +64,6 @@ import { RemixContestSection } from './remix-contests/RemixContestSection'
 const { NOT_FOUND_PAGE, FAVORITING_USERS_ROUTE, REPOSTING_USERS_ROUTE } = route
 const { getPlaying, getPreviewing } = playbackSelectors
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
-const { open } = mobileOverflowMenuUIActions
 const { setFavorite } = favoritesUserListActions
 const { setRepost } = repostsUserListActions
 
@@ -219,19 +216,6 @@ const TrackPage = () => {
     [dispatch]
   )
 
-  const onClickMobileOverflow = useCallback(
-    (trackId: ID, overflowActions: OverflowAction[]) => {
-      dispatch(
-        open({
-          source: 'TRACKS' as any,
-          id: trackId,
-          overflowActions
-        })
-      )
-    },
-    [dispatch]
-  )
-
   const goToFavoritesPage = useCallback(
     (trackId: ID) => {
       dispatch(setFavorite(trackId, FavoriteType.TRACK))
@@ -333,7 +317,6 @@ const TrackPage = () => {
             isOwner={isOwner}
             isSaved={isSaved}
             coSign={defaults.coSign}
-            onClickMobileOverflow={onClickMobileOverflow}
             onPlay={onPlay}
             onPreview={onPreview}
             onSave={toggleSaveTrack}

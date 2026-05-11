@@ -1,4 +1,4 @@
-import { memo, MouseEvent } from 'react'
+import { memo, MouseEvent, ReactNode } from 'react'
 
 import {
   SquareSizes,
@@ -121,6 +121,7 @@ export type TrackListItemProps = {
   onRemove?: (trackId: ID) => void
   togglePlay?: (uid: string, trackId: ID) => void
   onClickOverflow?: () => void
+  renderOverflow?: () => ReactNode
   onClickGatedUnlockPill?: (e: MouseEvent) => void
   hasStreamAccess?: boolean
   trackItemAction?: TrackItemAction
@@ -146,6 +147,7 @@ const TrackListItem = ({
   togglePlay,
   trackItemAction,
   onClickOverflow,
+  renderOverflow,
   isReorderable = false,
   isDragging = false
 }: TrackListItemProps) => {
@@ -205,20 +207,25 @@ const TrackListItem = ({
       </div>
       {isUnlisted ? <IconVisibilityHidden color='subdued' size='s' /> : null}
       {!isDeleted && isLocked ? <IconLock color='subdued' size='s' /> : null}
-      {onClickOverflow && trackItemAction === TrackItemAction.Overflow && (
-        <div className={styles.iconContainer}>
-          <IconButton
-            aria-label='more actions'
-            icon={IconKebabHorizontal}
-            color='subdued'
-            size='m'
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation()
-              onClickOverflow()
-            }}
-          />
-        </div>
-      )}
+      {(renderOverflow || onClickOverflow) &&
+        trackItemAction === TrackItemAction.Overflow && (
+          <div className={styles.iconContainer}>
+            {renderOverflow ? (
+              renderOverflow()
+            ) : (
+              <IconButton
+                aria-label='more actions'
+                icon={IconKebabHorizontal}
+                color='subdued'
+                size='m'
+                onClick={(e: MouseEvent) => {
+                  e.stopPropagation()
+                  onClickOverflow?.()
+                }}
+              />
+            )}
+          </div>
+        )}
       {onRemove && (
         <div className={styles.iconContainer}>
           <IconButton

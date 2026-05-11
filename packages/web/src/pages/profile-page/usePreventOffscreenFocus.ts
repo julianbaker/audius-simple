@@ -105,8 +105,11 @@ export const usePreventOffscreenFocus = (
       attributeFilter: ['class', 'style', 'hidden', 'tabindex']
     })
 
-    window.addEventListener('resize', scheduleSync)
-    window.addEventListener('scroll', scheduleSync, true)
+    window.addEventListener('resize', scheduleSync, { passive: true })
+    window.addEventListener('scroll', scheduleSync, {
+      capture: true,
+      passive: true
+    })
     root.addEventListener('focusin', handleFocusIn)
 
     return () => {
