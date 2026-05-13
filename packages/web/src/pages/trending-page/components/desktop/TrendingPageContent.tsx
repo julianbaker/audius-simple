@@ -417,10 +417,9 @@ const TrendingPageContent = ({ containerRef }: TrendingPageContentProps) => {
   const actions = useMemo(
     () => ({
       replaceRoute: replaceRouteCallback,
-      goToSignUp,
-      goToGenreSelection: () => dispatch(pushRoute(route.TRENDING_GENRES))
+      goToSignUp
     }),
-    [replaceRouteCallback, goToSignUp, dispatch]
+    [replaceRouteCallback, goToSignUp]
   )
 
   const pageContent =

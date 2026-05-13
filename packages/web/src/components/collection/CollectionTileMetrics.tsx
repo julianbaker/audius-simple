@@ -1,13 +1,8 @@
 import { useCallback } from 'react'
 
 import { useCollection } from '@audius/common/api'
-import { FavoriteType, ID } from '@audius/common/models'
-import {
-  favoritesUserListActions,
-  repostsUserListActions,
-  RepostType
-} from '@audius/common/store'
-import { formatCount, route, pluralize } from '@audius/common/utils'
+import { ID } from '@audius/common/models'
+import { formatCount, pluralize } from '@audius/common/utils'
 import { Text, Flex, IconRepost, IconHeart } from '@audius/harmony'
 import { pick } from 'lodash'
 import { useDispatch } from 'react-redux'
@@ -24,12 +19,6 @@ import {
   UserListEntityType,
   UserListType
 } from 'store/application/ui/userListModal/types'
-import { push } from 'utils/navigation'
-
-const { REPOSTING_USERS_ROUTE, FAVORITING_USERS_ROUTE } = route
-
-const { setFavorite } = favoritesUserListActions
-const { setRepost } = repostsUserListActions
 
 type RepostsMetricProps = {
   collectionId: ID
@@ -48,20 +37,15 @@ export const RepostsMetric = (props: RepostsMetricProps) => {
   const dispatch = useDispatch()
 
   const handleClick = useCallback(() => {
-    if (isMobile) {
-      dispatch(setRepost(collectionId, RepostType.COLLECTION))
-      dispatch(push(REPOSTING_USERS_ROUTE))
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.REPOST,
-          entityType: UserListEntityType.COLLECTION,
-          id: collectionId
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [dispatch, isMobile, collectionId])
+    dispatch(
+      setUsers({
+        userListType: UserListType.REPOST,
+        entityType: UserListEntityType.COLLECTION,
+        id: collectionId
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [dispatch, collectionId])
 
   if (repost_count === undefined || followee_reposts === undefined) return null
 
@@ -126,20 +110,15 @@ export const SavesMetric = (props: SavesMetricProps) => {
   const dispatch = useDispatch()
 
   const handleClick = useCallback(() => {
-    if (isMobile) {
-      dispatch(setFavorite(collectionId, FavoriteType.PLAYLIST))
-      dispatch(push(FAVORITING_USERS_ROUTE))
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.FAVORITE,
-          entityType: UserListEntityType.COLLECTION,
-          id: collectionId
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [dispatch, isMobile, collectionId])
+    dispatch(
+      setUsers({
+        userListType: UserListType.FAVORITE,
+        entityType: UserListEntityType.COLLECTION,
+        id: collectionId
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [dispatch, collectionId])
 
   if (save_count === undefined) return null
 

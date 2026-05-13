@@ -52,9 +52,6 @@ import { getPathname } from 'utils/route'
 
 import styles from './WebPlayer.module.css'
 const { getFrostedSurfaceIntensity } = themeSelectors
-const TrendingGenreSelectionPage = lazy(
-  () => import('components/trending-genre-selection/TrendingGenreSelectionPage')
-)
 const ChatPage = lazy(() => import('pages/chat-page'))
 const CollectionPage = lazy(
   () => import('pages/collection-page/CollectionPage')
@@ -81,7 +78,6 @@ const EditCollectionPage = lazy(() =>
   }))
 )
 const EmptyPage = lazy(() => import('pages/empty-page/EmptyPage'))
-const FavoritesPage = lazy(() => import('pages/favorites-page/FavoritesPage'))
 const FbSharePage = lazy(() =>
   import('pages/fb-share-page/FbSharePage').then((m) => ({
     default: m.FbSharePage
@@ -89,8 +85,6 @@ const FbSharePage = lazy(() =>
 )
 const FeedPage = lazy(() => import('pages/feed-page/FeedPage'))
 const HomePage = lazy(() => import('pages/home-page/HomePage'))
-const FollowersPage = lazy(() => import('pages/followers-page/FollowersPage'))
-const FollowingPage = lazy(() => import('pages/following-page/FollowingPage'))
 const HistoryPage = lazy(() => import('pages/history-page/HistoryPage'))
 const LibraryPage = lazy(() => import('pages/library-page/LibraryPage'))
 const NotFoundPage = lazy(() =>
@@ -114,7 +108,6 @@ const ContestPage = lazy(() => import('pages/contest-page/ContestPage'))
 const HostRemixContestPage = lazy(
   () => import('pages/host-remix-contest-page/HostRemixContestPage')
 )
-const RepostsPage = lazy(() => import('pages/reposts-page/RepostsPage'))
 const RequiresUpdate = lazy(() =>
   import('pages/requires-update/RequiresUpdate').then((m) => ({
     default: m.RequiresUpdate
@@ -131,11 +124,6 @@ const ContestsPage = lazy(() =>
   }))
 )
 const SettingsPage = lazy(() => import('pages/settings-page/SettingsPage'))
-const TrackCommentsPage = lazy(() =>
-  import('pages/track-page/TrackCommentsPage').then((m) => ({
-    default: m.TrackCommentsPage
-  }))
-)
 const TrackPage = lazy(() => import('pages/track-page/TrackPage'))
 const TrendingPage = lazy(() => import('pages/trending-page/TrendingPage'))
 const Visualizer = lazy(() => import('pages/visualizer/Visualizer'))
@@ -166,7 +154,6 @@ const {
 
   ALBUM_PAGE,
   TRACK_PAGE,
-  TRACK_COMMENTS_PAGE,
   TRACK_REMIXES_PAGE,
   PICK_WINNERS_PAGE,
   CONTEST_PAGE,
@@ -176,17 +163,12 @@ const {
   authenticatedRoutes,
   guestRoutes,
   EMPTY_PAGE,
-  REPOSTING_USERS_ROUTE,
-  FAVORITING_USERS_ROUTE,
   ACCOUNT_SETTINGS_PAGE,
   CHANGE_PASSWORD_SETTINGS_PAGE,
   CHANGE_EMAIL_SETTINGS_PAGE,
   LABEL_ACCOUNT_SETTINGS_PAGE,
   NOTIFICATION_SETTINGS_PAGE,
   ABOUT_SETTINGS_PAGE,
-  FOLLOWING_USERS_ROUTE,
-  FOLLOWERS_USERS_ROUTE,
-  TRENDING_GENRES,
   APP_REDIRECT,
   TRACK_ID_PAGE,
   USER_ID_PAGE,
@@ -706,10 +688,6 @@ const WebPlayer = (props: WebPlayerProps) => {
                 element={<NotificationRedirect />}
               />
               <Route
-                path={TRENDING_GENRES}
-                element={<TrendingGenreSelectionPage />}
-              />
-              <Route
                 path={TRENDING_PAGE}
                 element={<TrendingPage containerRef={mainContentRef} />}
               />
@@ -882,10 +860,6 @@ const WebPlayer = (props: WebPlayerProps) => {
               />
               <Route path={TRACK_PAGE} element={<TrackPage />} />
               <Route
-                path={TRACK_COMMENTS_PAGE}
-                element={<TrackCommentsPage />}
-              />
-              <Route
                 path={TRACK_EDIT_PAGE}
                 element={<EditTrackPage scrollToTop={scrollToTop} />}
               />
@@ -907,13 +881,6 @@ const WebPlayer = (props: WebPlayerProps) => {
                 element={<HostRemixContestPage />}
               />
               <Route path={PICK_WINNERS_PAGE} element={<PickWinnersPage />} />
-              <Route path={REPOSTING_USERS_ROUTE} element={<RepostsPage />} />
-              <Route
-                path={FAVORITING_USERS_ROUTE}
-                element={<FavoritesPage />}
-              />
-              <Route path={FOLLOWING_USERS_ROUTE} element={<FollowingPage />} />
-              <Route path={FOLLOWERS_USERS_ROUTE} element={<FollowersPage />} />
               <Route path='/leaderboard' element={<NotFoundPage />} />
               <Route path={EMPTY_PAGE} element={<EmptyPage />} />
               <Route

@@ -12,16 +12,13 @@ import {
   addToCollectionUIActions,
   modalsActions
 } from '@audius/common/store'
-import { LoadingSpinner } from '@audius/harmony'
+import { Button, Flex, LoadingSpinner, Text } from '@audius/harmony'
 import { capitalize } from 'lodash'
 import InfiniteScroll from 'react-infinite-scroller'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { CollectionCard } from 'components/collection'
 import CardLineup from 'components/lineup/CardLineup'
-import MobilePageContainer from 'components/mobile-page-container/MobilePageContainer'
-import { useTemporaryNavContext } from 'components/nav/mobile/NavContext'
-import TextElement, { Type } from 'components/nav/mobile/TextElement'
 import { ToastContext } from 'components/toast/ToastContext'
 import useHasChangedRoute from 'hooks/useHasChangedRoute'
 import NewCollectionButton from 'pages/library-page/components/NewCollectionButton'
@@ -41,6 +38,14 @@ const getMessages = (collectionType: 'album' | 'playlist') => ({
   createdToast: `${capitalize(collectionType)} created!`
 })
 
+/**
+ * Mobile-only full-screen overlay for picking a collection to add a track to.
+ * Rendered via `TopLevelPage` (in WebPlayer) when the AddToCollection modal
+ * is requested on mobile. The desktop counterpart is `AddToCollectionModal`.
+ *
+ * Header chrome is rendered inline (Cancel button + title) because this view
+ * lives outside the unified `Page` shell — it's an overlay, not a route.
+ */
 const AddToCollection = () => {
   const dispatch = useDispatch()
   const trackId = useSelector(getTrackId)
@@ -68,7 +73,6 @@ const AddToCollection = () => {
     }
   }, [isFetchingNextPage, hasNextPage, fetchNextPage])
 
-  // Close the page if the route was changed
   const handleClose = useCallback(() => {
     dispatch(close())
     dispatch(setVisibility({ modal: 'AddToCollection', visible: false }))
@@ -77,21 +81,6 @@ const AddToCollection = () => {
   useHasChangedRoute(handleClose)
 
   const messages = getMessages(collectionType)
-  const setters = useCallback(
-    () => ({
-      left: (
-        <TextElement
-          text='Cancel'
-          type={Type.SECONDARY}
-          onClick={handleClose}
-        />
-      ),
-      center: messages.title,
-      right: null
-    }),
-    [handleClose, messages.title]
-  )
-  useTemporaryNavContext(setters)
 
   const handleCollectionClick = useCallback(
     (collectionId: number) => {
@@ -123,7 +112,6 @@ const AddToCollection = () => {
     handleClose
   ])
 
-  // Guard against null values
   if (!trackTitle) return null
 
   const cards = collections.map((collection) => (
@@ -137,7 +125,24 @@ const AddToCollection = () => {
   ))
 
   return (
-    <MobilePageContainer>
+    <Flex column h='100%' backgroundColor='default'>
+      <Flex
+        alignItems='center'
+        justifyContent='space-between'
+        ph='m'
+        pv='s'
+        borderBottom='default'
+        css={{ flexShrink: 0 }}
+      >
+        <Button variant='secondary' size='small' onClick={handleClose}>
+          Cancel
+        </Button>
+        <Text variant='title' size='m'>
+          {messages.title}
+        </Text>
+        {/* Spacer to balance the Cancel button so the title stays centered */}
+        <Flex css={{ width: 72, visibility: 'hidden' }} />
+      </Flex>
       <div className={styles.bodyContainer}>
         <NewCollectionButton
           onClick={handleCreateCollection}
@@ -159,7 +164,7 @@ const AddToCollection = () => {
           )}
         </div>
       </div>
-    </MobilePageContainer>
+    </Flex>
   )
 }
 

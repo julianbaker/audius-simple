@@ -24,7 +24,6 @@ import {
   ShareSource,
   RepostSource,
   FavoriteSource,
-  FavoriteType,
   FollowSource,
   PlaybackSource,
   Kind
@@ -36,9 +35,6 @@ import {
   tracksSocialActions as socialTracksActions,
   usersSocialActions as socialUsersActions,
   shareModalUIActions,
-  repostsUserListActions,
-  favoritesUserListActions,
-  RepostType,
   playbackActions,
   CollectionTrack,
   CollectionsPageType,
@@ -73,14 +69,12 @@ import { replace } from 'utils/navigation'
 import { getPathname, collectionPage, profilePage } from 'utils/route'
 import { parseCollectionRoute } from 'utils/route/collectionRouteParser'
 
-const { NOT_FOUND_PAGE, REPOSTING_USERS_ROUTE, FAVORITING_USERS_ROUTE } = route
+const { NOT_FOUND_PAGE } = route
 const {
   makeGetCurrent,
   getCurrentPlayerBehavior: getPlayerBehavior,
   getPlaying
 } = playbackSelectors
-const { setFavorite } = favoritesUserListActions
-const { setRepost } = repostsUserListActions
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
 const { removeTrackFromPlaylist, orderPlaylist, publishPlaylist } =
   cacheCollectionsActions
@@ -813,37 +807,27 @@ export const useCollectionPage = (
 
   const onClickReposts = useCallback(() => {
     if (!collection) return
-    if (isMobile) {
-      dispatch(setRepost(collection.playlist_id, RepostType.COLLECTION))
-      navigate(REPOSTING_USERS_ROUTE)
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.REPOST,
-          entityType: UserListEntityType.COLLECTION,
-          id: collection.playlist_id
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [collection, isMobile, dispatch, navigate])
+    dispatch(
+      setUsers({
+        userListType: UserListType.REPOST,
+        entityType: UserListEntityType.COLLECTION,
+        id: collection.playlist_id
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [collection, dispatch])
 
   const onClickFavorites = useCallback(() => {
     if (!collection) return
-    if (isMobile) {
-      dispatch(setFavorite(collection.playlist_id, FavoriteType.PLAYLIST))
-      navigate(FAVORITING_USERS_ROUTE)
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.FAVORITE,
-          entityType: UserListEntityType.COLLECTION,
-          id: collection.playlist_id
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [collection, isMobile, dispatch, navigate])
+    dispatch(
+      setUsers({
+        userListType: UserListType.FAVORITE,
+        entityType: UserListEntityType.COLLECTION,
+        id: collection.playlist_id
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [collection, dispatch])
 
   const onFollow = useCallback(() => {
     if (collection) {

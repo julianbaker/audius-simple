@@ -21,7 +21,6 @@ export interface TrendingPageContentProps {
   hasAccount: boolean
   goToTrending: () => void
   goToSignUp: () => void
-  goToGenreSelection: () => void
   setTrendingInView: (inView: boolean) => void
   switchView: () => void
   getLineupProps: (lineup: Lineup<any>) => {

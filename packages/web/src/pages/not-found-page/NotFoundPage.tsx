@@ -1,4 +1,4 @@
-import { useEffect, useContext } from 'react'
+import { useEffect } from 'react'
 
 import { Name } from '@audius/common/models'
 import { route } from '@audius/common/utils'
@@ -11,10 +11,6 @@ import { Link } from 'react-router'
 import notFoundAnimation from 'assets/animations/404.json'
 import tiledBackground from 'assets/img/notFoundTiledBackround.png'
 import { useRecord, make } from 'common/store/analytics/actions'
-import NavContext, {
-  CenterPreset,
-  RightPreset
-} from 'components/nav/mobile/NavContext'
 import Page from 'components/page/Page'
 import { useIsMobile } from 'hooks/useIsMobile'
 
@@ -37,16 +33,6 @@ export const NotFoundPage = () => {
   useEffect(() => {
     record(make(Name.NOT_FOUND_PAGE, {}))
   }, [record])
-
-  const navContext = useContext(NavContext)!
-  useEffect(() => {
-    if (isMobile) {
-      const { setLeft, setCenter, setRight } = navContext
-      setLeft(null)
-      setRight(RightPreset.KEBAB)
-      setCenter(CenterPreset.LOGO)
-    }
-  }, [isMobile, navContext])
 
   return (
     <Page

@@ -1,18 +1,8 @@
 import { useCallback, useMemo } from 'react'
 
 import { useTrack } from '@audius/common/api'
-import { FavoriteType, ID, Name, Track } from '@audius/common/models'
-import {
-  favoritesUserListActions,
-  repostsUserListActions,
-  RepostType
-} from '@audius/common/store'
-import {
-  createShallowSelector,
-  formatCount,
-  route,
-  pluralize
-} from '@audius/common/utils'
+import { ID, Name, Track } from '@audius/common/models'
+import { createShallowSelector, formatCount, pluralize } from '@audius/common/utils'
 import { IconMessage, Text, Flex, IconRepost, IconHeart } from '@audius/harmony'
 import { useDispatch } from 'react-redux'
 
@@ -29,18 +19,12 @@ import {
   UserListEntityType,
   UserListType
 } from 'store/application/ui/userListModal/types'
-import { push } from 'utils/navigation'
 
 const messages = {
   favorites: 'Favorites',
   reposts: 'Reposts',
   comments: 'Comments'
 }
-
-const { REPOSTING_USERS_ROUTE, FAVORITING_USERS_ROUTE } = route
-
-const { setFavorite } = favoritesUserListActions
-const { setRepost } = repostsUserListActions
 
 type RepostsMetricProps = {
   trackId: ID
@@ -72,20 +56,15 @@ export const RepostsMetric = (props: RepostsMetricProps) => {
   const dispatch = useDispatch()
 
   const handleClick = useCallback(() => {
-    if (isMobile) {
-      dispatch(setRepost(trackId, RepostType.TRACK))
-      dispatch(push(REPOSTING_USERS_ROUTE))
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.REPOST,
-          entityType: UserListEntityType.TRACK,
-          id: trackId
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [dispatch, isMobile, trackId])
+    dispatch(
+      setUsers({
+        userListType: UserListType.REPOST,
+        entityType: UserListEntityType.TRACK,
+        id: trackId
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [dispatch, trackId])
 
   if (!repostCount || followeeReposts === undefined) return null
 
@@ -144,20 +123,15 @@ export const SavesMetric = (props: SavesMetricProps) => {
   const dispatch = useDispatch()
 
   const handleClick = useCallback(() => {
-    if (isMobile) {
-      dispatch(setFavorite(trackId, FavoriteType.TRACK))
-      dispatch(push(FAVORITING_USERS_ROUTE))
-    } else {
-      dispatch(
-        setUsers({
-          userListType: UserListType.FAVORITE,
-          entityType: UserListEntityType.TRACK,
-          id: trackId
-        })
-      )
-      dispatch(setVisibility(true))
-    }
-  }, [dispatch, isMobile, trackId])
+    dispatch(
+      setUsers({
+        userListType: UserListType.FAVORITE,
+        entityType: UserListEntityType.TRACK,
+        id: trackId
+      })
+    )
+    dispatch(setVisibility(true))
+  }, [dispatch, trackId])
 
   if (!saveCount) return null
 

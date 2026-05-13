@@ -24,9 +24,7 @@ import {
   ChatPermissionAction,
   usersSocialActions as socialActions,
   shareModalUIActions,
-  inboxUnavailableModalActions,
-  followingUserListActions,
-  followersUserListActions
+  inboxUnavailableModalActions
 } from '@audius/common/store'
 import { dayjs, getErrorMessage, route } from '@audius/common/utils'
 import { useDispatch, useSelector } from 'react-redux'
@@ -47,8 +45,6 @@ import { getPathname } from 'utils/route'
 import { parseUserRoute } from 'utils/route/userRouteParser'
 
 const { NOT_FOUND_PAGE, profilePage: profilePageRoute } = route
-const { setFollowers } = followersUserListActions
-const { setFollowing } = followingUserListActions
 const { requestOpen: requestOpenShareModal } = shareModalUIActions
 const { fetchHasTracks } = accountActions
 const { createPlaylist } = cacheCollectionsActions
@@ -553,16 +549,6 @@ export const useProfilePage = () => {
     // This is a placeholder for any additional refresh logic
   }, [])
 
-  const setFollowingUserId = useCallback(
-    (userId: ID) => dispatch(setFollowing(userId)),
-    [dispatch]
-  )
-
-  const setFollowersUserId = useCallback(
-    (userId: ID) => dispatch(setFollowers(userId)),
-    [dispatch]
-  )
-
   const onMessage = useCallback(() => {
     if (!profile) return
     if (chatPermissions?.callToAction === ChatPermissionAction.SIGN_UP) {
@@ -705,8 +691,6 @@ export const useProfilePage = () => {
     onSortByRecent,
     onSortByPopular,
     refreshProfile,
-    setFollowingUserId,
-    setFollowersUserId,
     onFollow,
     onUnfollow,
     onShare,
